@@ -1718,5 +1718,462 @@
     "Review all 16 multiple-permissive-policy findings, especially roles with multiple broad policies on candidate_credentials and candidate_sessions.",
     "Enable and verify Supabase leaked-password protection in a planned auth configuration change after review.",
     "Do not drop the 282 unused-index candidates automatically; measure representative workload and preserve indexes used for foreign keys, rare paths or future launches."
-  ]
+  ],
+  "liveDatabaseVerification": {
+    "capturedOn": "2026-11-25",
+    "method": "Read-only PostgreSQL catalog queries through Supabase execute_sql; deployed function bodies obtained with pg_get_functiondef; normalized body comparison collapses whitespace only.",
+    "functionBodyAndPrivilegeChecks": [
+      {
+        "name": "get_candidate_cao_choices",
+        "identityArguments": "p_application_id uuid",
+        "sourcePath": "db/migrations/0096_candidate_application_cao_choice_bridge.sql",
+        "sourceBranch": "ops/backup-restore-safety-current-rc-2026-10-30",
+        "sourceGitBlobSha": "d6d3766b45342fb6900c9f78a10a04efaeb7c280",
+        "sourceBodyChars": 2182,
+        "liveBodyChars": 2182,
+        "normalizedBodyMatches": true,
+        "securityDefiner": true,
+        "searchPath": "pg_catalog, public, kingsmen_security",
+        "owner": "postgres",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "anonCanExecute": false,
+        "authenticatedCanExecute": true,
+        "publicCanExecute": false,
+        "review": "Identity-verified candidate and linked-parent checks; application ownership filtering; revoke PUBLIC/anon; authenticated access intentionally granted in source."
+      },
+      {
+        "name": "list_candidate_cao_parents",
+        "identityArguments": "",
+        "sourcePath": "db/migrations/0096_candidate_application_cao_choice_bridge.sql",
+        "sourceBranch": "ops/backup-restore-safety-current-rc-2026-10-30",
+        "sourceGitBlobSha": "d6d3766b45342fb6900c9f78a10a04efaeb7c280",
+        "sourceBodyChars": 1915,
+        "liveBodyChars": 1915,
+        "normalizedBodyMatches": true,
+        "securityDefiner": true,
+        "searchPath": "pg_catalog, public, kingsmen_security",
+        "owner": "postgres",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "anonCanExecute": false,
+        "authenticatedCanExecute": true,
+        "publicCanExecute": false,
+        "review": "Identity-verified candidate linkage checks; authenticated access intentionally granted in source."
+      },
+      {
+        "name": "prepare_candidate_application_from_master_target",
+        "identityArguments": "p_target_key text",
+        "sourcePath": "db/migrations/0096_candidate_application_cao_choice_bridge.sql",
+        "sourceBranch": "ops/backup-restore-safety-current-rc-2026-10-30",
+        "sourceGitBlobSha": "d6d3766b45342fb6900c9f78a10a04efaeb7c280",
+        "sourceBodyChars": 9721,
+        "liveBodyChars": 9721,
+        "normalizedBodyMatches": true,
+        "securityDefiner": true,
+        "searchPath": "pg_catalog, public, kingsmen_security",
+        "owner": "postgres",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "anonCanExecute": false,
+        "authenticatedCanExecute": true,
+        "publicCanExecute": false,
+        "review": "Verified candidate identity; owned master-target lookup; active consent check; approved human-reviewed N15 match/fresh official source gates; creates a draft only; provider_submission_sent=false."
+      },
+      {
+        "name": "prepare_candidate_manual_portal_submission",
+        "identityArguments": "p_application_id uuid",
+        "sourcePath": "db/migrations/0092_candidate_manual_portal_handoff.sql",
+        "sourceBranch": "release/kingsmen-2026-10-25-rc1",
+        "sourceGitBlobSha": "da6c992682ea3b6ae792b7fce38cf0289e1af0d3",
+        "sourceBodyChars": 4875,
+        "liveBodyChars": 4875,
+        "normalizedBodyMatches": true,
+        "securityDefiner": true,
+        "searchPath": "pg_catalog, public, kingsmen_security",
+        "owner": "postgres",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "anonCanExecute": false,
+        "authenticatedCanExecute": true,
+        "publicCanExecute": false,
+        "review": "Verified candidate identity and owned application; official-source freshness/HTTPS gates; idempotent manual handoff; explicit provider_submission_sent=false."
+      },
+      {
+        "name": "record_candidate_application_outcome",
+        "identityArguments": "p_application_id uuid, p_evidence_ref text, p_outcome_type text, p_provider_reference text, p_summary text, p_next_step text",
+        "sourcePath": "db/migrations/0095_verified_submission_and_outcome_workflow.sql",
+        "sourceBranch": "release/kingsmen-2026-10-25-rc1",
+        "sourceGitBlobSha": "8da91c83290f8ca3ea745b587c8088ce9860dc1a",
+        "sourceBodyChars": 5553,
+        "liveBodyChars": 5553,
+        "normalizedBodyMatches": true,
+        "securityDefiner": true,
+        "searchPath": "pg_catalog, public",
+        "owner": "postgres",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "anonCanExecute": false,
+        "authenticatedCanExecute": true,
+        "publicCanExecute": false,
+        "review": "Authenticated execution additionally requires an active APPLICATION_REVIEWER or PLATFORM_ADMIN; evidence must be reviewer-verified and linked to the same application."
+      },
+      {
+        "name": "save_candidate_cao_choices",
+        "identityArguments": "p_application_id uuid, p_choices jsonb",
+        "sourcePath": "db/migrations/0096_candidate_application_cao_choice_bridge.sql",
+        "sourceBranch": "ops/backup-restore-safety-current-rc-2026-10-30",
+        "sourceGitBlobSha": "d6d3766b45342fb6900c9f78a10a04efaeb7c280",
+        "sourceBodyChars": 7559,
+        "liveBodyChars": 7559,
+        "normalizedBodyMatches": true,
+        "securityDefiner": true,
+        "searchPath": "pg_catalog, public, kingsmen_security",
+        "owner": "postgres",
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "anonCanExecute": false,
+        "authenticatedCanExecute": true,
+        "publicCanExecute": false,
+        "review": "Identity-verified candidate/parent checks; validates consent and constrained ordered choices; authenticated access intentionally granted in source."
+      }
+    ],
+    "noPolicyTablePrivilegeChecks": [
+      {
+        "table": "candidate_identity_review_audit",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "candidate_identity_review_evidence",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "candidate_identity_review_requests",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "candidate_private_document_reviews",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_command_catalog",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_command_requests",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_command_results",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_daily_briefs",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_decision_log",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_escalation_threads",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_mobile_cards",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_operator_profiles",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_ops_audit_events",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_report_sections",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_reports",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_runtime_config",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      },
+      {
+        "table": "founder_watchlist_items",
+        "rlsEnabled": true,
+        "forceRls": false,
+        "policyCount": 0,
+        "anon": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "authenticated": {
+          "select": false,
+          "insert": false,
+          "update": false,
+          "delete": false
+        },
+        "classification": "No direct anon/authenticated table privileges observed; treat as backend-only candidates and verify intended server boundary."
+      }
+    ],
+    "findings": {
+      "securityDefinerBodiesExactlyMatchCandidateHistoricalSource": 6,
+      "flaggedFunctionsWithAnonExecute": 0,
+      "flaggedFunctionsWithPublicExecute": 0,
+      "flaggedFunctionsCallableByAuthenticated": 6,
+      "noPolicyTablesWithAnonOrAuthenticatedTableGrant": 0,
+      "noPolicyTablesChecked": 17
+    },
+    "disposition": "The 6 SECURITY DEFINER advisor findings are not, by themselves, evidence of an anonymous exposure. Live ACL checks show PUBLIC and anon cannot execute them, and each deployed function body matches the reviewed historical source candidate after whitespace normalization. Authenticated execution remains allowed and requires role-specific negative E2E tests. All 17 RLS/no-policy tables deny direct anon/authenticated table privileges and are candidates for intentional backend-only classification, not for broad policy creation.",
+    "safety": {
+      "schemaChanged": false,
+      "dataChanged": false,
+      "policiesChanged": false,
+      "functionDefinitionsChanged": false,
+      "functionPrivilegesChanged": false,
+      "authSettingsChanged": false,
+      "releaseGateOpened": false
+    }
+  }
 }
