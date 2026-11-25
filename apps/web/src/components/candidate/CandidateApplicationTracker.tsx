@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Session = { url: string; anonKey: string; token: string };
@@ -59,30 +60,20 @@ type LoadResult = {
 };
 
 function readSession(): Session {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) throw new Error("Candidate application services are not configured for this deployment.");
-
-  let raw: string | null = null;
-  try {
-    const projectRef = new URL(url).hostname.split(".")[0];
-    raw = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
-  } catch {
-    throw new Error("The signed-in browser session could not be read. Sign in again.");
+  const state = getCandidateSessionState();
+  if (state.status === "not_configured") {
+    throw new Error("Candidate application services are not configured for this deployment.");
   }
-  if (!raw) throw new Error("Sign in to view your Kingsmen application tracker.");
-
-  let session: { access_token?: string; expires_at?: number };
-  try {
-    session = JSON.parse(raw) as { access_token?: string; expires_at?: number };
-  } catch {
-    throw new Error("Your browser session could not be read. Sign in again.");
+  if (state.status === "missing") {
+    throw new Error("Sign in to view your Kingsmen application tracker.");
   }
-  if (!session.access_token) throw new Error("Sign in to view your Kingsmen application tracker.");
-  if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
+  if (state.status === "expired") {
     throw new Error("Your session has expired. Sign in again.");
   }
-  return { url, anonKey, token: session.access_token };
+  if (state.status === "unreadable") {
+    throw new Error("Your browser session could not be read. Sign in again.");
+  }
+  return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 
 async function loadCandidateApplications(): Promise<LoadResult> {
