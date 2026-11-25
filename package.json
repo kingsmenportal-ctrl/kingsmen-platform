@@ -106,7 +106,8 @@
     "kingsmen:security-advisor:validate": "node scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
     "security:probe:staging:rls": "node scripts/staging/probe-live-rls-api-boundary.mjs",
     "security:test:staging:rls": "node scripts/staging/test-live-rls-api-boundary.mjs",
-    "db:preflight:candidate-draft:validate": "node scripts/staging/test-candidate-draft-runtime-preflight.mjs"
+    "db:preflight:candidate-draft:validate": "node scripts/staging/test-candidate-draft-runtime-preflight.mjs",
+    "candidate:draft:api:test": "node scripts/staging/test-candidate-application-draft-api-boundary.mjs"
   },
   "repository": {
     "type": "git",
