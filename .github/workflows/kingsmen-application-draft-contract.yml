@@ -1,6 +1,43 @@
 name: Kingsmen application draft contract
 
 on:
+  pull_request:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - apps/web/src/app/api/candidate/application-draft/route.ts
+      - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
+      - apps/web/src/lib/candidate-session.ts
+      - apps/web/src/lib/read-limited-json.ts
+      - apps/web/package.json
+      - apps/web/package-lock.json
+      - scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - scripts/validators/validate-n15-source-review-decision.mjs
+      - scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
+      - scripts/staging/test-application-draft-postgres.sql
+      - scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
+      - scripts/staging/test-application-lifecycle-postgres.sql
+      - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
+      - scripts/staging/test-n15-source-review-postgres.sql
+      - scripts/staging/test-n15-source-review-ui.mjs
+      - scripts/staging/test-free-destiny-map-preview-ui.mjs
+      - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+      - scripts/validators/validate-free-destiny-map-preview.mjs
+      - package.json
+      - scripts/staging/test-candidate-application-draft-ui.mjs
+      - scripts/staging/test-candidate-profile-ui.mjs
+      - scripts/staging/test-candidate-workbench-ui.mjs
+      - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
+      - apps/web/src/components/founder/N15SourceReviewConsole.tsx
+      - apps/web/src/app/founder/opportunity-sources/page.tsx
+      - supabase/functions/n15-source-review-decision/index.ts
+      - supabase/functions/n15-source-ingestion/index.ts
+      - .github/workflows/kingsmen-application-draft-contract.yml
   push:
     branches:
       - rebuild/kingsmen-one-foundation-2026-11-17
@@ -25,6 +62,10 @@ on:
       - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
       - scripts/staging/test-n15-source-review-postgres.sql
       - scripts/staging/test-n15-source-review-ui.mjs
+      - scripts/staging/test-free-destiny-map-preview-ui.mjs
+      - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+      - scripts/validators/validate-free-destiny-map-preview.mjs
+      - package.json
       - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-profile-ui.mjs
       - scripts/staging/test-candidate-workbench-ui.mjs
@@ -75,6 +116,8 @@ jobs:
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
       - name: Validate N15 source-review security contract
         run: node scripts/validators/validate-n15-source-review-decision.mjs
+      - name: Validate Free Destiny Map browser-local readiness preview
+        run: node scripts/validators/validate-free-destiny-map-preview.mjs
       - name: Locate disposable PostgreSQL service container
         shell: bash
         run: |
@@ -124,6 +167,9 @@ jobs:
       - name: Test saved target to parent application workbench journey
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-workbench-ui.mjs
+      - name: Test Free Destiny Map local readiness preview
+        timeout-minutes: 3
+        run: node scripts/staging/test-free-destiny-map-preview-ui.mjs
       - name: Test N15 source-review queue and decisions
         timeout-minutes: 3
         run: node scripts/staging/test-n15-source-review-ui.mjs

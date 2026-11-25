@@ -90,6 +90,8 @@ function queuePayload() {
 }
 
 const server = spawn("npm", ["run", "start"], {
+  // Start a process group so cleanup can terminate npm and its Next.js child.
+  detached: process.platform !== "win32",
   cwd: webDirectory,
   env: {
     ...process.env,
@@ -239,7 +241,7 @@ try {
   await page.getByRole("button", { name: "Run source discovery" }).click();
   await page.getByRole("status").filter({ hasText: "Source discovery completed: 0 new, 0 updated, 0 skipped" }).waitFor();
   assert.equal(discoveryCalled, true);
-  await page.getByText("n15_ci_ingestion_002").waitFor();
+  await page.getByRole("cell", { name: "n15_ci_ingestion_002", exact: true }).waitFor();
 
   const first = page.locator("article").filter({ hasText: "CI official-source candidate one" });
   await first.getByLabel("Review reason", { exact: true }).fill("The page is controlled by the declared authority.");
@@ -283,6 +285,21 @@ try {
   console.log("PASS: authorized reviewer can invoke source discovery; results remain review-only");
   console.log("PASS: unauthorized reviewer receives an error and no decision request is sent");
 } finally {
-  if (browser) await browser.close().catch(() => {});
-  server.kill("SIGTERM");
+  if (browser) {
+    await Promise.race([
+      browser.close().catch(() => {}),
+      delay(5000)
+    ]);
+  }
+  // Killing only npm may leave next-server orphaned after every assertion passes.
+  try {
+    if (process.platform !== "win32" && server.pid) process.kill(-server.pid, "SIGTERM");
+    else server.kill("SIGTERM");
+  } catch {}
+  if (server.exitCode === null) {
+    await Promise.race([
+      new Promise(resolve => server.once("exit", resolve)),
+      delay(5000)
+    ]);
+  }
 }
