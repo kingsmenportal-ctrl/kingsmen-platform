@@ -1,0 +1,2612 @@
+{
+  "schema": "kingsmen.staging-migration-body-provenance.v1",
+  "capturedOn": "2026-11-25",
+  "database": {
+    "provider": "Supabase",
+    "projectName": "kingsmen-portal-staging",
+    "projectRef": "euhubhhnumtibbyufghm",
+    "statusObserved": "ACTIVE_HEALTHY",
+    "postgresVersion": "17.11.0.003"
+  },
+  "sourceSnapshot": {
+    "path": "manifests/rebuild/kingsmen-staging-migration-provenance-2026-11-25.json",
+    "capturedOn": "2026-11-25",
+    "sourceBranch": "rebuild/kingsmen-one-foundation-2026-11-17",
+    "sourceTreeSha": "a5daeb6b11d250c2643819f051ccbb0763e2ac7a",
+    "searchedBranchCount": 8,
+    "searchedBranches": [
+      "rebuild/kingsmen-one-foundation-2026-11-17",
+      "ops/backup-restore-safety-current-rc-2026-10-30",
+      "release/kingsmen-2026-10-25-rc1",
+      "feat/candidate-application-draft-persistence-2026-11-01",
+      "feat/candidate-experience-closeout-2026-10-30",
+      "integration/payfast-sandbox-rc1-2026-10-27",
+      "integration/identity-review-ui-e2e-rc1",
+      "feat/national-institution-network-source-coverage-2026-10-31"
+    ]
+  },
+  "method": {
+    "source": "supabase_migrations.schema_migrations.statements[1]",
+    "statementCardinalityRequirement": 1,
+    "hash": "Git blob SHA-1: SHA1(UTF8('blob ' + byteLength + NUL) + UTF8(statement))",
+    "comparison": "Exact 40-character Git blob SHA comparison against current rebuild-branch and eight-branch historical SQL source inventory.",
+    "sqlQueryPath": "scripts/staging/kingsmen-staging-migration-body-provenance.sql",
+    "selectOnly": true,
+    "rawSqlBodiesIncluded": false
+  },
+  "summary": {
+    "ledgerRecords": 130,
+    "recordsWithOneStatement": 130,
+    "recordsWithOtherStatementCardinality": 0,
+    "exactBodyMatchLedgerRecords": 30,
+    "exactBodyMatchDistinctSqlBodies": 29,
+    "noExactBodyMatchLedgerRecords": 100,
+    "filenameCandidateButDifferentBody": 37,
+    "noFilenameOrBodyCandidateInSearchedBranches": 63,
+    "sourceFileReferences": 127,
+    "distinctSourceGitBlobHashes": 86
+  },
+  "safety": {
+    "readOnlyCapture": true,
+    "schemaChanged": false,
+    "dataChanged": false,
+    "migrationsApplied": false,
+    "grantsOrPoliciesChanged": false,
+    "authChanged": false,
+    "deploymentChanged": false,
+    "replayAuthorized": false,
+    "releaseGateOpened": false
+  },
+  "ledgerRecords": [
+    {
+      "version": "20261012155326",
+      "name": "n03_truth_vault_0001",
+      "statementCount": 1,
+      "statementBytes": 15611,
+      "appliedStatementGitBlobSha": "a46c8c0e4efda63bb483690767aeed370a429b21",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0001_n03_truth_vault.sql",
+          "gitBlobSha": "2ee31de554c20dbcf522f5868af411d50d74173a",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155332",
+      "name": "n04_candidate_core_0002",
+      "statementCount": 1,
+      "statementBytes": 10200,
+      "appliedStatementGitBlobSha": "b538d630eb47c4eb92a920b70aa6d8fd3366ac45",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0002_n04_candidate_core.sql",
+          "gitBlobSha": "ae02bbdd9ffce662506ed6e930786346a01e28e0",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155338",
+      "name": "n05_document_vault_0003",
+      "statementCount": 1,
+      "statementBytes": 11491,
+      "appliedStatementGitBlobSha": "77bdf37db1edd1eb7a63ecefdfedd99776c516bc",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0003_n05_document_vault.sql",
+          "gitBlobSha": "2f6efa5d4c3f6686965952bbc774d4c701e9e922",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155345",
+      "name": "n06_route_universe_0004",
+      "statementCount": 1,
+      "statementBytes": 18174,
+      "appliedStatementGitBlobSha": "e9ca35a0f54dfd09b932b95d20d16d24e5f12921",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0004_n06_route_universe.sql",
+          "gitBlobSha": "17b3a4f2880094464590d619643353a12fa3b6de",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155355",
+      "name": "n07_airtable_sync_0005",
+      "statementCount": 1,
+      "statementBytes": 7287,
+      "appliedStatementGitBlobSha": "33b810e66f43935c2a82d28fc941432570f18e82",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0005_n07_airtable_sync.sql",
+          "gitBlobSha": "689b8db53070390dfff0ce593314786325f33024",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155403",
+      "name": "n08_control_plane_0006",
+      "statementCount": 1,
+      "statementBytes": 8461,
+      "appliedStatementGitBlobSha": "927daed5b12a8b628b7d8f28bc75ec238ce6af76",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0006_n08_control_plane.sql",
+          "gitBlobSha": "e58946ac23294b58d4a1092a3c1a02591cfff8b8",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155411",
+      "name": "n09_notifications_communications_0007",
+      "statementCount": 1,
+      "statementBytes": 8995,
+      "appliedStatementGitBlobSha": "9cf90bf4de6fab9b09cb6987dfa1dcefd81def08",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0007_n09_notifications_communications.sql",
+          "gitBlobSha": "b782e056428db6c9049582d45e1cc78076857bc1",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155417",
+      "name": "n10_finance_payfast_0008",
+      "statementCount": 1,
+      "statementBytes": 10841,
+      "appliedStatementGitBlobSha": "a58eea1a0f0a582e3cf61d2892f696fb1c586363",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0008_n10_finance_payfast.sql",
+          "gitBlobSha": "7f8f6cbe1a751a8e199b5571baaaa9e0a3d82142",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155539",
+      "name": "n11_ai_decision_matching_0009",
+      "statementCount": 1,
+      "statementBytes": 12857,
+      "appliedStatementGitBlobSha": "23c5042d4886600e38e812c9b6d769eca1eaef26",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0084_n11_ai_decision_matching.sql",
+          "gitBlobSha": "a9925c15cb6d10392eec2791b1d3bbd02ee61aeb",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "CORE_ONLY_REVIEW_REQUIRED",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261012155549",
+      "name": "n12_governance_policy_0010",
+      "statementCount": 1,
+      "statementBytes": 12885,
+      "appliedStatementGitBlobSha": "9302a565b985c715c510e90a54526b6cfc7108e9",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0010_n12_governance_policy.sql",
+          "gitBlobSha": "51f68ca9dd2c28b72d154ee5223dd605d42a8f8f",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155559",
+      "name": "n13_observability_reports_incidents_0011",
+      "statementCount": 1,
+      "statementBytes": 16765,
+      "appliedStatementGitBlobSha": "72ed6e799bbbc4ca5e08ed0f0cd59dd7b8c69f5e",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0011_n13_observability_reports_incidents.sql",
+          "gitBlobSha": "63cddf2a97ef10e06fba814a23bf81eb43ea18c9",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155618",
+      "name": "n14_integrations_workflow_connectors_0012",
+      "statementCount": 1,
+      "statementBytes": 10573,
+      "appliedStatementGitBlobSha": "ec793215fd855dea64be666a1f4e7b5bed5c7aef",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0012_n14_integrations_workflow_connectors.sql",
+          "gitBlobSha": "064bd89116810efa96d2047c9055deae356bbd2b",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155627",
+      "name": "n15_opportunity_engine_0013",
+      "statementCount": 1,
+      "statementBytes": 13549,
+      "appliedStatementGitBlobSha": "461e59953f2d702b9c55a2848c75b77e58e4cda8",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0013_n15_opportunity_engine.sql",
+          "gitBlobSha": "78f84d8c2e903a37ff737fdd3b630e99082e49a7",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155636",
+      "name": "n16_orchestrator_execution_0014",
+      "statementCount": 1,
+      "statementBytes": 14842,
+      "appliedStatementGitBlobSha": "bdd80a0ada9c62f8a6a14f5ed826b1b770a9e3be",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0014_n16_orchestrator_execution.sql",
+          "gitBlobSha": "7c4220c92adae2a8a098af7a5c95e00163b32501",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155644",
+      "name": "n17_founder_command_ops_0015",
+      "statementCount": 1,
+      "statementBytes": 13009,
+      "appliedStatementGitBlobSha": "5cabebcbe4f5161218dee725b655ce63767d748b",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0015_n17_founder_command_ops.sql",
+          "gitBlobSha": "b9757ca7b99a59b625eddbbbe608135d419e9e83",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155655",
+      "name": "n18_public_website_0016",
+      "statementCount": 1,
+      "statementBytes": 13123,
+      "appliedStatementGitBlobSha": "55e50005377d5cf607c8ad27e304d13a5957c59a",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0016_n18_public_website.sql",
+          "gitBlobSha": "ebf17142016d115afc35e993b20271b6d0b9cfca",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155704",
+      "name": "n19_candidate_mobile_public_portal_0017",
+      "statementCount": 1,
+      "statementBytes": 10108,
+      "appliedStatementGitBlobSha": "bc0d8f0bb54230c27a1bb7f42b1032763adcc631",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0017_n19_candidate_mobile_public_portal.sql",
+          "gitBlobSha": "2ecfebfc94a1ffc5bc1e6d1e28d4222643f21a93",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155713",
+      "name": "n20_final_assembly_system_lock_0018",
+      "statementCount": 1,
+      "statementBytes": 9214,
+      "appliedStatementGitBlobSha": "bb869d104c1a6197b4d401637a57cd303d4ee58d",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0018_n20_final_assembly_system_lock.sql",
+          "gitBlobSha": "901af0bc08819e8561738254c1219dd6cc81a242",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261012155744",
+      "name": "rls_security_boundary_0019",
+      "statementCount": 1,
+      "statementBytes": 10079,
+      "appliedStatementGitBlobSha": "530f35fccc5d3af360a55131ad07fa7da5d96399",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0009_rls_security_boundary.sql",
+          "gitBlobSha": "1b74136123f1d37370c7cd62e941a8581f711704",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "CORE_ONLY_REVIEW_REQUIRED",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261012155914",
+      "name": "rls_helper_search_path_hardening_0020",
+      "statementCount": 1,
+      "statementBytes": 791,
+      "appliedStatementGitBlobSha": "f0c7000903ab0a414866a89912747b3afc6571b9",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261012160432",
+      "name": "foreign_key_index_hardening_0021",
+      "statementCount": 1,
+      "statementBytes": 4293,
+      "appliedStatementGitBlobSha": "99cc79aaea2e3b4f7f8a47211949396d9f4cb114",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261012173518",
+      "name": "n10_commercial_schedule_v1_0022",
+      "statementCount": 1,
+      "statementBytes": 3812,
+      "appliedStatementGitBlobSha": "a304ea1b75611145c3539a7724dd17eb6c862d4b",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015151555",
+      "name": "candidate_auth_private_storage_0023",
+      "statementCount": 1,
+      "statementBytes": 3539,
+      "appliedStatementGitBlobSha": "37a69a5d7cb87a68536c95a65770e83e401483a8",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015151630",
+      "name": "candidate_owned_application_document_reads_0024",
+      "statementCount": 1,
+      "statementBytes": 733,
+      "appliedStatementGitBlobSha": "419350b20890edbe04e673ac0a5c1525076c69db",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015152102",
+      "name": "explicit_candidate_identity_binding",
+      "statementCount": 1,
+      "statementBytes": 2089,
+      "appliedStatementGitBlobSha": "115b15471f3860f345d8dea6c2c7eb230c75ab06",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015152345",
+      "name": "require_verified_candidate_identity",
+      "statementCount": 1,
+      "statementBytes": 2362,
+      "appliedStatementGitBlobSha": "609d1f15cd2d1430878433c8cc2c7bf25750fd0f",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015152529",
+      "name": "candidate_portal_durable_state",
+      "statementCount": 1,
+      "statementBytes": 2266,
+      "appliedStatementGitBlobSha": "248a476059ea81a7fb3b0a9ea6c7b3e8e9d0fbaa",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015152933",
+      "name": "harden_candidate_document_storage",
+      "statementCount": 1,
+      "statementBytes": 1340,
+      "appliedStatementGitBlobSha": "75929e6d13876376088a4e65f445abca074544fd",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015153626",
+      "name": "revoke_anon_candidate_data_access_0029",
+      "statementCount": 1,
+      "statementBytes": 973,
+      "appliedStatementGitBlobSha": "aff33a174499ac8c9555ce10226655aac5108946",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261015153651",
+      "name": "revoke_unneeded_candidate_mutations_0030",
+      "statementCount": 1,
+      "statementBytes": 897,
+      "appliedStatementGitBlobSha": "73c4f3c6c0511a18b795534acb04c07beccc164e",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017062557",
+      "name": "n11_payfast_provider_idempotency_0036",
+      "statementCount": 1,
+      "statementBytes": 1224,
+      "appliedStatementGitBlobSha": "1238aa0460b3a47c1fe73474897d1ce489a18194",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017062602",
+      "name": "n11_payfast_retryable_rejected_itn_0037",
+      "statementCount": 1,
+      "statementBytes": 842,
+      "appliedStatementGitBlobSha": "e709698240152e5432be43fc31af3e8a10ad303b",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017062700",
+      "name": "candidate_sessions_0038_legacy_compatible",
+      "statementCount": 1,
+      "statementBytes": 4890,
+      "appliedStatementGitBlobSha": "9edac6561412a930313a2800680033e99c6838e0",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017062706",
+      "name": "candidate_credentials_0039",
+      "statementCount": 1,
+      "statementBytes": 1957,
+      "appliedStatementGitBlobSha": "4f045cb79be539cea9f053332c12ce26a6885997",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017062711",
+      "name": "candidate_auth_identity_link_0040",
+      "statementCount": 1,
+      "statementBytes": 1918,
+      "appliedStatementGitBlobSha": "3bc2c8cbefabf902c4a965a984730d1f94c42378",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017082458",
+      "name": "kingsmen_ecosystem_marketplace_0041",
+      "statementCount": 1,
+      "statementBytes": 7191,
+      "appliedStatementGitBlobSha": "24cde2a260fa5503153c2efb6de7b818f0494fca",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017082554",
+      "name": "public_verified_opportunity_read_0042",
+      "statementCount": 1,
+      "statementBytes": 1194,
+      "appliedStatementGitBlobSha": "daf44b87b6e8cc6a3a3a07dec12db0a2c7344742",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017082751",
+      "name": "marketplace_rls_performance_hardening_0043",
+      "statementCount": 1,
+      "statementBytes": 1313,
+      "appliedStatementGitBlobSha": "923e9819fbcfae48ad0796720c33a17e8a840711",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017083209",
+      "name": "candidate_saved_routes_0044",
+      "statementCount": 1,
+      "statementBytes": 2367,
+      "appliedStatementGitBlobSha": "8dcf29fd29d992e29f1163c46256fbe786d377f7",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017083300",
+      "name": "partner_pending_listing_intake_0045",
+      "statementCount": 1,
+      "statementBytes": 662,
+      "appliedStatementGitBlobSha": "90515fe902e57e1d6363565fb8685d7d0914bfb4",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0045_partner_pending_listing_intake.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0045_partner_pending_listing_intake.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0045_partner_pending_listing_intake.sql",
+          "gitBlobSha": "90515fe902e57e1d6363565fb8685d7d0914bfb4",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083446",
+      "name": "candidate_saved_routes_fk_index_0046",
+      "statementCount": 1,
+      "statementBytes": 117,
+      "appliedStatementGitBlobSha": "846e1f60bbe43d9635608e5b458293871e745f86",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0046_candidate_saved_routes_fk_index.sql",
+          "gitBlobSha": "2ab802d988000c04b923dfbde849ee4e0d35c7a0",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083509",
+      "name": "candidate_route_application_tracker_0047",
+      "statementCount": 1,
+      "statementBytes": 4585,
+      "appliedStatementGitBlobSha": "8f7b6d0ad1dd2fdacee936576a92de5a3b974006",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0047_candidate_route_application_tracker.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0047_candidate_route_application_tracker.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0047_candidate_route_application_tracker.sql",
+          "gitBlobSha": "8f7b6d0ad1dd2fdacee936576a92de5a3b974006",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083558",
+      "name": "candidate_route_application_unique_sources_0048",
+      "statementCount": 1,
+      "statementBytes": 384,
+      "appliedStatementGitBlobSha": "c19dd37833fc6a8cb1e5306c80606f071dbf2850",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0048_candidate_route_application_unique_sources.sql",
+          "gitBlobSha": "d517f5558b02c35faab38418c8ce014c4eca9f3b",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083615",
+      "name": "candidate_application_source_integrity_0049",
+      "statementCount": 1,
+      "statementBytes": 1466,
+      "appliedStatementGitBlobSha": "2cc725966e563e2e221a3b1ea13a3adf35c78087",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0049_candidate_application_source_integrity.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0049_candidate_application_source_integrity.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0049_candidate_application_source_integrity.sql",
+          "gitBlobSha": "2cc725966e563e2e221a3b1ea13a3adf35c78087",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083818",
+      "name": "marketplace_reviewer_queue_0050",
+      "statementCount": 1,
+      "statementBytes": 1908,
+      "appliedStatementGitBlobSha": "ee88f23d78451a774ac226ca79ab803cf89aea7a",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0050_marketplace_reviewer_queue.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0050_marketplace_reviewer_queue.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0050_marketplace_reviewer_queue.sql",
+          "gitBlobSha": "ee88f23d78451a774ac226ca79ab803cf89aea7a",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083832",
+      "name": "published_listing_organisation_guard_0051",
+      "statementCount": 1,
+      "statementBytes": 1155,
+      "appliedStatementGitBlobSha": "5a2b2aa8eb5b93ed33920a7e5ab59c0048d64c74",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0051_published_listing_organisation_guard.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0051_published_listing_organisation_guard.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0051_published_listing_organisation_guard.sql",
+          "gitBlobSha": "5a2b2aa8eb5b93ed33920a7e5ab59c0048d64c74",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017083909",
+      "name": "marketplace_review_audit_fields_0052",
+      "statementCount": 1,
+      "statementBytes": 357,
+      "appliedStatementGitBlobSha": "b8b33f8520b6570b59eb1bb4502a9d457f91139d",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0052_marketplace_review_audit_fields.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0052_marketplace_review_audit_fields.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0052_marketplace_review_audit_fields.sql",
+          "gitBlobSha": "b8b33f8520b6570b59eb1bb4502a9d457f91139d",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017084005",
+      "name": "marketplace_select_policy_consolidation_0053",
+      "statementCount": 1,
+      "statementBytes": 1055,
+      "appliedStatementGitBlobSha": "df0cd18d60037f2da6107d0082dbaba349e73a6c",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0053_marketplace_select_policy_consolidation.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0053_marketplace_select_policy_consolidation.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0053_marketplace_select_policy_consolidation.sql",
+          "gitBlobSha": "df0cd18d60037f2da6107d0082dbaba349e73a6c",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017084021",
+      "name": "marketplace_public_authenticated_select_split_0054",
+      "statementCount": 1,
+      "statementBytes": 872,
+      "appliedStatementGitBlobSha": "16ca893cbf3acf83166f9085fc3646ae239af705",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0054_marketplace_public_authenticated_select_split.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0054_marketplace_public_authenticated_select_split.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0054_marketplace_public_authenticated_select_split.sql",
+          "gitBlobSha": "16ca893cbf3acf83166f9085fc3646ae239af705",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017084048",
+      "name": "saved_partner_listings_verified_only_0055",
+      "statementCount": 1,
+      "statementBytes": 567,
+      "appliedStatementGitBlobSha": "a77a40791db0307e8a05115471dd4c9f21abd966",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0055_saved_partner_listings_verified_only.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0055_saved_partner_listings_verified_only.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0055_saved_partner_listings_verified_only.sql",
+          "gitBlobSha": "a77a40791db0307e8a05115471dd4c9f21abd966",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261017084704",
+      "name": "marketplace_review_event_audit_0056",
+      "statementCount": 1,
+      "statementBytes": 4615,
+      "appliedStatementGitBlobSha": "062c32da6908a8b5457f429b8d9443d9859d597e",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017085001",
+      "name": "marketplace_https_url_constraints_0057",
+      "statementCount": 1,
+      "statementBytes": 3311,
+      "appliedStatementGitBlobSha": "20846783d24983a54459e77a6f31702b986e2dbb",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017085438",
+      "name": "marketplace_public_dns_url_constraints_0058",
+      "statementCount": 1,
+      "statementBytes": 1091,
+      "appliedStatementGitBlobSha": "4e16a26b81d4177ef350cc2a833d43cf5babfd0a",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017155008",
+      "name": "0060_n06_application_pathway_runtime",
+      "statementCount": 1,
+      "statementBytes": 6378,
+      "appliedStatementGitBlobSha": "a25d6ba71f96086b467f164643159d0778099146",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017155013",
+      "name": "0061_n07_provider_review_operations",
+      "statementCount": 1,
+      "statementBytes": 6523,
+      "appliedStatementGitBlobSha": "3d3e02338b0f932727c9bf0d3580d86b4939804f",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017155018",
+      "name": "0062_n08_outcomes_progression",
+      "statementCount": 1,
+      "statementBytes": 6722,
+      "appliedStatementGitBlobSha": "0410a929113b2a9e787cfbbc7bdbdff23df34461",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017155024",
+      "name": "0063_n09_communications_follow_up",
+      "statementCount": 1,
+      "statementBytes": 9294,
+      "appliedStatementGitBlobSha": "bb50367000236e79fa427af04490f93fd3e843d0",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017155029",
+      "name": "0064_n10_packages_payments_refunds",
+      "statementCount": 1,
+      "statementBytes": 6789,
+      "appliedStatementGitBlobSha": "fc170614d49fc1f994b4d926bd4d3f2b56890d13",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017155618",
+      "name": "n10_finance_privilege_hardening",
+      "statementCount": 1,
+      "statementBytes": 1353,
+      "appliedStatementGitBlobSha": "16654f26c3f9bf1cb1e688bc197194b3c2bde45b",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017160630",
+      "name": "n10_atomic_payfast_payment_confirmation",
+      "statementCount": 1,
+      "statementBytes": 4037,
+      "appliedStatementGitBlobSha": "33a1ff09af51c0c15fe76e35e371800c4cbd1ec3",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017160636",
+      "name": "n10_payfast_refund_reconciliation",
+      "statementCount": 1,
+      "statementBytes": 8625,
+      "appliedStatementGitBlobSha": "d3e21aa69a9ca3b1ca451560d82b64bb34aafaa3",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017160641",
+      "name": "n10_atomic_finance_workflows",
+      "statementCount": 1,
+      "statementBytes": 14448,
+      "appliedStatementGitBlobSha": "31afb39e91c9a14d96c13bab871fbcd0c5569bc6",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017160751",
+      "name": "n10_finance_rpc_only_writes",
+      "statementCount": 1,
+      "statementBytes": 2797,
+      "appliedStatementGitBlobSha": "5675dd4857f27c1eebbbf5d7d362c034937689db",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261017174940",
+      "name": "n03_truth_vault_0002_rls_hardening",
+      "statementCount": 1,
+      "statementBytes": 3321,
+      "appliedStatementGitBlobSha": "e45f613b087b2a5e0da5c8d418183cffea104ba5",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019065555",
+      "name": "staging_rls_search_path_hardening_0072",
+      "statementCount": 1,
+      "statementBytes": 1709,
+      "appliedStatementGitBlobSha": "f7453e40164c31f0259814537df78e3cd4435b7b",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0072_staging_rls_search_path_hardening.sql",
+          "gitBlobSha": "f951457803823bdcbd6f5d2268d825574a2ba196",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261019082917",
+      "name": "n06_application_privilege_hardening_0073",
+      "statementCount": 1,
+      "statementBytes": 834,
+      "appliedStatementGitBlobSha": "f5b3bccde5623f2f83167e1cf212236ff50f78a8",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019095926",
+      "name": "candidate_workspace_persistence_v1",
+      "statementCount": 1,
+      "statementBytes": 4512,
+      "appliedStatementGitBlobSha": "6381b3090e690f24176ab25d6b723749c9f85230",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019101601",
+      "name": "candidate_identity_review_requests_v1",
+      "statementCount": 1,
+      "statementBytes": 2057,
+      "appliedStatementGitBlobSha": "3b6e03952fc31f2a38de7a2564c790fb771be1a8",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112437",
+      "name": "candidate_identity_review_decision_workflow_0076",
+      "statementCount": 1,
+      "statementBytes": 8047,
+      "appliedStatementGitBlobSha": "560f4fcdf43ad3da09c221e8157a32781aec7ad7",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112445",
+      "name": "candidate_application_tracker_0077",
+      "statementCount": 1,
+      "statementBytes": 5780,
+      "appliedStatementGitBlobSha": "cc497c66237518285aeac8e7149ac5ad152fab25",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112452",
+      "name": "candidate_application_preparation_readiness_0078",
+      "statementCount": 1,
+      "statementBytes": 6648,
+      "appliedStatementGitBlobSha": "6f3512d330b99206bad7859318dcaf9fdb461c59",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112511",
+      "name": "candidate_application_preparation_readiness_0078",
+      "statementCount": 1,
+      "statementBytes": 6983,
+      "appliedStatementGitBlobSha": "9fdabdde36c981ae305e57df589c168471b7d974",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112516",
+      "name": "candidate_private_document_vault_0079",
+      "statementCount": 1,
+      "statementBytes": 5041,
+      "appliedStatementGitBlobSha": "304c0f400cb3830d16882902986b7f757eeb48db",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112521",
+      "name": "authorised_candidate_document_review_0080",
+      "statementCount": 1,
+      "statementBytes": 4218,
+      "appliedStatementGitBlobSha": "54986fec5d05a1309f400c1e6abf1da4dd1e8425",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019112627",
+      "name": "candidate_document_preparation_detach_and_fk_indexes_0081",
+      "statementCount": 1,
+      "statementBytes": 1922,
+      "appliedStatementGitBlobSha": "5713c8821777223349b882e4e9e20af63fac3256",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261019122713",
+      "name": "fk_index_hardening_0082",
+      "statementCount": 1,
+      "statementBytes": 5333,
+      "appliedStatementGitBlobSha": "d773302e65339597d63c2642896af1c13a911f32",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0082_fk_index_hardening.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0082_fk_index_hardening.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0082_fk_index_hardening.sql",
+          "gitBlobSha": "d773302e65339597d63c2642896af1c13a911f32",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261020031028",
+      "name": "n12_candidate_private_document_review",
+      "statementCount": 1,
+      "statementBytes": 4480,
+      "appliedStatementGitBlobSha": "6ef74c13893a044392d89aa5cf6aa7719cfadf1a",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261022030303",
+      "name": "reviewer_audit_tables_backend_only",
+      "statementCount": 1,
+      "statementBytes": 710,
+      "appliedStatementGitBlobSha": "b7634f6f32d0b047cdc4325e03e0a1980702f33d",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022030303_reviewer_audit_tables_backend_only.sql",
+          "gitBlobSha": "ae1e1c3230b2fd953093d0dedf916ab7bea88c7d",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022031206",
+      "name": "move_candidate_identity_helper_to_private_schema",
+      "statementCount": 1,
+      "statementBytes": 968,
+      "appliedStatementGitBlobSha": "76087639f9b4acf6accbd198cc8ba691c1008de8",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022031206_move_candidate_identity_helper_to_private_schema.sql",
+          "gitBlobSha": "e0297a7861c2381f35f4e3c52458cad9f5b7c4ba",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022042942",
+      "name": "candidate_identity_review_submission_rpc",
+      "statementCount": 1,
+      "statementBytes": 2491,
+      "appliedStatementGitBlobSha": "6eb0f8197ed6a0e46a4c47582c204c81b47f2e2e",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022042942_candidate_identity_review_submission_rpc.sql",
+          "gitBlobSha": "b9381853ee75a971594c6edabdb1563facf1e4e7",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022043212",
+      "name": "serialize_candidate_identity_review_submissions",
+      "statementCount": 1,
+      "statementBytes": 2561,
+      "appliedStatementGitBlobSha": "6eafd0842ba60ed5ab05fc2beaa29a375b0984f7",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022050000_serialize_candidate_identity_review_submissions.sql",
+          "gitBlobSha": "6f53510a41192cc8e31c89a649bf392cc7bf0407",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022183219",
+      "name": "revoke_client_candidate_identity_link_table_access",
+      "statementCount": 1,
+      "statementBytes": 466,
+      "appliedStatementGitBlobSha": "58e683b15aa2c2c507c8e6bbd6c76e3698e1e076",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022183219_revoke_client_candidate_identity_link_table_access.sql",
+          "gitBlobSha": "d7eb5abd546d893ddd20c2b3c1fdfb1afcfd51e3",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022184513",
+      "name": "identity_review_server_side_submission_route",
+      "statementCount": 1,
+      "statementBytes": 3256,
+      "appliedStatementGitBlobSha": "b6d12d4618b3d4e7c18f6ce26fd68b0a2505591b",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022184513_identity_review_server_side_submission_route.sql",
+          "gitBlobSha": "232bb290644c96b95fd078b42b9374e9df0e3f91",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022184626",
+      "name": "identity_review_submission_audit_schema_compat",
+      "statementCount": 1,
+      "statementBytes": 2917,
+      "appliedStatementGitBlobSha": "c1dbaed43c1c90b032e596f6bc4cd2cd8344941b",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261022184626_identity_review_submission_audit_schema_compat.sql",
+          "gitBlobSha": "fb300f77805217786aab36d2fd709c74e37bfcfd",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261022194413",
+      "name": "expand_sa_official_source_catalog",
+      "statementCount": 1,
+      "statementBytes": 4014,
+      "appliedStatementGitBlobSha": "1bd21bed14e7bbc5f1d482beb948843307fa7e14",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261022202953",
+      "name": "n09_communications_backend_only",
+      "statementCount": 1,
+      "statementBytes": 4081,
+      "appliedStatementGitBlobSha": "991459940a4c3f0d24e78d3183b7e4c455370f34",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023040341",
+      "name": "cross_module_application_outcome_truth_guards",
+      "statementCount": 1,
+      "statementBytes": 5490,
+      "appliedStatementGitBlobSha": "7e9ad6c5f0641f57200fc953af3eecaa8cc9cca5",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023132336",
+      "name": "revoke_client_execute_application_outcome_guard_functions",
+      "statementCount": 1,
+      "statementBytes": 695,
+      "appliedStatementGitBlobSha": "65be42678f2722726a2477edaa76d9621629fdcd",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023133631",
+      "name": "20261023170000_application_linked_private_document_evidence",
+      "statementCount": 1,
+      "statementBytes": 4960,
+      "appliedStatementGitBlobSha": "e74a9332f0d67a51f08b4d58e56924305588492f",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023135605",
+      "name": "20261023180000_seed_verified_labour_vacancies",
+      "statementCount": 1,
+      "statementBytes": 4455,
+      "appliedStatementGitBlobSha": "66079bd74132b924e3996b31dac5b9ea845bee8c",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023142155",
+      "name": "20261023190000_route_availability_expiry_guards",
+      "statementCount": 1,
+      "statementBytes": 1744,
+      "appliedStatementGitBlobSha": "753bbb8a9feb874c8690b6cb1bdb6593a0af38ca",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023142549",
+      "name": "20261023200000_route_availability_sa_timezone",
+      "statementCount": 1,
+      "statementBytes": 1839,
+      "appliedStatementGitBlobSha": "2eb3dda6b0575afcc0876aec2ae0101f85cbcbcb",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023144551",
+      "name": "n15_current_verified_opportunity_feed",
+      "statementCount": 1,
+      "statementBytes": 1674,
+      "appliedStatementGitBlobSha": "ef5a484ef05e52b7b59ed5d7436b4c043e6bf2eb",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023145002",
+      "name": "n15_public_safe_opportunity_feed",
+      "statementCount": 1,
+      "statementBytes": 1695,
+      "appliedStatementGitBlobSha": "699b3d9dbd620ff30f311c7016c6ab4077bf42ce",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023145908",
+      "name": "n05_document_application_owner_index",
+      "statementCount": 1,
+      "statementBytes": 382,
+      "appliedStatementGitBlobSha": "b919a6e166f60b6b1630f12005112cfb2ffbafef",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023152823",
+      "name": "n11_ai_evidence_and_review_guards",
+      "statementCount": 1,
+      "statementBytes": 3037,
+      "appliedStatementGitBlobSha": "599fdde4ca0a5e4555df0a70552ecc2ec083adb7",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261023160910",
+      "name": "n15_source_authority_registry_bridge_0085",
+      "statementCount": 1,
+      "statementBytes": 2450,
+      "appliedStatementGitBlobSha": "3780904c743e829462e343e4c28e4d1cbb83c39f",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0085_n15_source_authority_registry_bridge.sql",
+          "gitBlobSha": "ffe3ee8a761fd37e6ffb517a27a09f1f647ce39e",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261023161234",
+      "name": "n15_live_ingestion_candidate_feed_0086",
+      "statementCount": 1,
+      "statementBytes": 1622,
+      "appliedStatementGitBlobSha": "efa81eab3fe945880906d4d86f7599b3f07ba6f3",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0086_n15_live_ingestion_candidate_feed.sql",
+          "sourceKind": "current_rebuild_branch",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17"
+          ]
+        },
+        {
+          "path": "db/migrations/0086_n15_live_ingestion_candidate_feed.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0086_n15_live_ingestion_candidate_feed.sql",
+          "gitBlobSha": "efa81eab3fe945880906d4d86f7599b3f07ba6f3",
+          "candidateType": "current_branch_normalized_name"
+        }
+      ],
+      "originalCurrentNameMatchType": "NORMALIZED_EXACT",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261023164135",
+      "name": "0020_n07_durable_outbox_leases_retry",
+      "statementCount": 1,
+      "statementBytes": 9525,
+      "appliedStatementGitBlobSha": "b6dc1ffe7fbb81b5b7f98dcedbc66cdc57c3b814",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261025004936",
+      "name": "n16_durable_worker_recovery_202610250001",
+      "statementCount": 1,
+      "statementBytes": 16118,
+      "appliedStatementGitBlobSha": "3ccbf3827558b72e25265cb757b72b8fc3344868",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/202610250001_n16_durable_worker_recovery.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/202610250001_n16_durable_worker_recovery.sql",
+          "gitBlobSha": "3ccbf3827558b72e25265cb757b72b8fc3344868",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261025004943",
+      "name": "n16_worker_send_boundary_202610250002",
+      "statementCount": 1,
+      "statementBytes": 2131,
+      "appliedStatementGitBlobSha": "5dc910e2bb95311d6b9880362ad42e828f7e0aef",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/202610250002_n16_worker_send_boundary.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/202610250002_n16_worker_send_boundary.sql",
+          "gitBlobSha": "5dc910e2bb95311d6b9880362ad42e828f7e0aef",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261025004952",
+      "name": "n16_exhausted_lease_recovery_202610250003",
+      "statementCount": 1,
+      "statementBytes": 1907,
+      "appliedStatementGitBlobSha": "88fd7dc04a9ea5280c26048c7eec8550d3384265",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/202610250003_n16_exhausted_lease_recovery.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/202610250003_n16_exhausted_lease_recovery.sql",
+          "gitBlobSha": "88fd7dc04a9ea5280c26048c7eec8550d3384265",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261025090643",
+      "name": "n17_founder_brief_access_hardening",
+      "statementCount": 1,
+      "statementBytes": 1475,
+      "appliedStatementGitBlobSha": "69aa9fb462cf8dcf669a616ce2f2f0aef25bb63f",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261025090832",
+      "name": "n17_founder_report_access_hardening",
+      "statementCount": 1,
+      "statementBytes": 441,
+      "appliedStatementGitBlobSha": "11dc0966769c8793719cf4b3b0c81d33989a8ada",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261025101411",
+      "name": "payfast_sandbox_atomic_settlement",
+      "statementCount": 1,
+      "statementBytes": 3557,
+      "appliedStatementGitBlobSha": "2cbffc96d5478ed4f32b992ef86918dddf5b2e37",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261025103000_payfast_sandbox_atomic_settlement.sql",
+          "gitBlobSha": "89aa9cc8a73e29e16919af7a309be6fc062a6764",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "integration/payfast-sandbox-rc1-2026-10-27"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025105336",
+      "name": "identity_review_least_privilege_role",
+      "statementCount": 1,
+      "statementBytes": 6480,
+      "appliedStatementGitBlobSha": "95af6909abf3eefd4d88b7bdac4018fc5cea65f6",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "supabase/migrations/20261025120000_identity_review_least_privilege_role.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261025120000_identity_review_least_privilege_role.sql",
+          "gitBlobSha": "95af6909abf3eefd4d88b7bdac4018fc5cea65f6",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025105411",
+      "name": "identity_review_role_code_constraint",
+      "statementCount": 1,
+      "statementBytes": 491,
+      "appliedStatementGitBlobSha": "c9facc4d37b52f151f305fab82643918a401ba06",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "supabase/migrations/20261025121500_identity_review_role_code_constraint.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261025121500_identity_review_role_code_constraint.sql",
+          "gitBlobSha": "c9facc4d37b52f151f305fab82643918a401ba06",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025105520",
+      "name": "identity_review_audit_actor_role",
+      "statementCount": 1,
+      "statementBytes": 428,
+      "appliedStatementGitBlobSha": "fc7c15379f68a2f2924ca6e1a2363f1196c996f2",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261025123000_identity_review_audit_actor_role.sql",
+          "gitBlobSha": "4078a0ae5da87449cbaa77cdfb4ea3acfdc3a7b7",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025110908",
+      "name": "unified_candidate_master_application",
+      "statementCount": 1,
+      "statementBytes": 7269,
+      "appliedStatementGitBlobSha": "ad7a6a2d8405489894c7e3eee9399097183fce4e",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0087_unified_candidate_master_application.sql",
+          "gitBlobSha": "d8b3fc27843b6e2e640c35eccbd1bf0f2c74585e",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025110918",
+      "name": "unified_candidate_master_application_rpc",
+      "statementCount": 1,
+      "statementBytes": 5043,
+      "appliedStatementGitBlobSha": "d7ccc3ed617692172eb2074ce51c5035bb64a279",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0088_unified_candidate_master_application_rpc.sql",
+          "gitBlobSha": "2bddc3fceacdc05cf4e63c58f02713bc210a354c",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025111050",
+      "name": "unified_master_application_source_confidence_guard",
+      "statementCount": 1,
+      "statementBytes": 584,
+      "appliedStatementGitBlobSha": "490a9cfcdb596c6d8bba43c2851945db9e037739",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0089_unified_master_application_source_confidence_guard.sql",
+          "gitBlobSha": "811041652a31efff16628e0527408c14eb7db8fc",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025111404",
+      "name": "candidate_identity_review_private_evidence",
+      "statementCount": 1,
+      "statementBytes": 2806,
+      "appliedStatementGitBlobSha": "1c560efc3d7d6fc7221de358669a307cea5746d2",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "supabase/migrations/20261025111404_candidate_identity_review_private_evidence.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261025111404_candidate_identity_review_private_evidence.sql",
+          "gitBlobSha": "1c560efc3d7d6fc7221de358669a307cea5746d2",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025112103",
+      "name": "candidate_identity_review_followup_status",
+      "statementCount": 1,
+      "statementBytes": 2494,
+      "appliedStatementGitBlobSha": "45128375712ea98220b3cb479335e725df4da398",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "supabase/migrations/20261025112103_candidate_identity_review_followup_status.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "supabase/migrations/20261025112103_candidate_identity_review_followup_status.sql",
+          "gitBlobSha": "45128375712ea98220b3cb479335e725df4da398",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025112853",
+      "name": "master_target_to_application_lifecycle_bridge",
+      "statementCount": 1,
+      "statementBytes": 8800,
+      "appliedStatementGitBlobSha": "2a177e62e8e2991b9930da6112af6ed01ce700d5",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0090_master_target_to_application_lifecycle_bridge.sql",
+          "gitBlobSha": "2b2141403a7ee959636169a0746a73648a0b8411",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025113010",
+      "name": "master_target_pathway_consistency_guard",
+      "statementCount": 1,
+      "statementBytes": 10112,
+      "appliedStatementGitBlobSha": "23ba1362ca26820ab8639dd4abdadcde08e298a2",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0091_master_target_pathway_consistency_guard.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0091_master_target_pathway_consistency_guard.sql",
+          "gitBlobSha": "23ba1362ca26820ab8639dd4abdadcde08e298a2",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025113119",
+      "name": "candidate_manual_portal_handoff",
+      "statementCount": 1,
+      "statementBytes": 5847,
+      "appliedStatementGitBlobSha": "da6c992682ea3b6ae792b7fce38cf0289e1af0d3",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0092_candidate_manual_portal_handoff.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0092_candidate_manual_portal_handoff.sql",
+          "gitBlobSha": "da6c992682ea3b6ae792b7fce38cf0289e1af0d3",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025113510",
+      "name": "freeze_linked_master_application_targets",
+      "statementCount": 1,
+      "statementBytes": 6936,
+      "appliedStatementGitBlobSha": "b9f865b0aac961213ebe90ea473c931fe6de1e50",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0093_freeze_linked_master_application_targets.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0093_freeze_linked_master_application_targets.sql",
+          "gitBlobSha": "b9f865b0aac961213ebe90ea473c931fe6de1e50",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025113726",
+      "name": "link_reviewed_documents_to_application_evidence",
+      "statementCount": 1,
+      "statementBytes": 7562,
+      "appliedStatementGitBlobSha": "0aa1c1447818f6a4349d3f66a50898e495a2d95f",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0094_link_reviewed_documents_to_application_evidence.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0094_link_reviewed_documents_to_application_evidence.sql",
+          "gitBlobSha": "0aa1c1447818f6a4349d3f66a50898e495a2d95f",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025113938",
+      "name": "verified_submission_and_outcome_workflow",
+      "statementCount": 1,
+      "statementBytes": 15876,
+      "appliedStatementGitBlobSha": "8da91c83290f8ca3ea745b587c8088ce9860dc1a",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0095_verified_submission_and_outcome_workflow.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0095_verified_submission_and_outcome_workflow.sql",
+          "gitBlobSha": "8da91c83290f8ca3ea745b587c8088ce9860dc1a",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261025114110",
+      "name": "lock_document_review_rpc_to_service_role",
+      "statementCount": 1,
+      "statementBytes": 410,
+      "appliedStatementGitBlobSha": "19a109662ed085f8c89fc9d7d03e89468aaaa08e",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0096_lock_document_review_rpc_to_service_role.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0096_lock_document_review_rpc_to_service_role.sql",
+          "gitBlobSha": "19a109662ed085f8c89fc9d7d03e89468aaaa08e",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261029143144",
+      "name": "canonical_package_benefits_universal_accommodation_20261029",
+      "statementCount": 1,
+      "statementBytes": 5584,
+      "appliedStatementGitBlobSha": "ec757e7850fd9d5076dbf9ef115e87056c23aea0",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261029143414",
+      "name": "seed_canonical_public_package_cards_20261029",
+      "statementCount": 1,
+      "statementBytes": 3430,
+      "appliedStatementGitBlobSha": "9553ddefb0bd208bd71d512abfbe15432f437190",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261029165245",
+      "name": "0088_covering_indexes_for_live_foreign_keys",
+      "statementCount": 1,
+      "statementBytes": 1889,
+      "appliedStatementGitBlobSha": "681067481ea8658cdb2482ec03209d92ddc00fc1",
+      "bodyMatchState": "NAME_CANDIDATE_BODY_DIFFERS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0088_covering_indexes_for_live_foreign_keys.sql",
+          "gitBlobSha": "4159b312e61b402923779f6a7d58c6bdf79a43ba",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261029174204",
+      "name": "candidate_private_document_vault_workflows_0089",
+      "statementCount": 1,
+      "statementBytes": 13158,
+      "appliedStatementGitBlobSha": "d15bb50e68caa38dc78913478541bf10f134cf89",
+      "bodyMatchState": "NO_SOURCE_CANDIDATE_IN_EIGHT_BRANCH_CORPUS",
+      "exactSourceBodyMatches": [],
+      "filenameCandidates": [],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE"
+    },
+    {
+      "version": "20261029180233",
+      "name": "atomic_payfast_checkout_bundle_0092",
+      "statementCount": 1,
+      "statementBytes": 12694,
+      "appliedStatementGitBlobSha": "3295afefaac833b849e6dcc78fbf2b85f4434dce",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0092_atomic_payfast_checkout_bundle.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0092_atomic_payfast_checkout_bundle.sql",
+          "gitBlobSha": "3295afefaac833b849e6dcc78fbf2b85f4434dce",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261029180243",
+      "name": "remove_duplicate_identity_review_open_request_index_0091",
+      "statementCount": 1,
+      "statementBytes": 2012,
+      "appliedStatementGitBlobSha": "3d8c5f92eca1a69bd2a479943a8c392ad31832c3",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0091_remove_duplicate_identity_review_open_request_index.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0091_remove_duplicate_identity_review_open_request_index.sql",
+          "gitBlobSha": "3d8c5f92eca1a69bd2a479943a8c392ad31832c3",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261029180632",
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "statementCount": 1,
+      "statementBytes": 6455,
+      "appliedStatementGitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+          "gitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261029180642",
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "statementCount": 1,
+      "statementBytes": 6455,
+      "appliedStatementGitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+          "gitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT"
+    },
+    {
+      "version": "20261029181155",
+      "name": "harden_payfast_checkout_identity_locks_0094",
+      "statementCount": 1,
+      "statementBytes": 13059,
+      "appliedStatementGitBlobSha": "09c2a457da9b14829979b204ac4114742238d975",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0094_harden_payfast_checkout_identity_locks.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0094_harden_payfast_checkout_identity_locks.sql",
+          "gitBlobSha": "09c2a457da9b14829979b204ac4114742238d975",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    },
+    {
+      "version": "20261029193124",
+      "name": "candidate_self_service_profile_bootstrap_0095",
+      "statementCount": 1,
+      "statementBytes": 6200,
+      "appliedStatementGitBlobSha": "030b11e43143b1dce3dc39ef89fa149d0246f6b9",
+      "bodyMatchState": "EXACT_SOURCE_BODY_MATCH",
+      "exactSourceBodyMatches": [
+        {
+          "path": "db/migrations/0095_candidate_self_service_profile_bootstrap.sql",
+          "sourceKind": "historical_branch_sweep",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "filenameCandidates": [
+        {
+          "path": "db/migrations/0095_candidate_self_service_profile_bootstrap.sql",
+          "gitBlobSha": "030b11e43143b1dce3dc39ef89fa149d0246f6b9",
+          "candidateType": "historical_core_sequence_name",
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ],
+      "originalCurrentNameMatchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "originalHistoricalNameMatchType": "CORE_AND_SEQUENCE_MATCH"
+    }
+  ]
+}
