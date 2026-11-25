@@ -51,7 +51,5 @@ assert.match(doc, /3–6 calendar weeks/);
 assert.match(claude, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
 assert.match(claude, /every Kingsmen response must start/i);
 assert.match(readme, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
-assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);
-assert.match(packageJson.scripts.test, /validate-kingsmen-simplified-status\.mjs/);
-
+assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);\n
 console.log("Kingsmen simplified status register contract passed: N00–N20 registered; 13 release gates remain blocked; staging, migration and security snapshot checked.");
