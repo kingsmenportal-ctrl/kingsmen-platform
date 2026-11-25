@@ -24,7 +24,7 @@ The historical sweep covers eight relevant current/historical feature/release br
 | Ledger records with a historical core-only candidate | 27 | Candidate source name with missing/different sequence |
 | Ledger records with no source-name candidate in the historical sweep | 63 | Requires recovery from commits/deployment evidence or direct schema provenance |
 | Duplicate names in the live ledger | 2 | Two names each recorded at two versions |
-| Exact deployed SQL-body-to-ledger provenance proven by this audit | 0 | Filename matching is not body/deployment proof |
+| Exact SQL-body matches against the searched Git source corpus | 30 ledger rows / 29 distinct bodies | Byte-for-byte Git blob SHA matches; 100 ledger rows still have no exact body match in the eight-branch corpus |
 
 **Interpretation:** the original 96-record gap was scoped to the selected rebuild branch only. The broader history sweep found source-name candidates for 67 of the 130 ledger records; it did not prove that those candidate SQL bodies are exactly the SQL that ran in staging. The remaining 63 live records have no candidate by filename/core-name among the eight branches scanned. None of these figures authorizes migration replay.
 
@@ -50,6 +50,33 @@ Two migration names appear more than once in the live ledger:
 
 These duplicates are audit findings, not on their own proof of a failed database. Inspect exact version, historical commit, source body and recorded deployment context before building a canonical lineage map.
 
+## Body-level comparison added on 25 November 2026 (read-only)
+
+The migration ledger's `supabase_migrations.schema_migrations.statements` column contains the SQL statement recorded for each applied migration. A follow-up SELECT-only query confirmed that all **130 of 130** ledger rows have exactly one stored statement. The full SQL text was not copied into the repository; only byte lengths and Git object fingerprints are retained in the body-provenance evidence manifest.
+
+The query computed a standard Git blob SHA-1 for each recorded statement:
+
+```text
+SHA1(UTF8("blob " + byte_length + NUL) + UTF8(statement))
+```
+
+Those hashes were compared with the current rebuild-branch migration files and the 86 path/hash entries from the eight-branch historical sweep (127 source references; 86 distinct Git blob hashes).
+
+| Body comparison result | Count | Interpretation |
+|---|---:|---|
+| Exact byte-for-byte source-body matches | **30 ledger rows / 29 distinct SQL bodies** | The stored applied statement is byte-identical to at least one tracked Git source blob |
+| Filename candidate exists, but the body differs | **37** | Names are not sufficient; the candidate file is not the exact SQL body in the ledger |
+| No filename or exact-body candidate in the eight searched branches | **63** | Requires older commit, backup/deployment or schema evidence |
+| Total without an exact body match | **100 of 130** | Still unresolved; not proof that source is permanently lost |
+
+The two duplicate ledger records for `seed_verified_labour_vacancy_deadlines_0093` contain the same exact SQL body, which is why 30 matching ledger rows represent 29 distinct bodies. Duplicate ledger names still require their version/deployment context to be reconciled separately.
+
+**What this proves:** for 30 records, the SQL bytes retained in the live migration ledger match a source Git blob exactly. This is materially stronger than a filename or sequence match.
+
+**What this does not prove:** the exact deployment commit, reviewer approval, intended branch adoption, schema compatibility, or authorization to replay. The other 100 records remain unresolved within the searched source corpus. Continue searching historical commits and approved backup/deployment records. Do not repair the ledger or replay migrations on the basis of these hashes.
+
+Reproducible SQL query: `scripts/staging/kingsmen-staging-migration-body-provenance.sql`. Hash-only capture: `manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json`.
+
 ## Current-branch source-only migrations
 
 The following files are tracked on the selected rebuild branch but do not have a matching name in the live staging ledger:
@@ -73,7 +100,7 @@ The snapshot uses:
 3. Normalized filename-core and sequence comparison to identify candidate source names.
 4. Duplicate-name and source-only inventory checks.
 
-The tool did **not** retrieve or compare the exact SQL body stored/executed by Supabase for every ledger record. A Git blob SHA proves the identity of a tracked source file, not that this file was applied. Current schema state can help corroborate a candidate but should not substitute for deployment history.
+The initial filename-only snapshot did not compare stored SQL bodies. The follow-up body-level capture now retrieves the one stored statement per ledger row and compares its Git blob SHA against the searched source corpus. Thirty exact byte-for-byte matches were found; a Git blob SHA match proves the statement body is identical to a tracked source file, but the source branch/commit deployment context and approval still need corroboration. One hundred ledger records remain without an exact body match in the eight branches searched.
 
 ## Safe resolution sequence
 
