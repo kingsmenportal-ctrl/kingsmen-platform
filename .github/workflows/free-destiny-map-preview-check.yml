@@ -1,0 +1,92 @@
+name: Free Destiny Map Preview Check
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/web/src/app/free-destiny-map/page.tsx"
+      - "scripts/staging/test-free-destiny-map-local-preview.mjs"
+      - "scripts/staging/e2e-free-destiny-map-preview.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - ".github/workflows/free-destiny-map-preview-check.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/src/app/free-destiny-map/page.tsx"
+      - "scripts/staging/test-free-destiny-map-local-preview.mjs"
+      - "scripts/staging/e2e-free-destiny-map-preview.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - ".github/workflows/free-destiny-map-preview-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: free-destiny-map-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Route preview, browser E2E and web build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/web/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run Kingsmen regression suite
+        run: npm test
+
+      - name: Install web dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+
+      - name: Install Chromium for browser test
+        run: npx playwright install --with-deps chromium
+
+      - name: Build the Next.js web application
+        run: npm run build --prefix apps/web
+
+      - name: Run production-preview browser E2E
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start --prefix apps/web > /tmp/kingsmen-next.log 2>&1 &
+          server_pid=$!
+          cleanup() {
+            kill "$server_pid" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:3000/free-destiny-map/ >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/kingsmen-next.log
+            echo "Next.js production server did not become ready."
+            exit 1
+          fi
+          npm run test:e2e:free-destiny-map-preview
