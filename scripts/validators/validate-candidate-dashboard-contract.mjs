@@ -23,15 +23,18 @@ const expectedRoutes = [
   "/candidate/opportunity-matches",
   "/candidate/saved-opportunities",
   "/candidate/documents",
-  "/personal-job-desk/application-tracker"
+  "/candidate/applications"
 ];
 
 for (const route of expectedRoutes) {
   assert.ok(source.includes(route), `Missing dashboard route: ${route}`);
 }
 
+assert.ok(!source.includes("/personal-job-desk/application-tracker"),
+  "Dashboard must route candidates through the canonical applications index, not the legacy tracker.");
+
 assert.match(source, /Provider receipt and outcomes require provider-origin evidence/);
 assert.match(source, /does not claim that a profile has been saved/);
 assert.match(source, /No admission, funding, placement, employment, or success is guaranteed/);
 
-console.log("Candidate dashboard contract passed: six pathways, five workspace routes, and evidence-bound status language.");
+console.log("Candidate dashboard contract passed: six pathways, canonical workspace routes, and evidence-bound status language.");
