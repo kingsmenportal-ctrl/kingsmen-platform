@@ -11,6 +11,7 @@ const ts = require("typescript");
 
 const statusPath = "apps/web/src/lib/candidate-application-status.ts";
 const statusSource = read(statusPath);
+const proposal = read("docs/rebuild/proposals/candidate-application-status-contract.proposal.sql");
 const transpiled = ts.transpileModule(statusSource, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext }
 });
@@ -43,6 +44,13 @@ assert.equal(statusContract.canResumeCandidateApplicationDraft("Draft", "READY_T
 assert.equal(statusContract.canResumeCandidateApplicationDraft("Action required", "READINESS_BLOCKED"), true);
 assert.equal(statusContract.canResumeCandidateApplicationDraft("Submitted to Kingsmen", "DRAFT"), false);
 assert.equal(statusContract.canResumeCandidateApplicationDraft("Draft", "SUBMITTED_CONFIRMED"), false);
+assert.ok(proposal.includes("APPLICATION_KINGSMEN_STATUS_MAPPING_REQUIRED"), "Progressed rows need explicit reviewed status mapping.");
+assert.ok(proposal.includes("SET readiness_status"), "Draft save must invalidate prior readiness.");
+assert.ok(proposal.includes("v_application.kingsmen_status NOT IN"), "Only approved candidate-facing statuses may be edited.");
+assert.ok(proposal.includes("candidate_applications_kingsmen_status_check"), "The database contract must constrain candidate-facing labels.");
+assert.ok(proposal.includes("APPLICATION_DRAFT_SAVED"), "Draft saves must retain the append-only audit event.");
+assert.ok(!proposal.includes("SET status ="), "Draft save must not rewrite the internal workflow status.");
+
 console.log("PASS: seven approved candidate-facing application statuses are exact and runtime-validated");
 console.log("PASS: unknown/internal machine states remain unavailable, not candidate-facing labels");
 console.log("PASS: draft resume requires both an editable Kingsmen status and a pre-submission workflow state");
