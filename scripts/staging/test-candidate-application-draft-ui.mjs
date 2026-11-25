@@ -93,6 +93,13 @@ try {
 
   const page = await context.newPage();
   page.setDefaultTimeout(10_000);
+  await page.addInitScript(() => {
+    window.__kingsmenConfirmMessages = [];
+    window.confirm = message => {
+      window.__kingsmenConfirmMessages.push(String(message));
+      return false;
+    };
+  });
   page.setDefaultNavigationTimeout(15_000);
   await page.route("**/functions/v1/**", async route => {
     providerRequests.push(route.request().url());
@@ -174,13 +181,11 @@ try {
   await motivation.fill("Updated motivation through the Kingsmen draft editor");
   assert.equal(await page.getByTestId("draft-save-state").textContent(),
     "Unsaved changes. Save your draft before leaving this page.");
-  let discardPromptShown = false;
-  page.once("dialog", async dialog => {
-    discardPromptShown = dialog.type === "confirm";
-    await dialog.dismiss();
-  });
   await page.getByRole("button", { name: "Reload saved draft" }).click();
-  assert.equal(discardPromptShown, true, "Reload must ask before discarding unsaved application answers.");
+  const confirmMessages = await page.evaluate(() => window.__kingsmenConfirmMessages);
+  assert.deepEqual(confirmMessages, [
+    "You have unsaved changes. Reloading will discard them. Continue?"
+  ], "Reload must ask before discarding unsaved application answers.");
   assert.equal(await motivation.inputValue(), "Updated motivation through the Kingsmen draft editor",
     "Dismissing the discard confirmation must preserve the edited answer.");
 
