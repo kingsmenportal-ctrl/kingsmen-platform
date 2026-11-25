@@ -1,25 +1,41 @@
 "use client";
 
+export type CandidateSupabaseConfig = {
+  url: string;
+  anonKey: string;
+  projectRef: string;
+  storageKey: string;
+};
+
 export type CandidateSessionState =
-  | { status: "ready"; url: string; anonKey: string; token: string }
+  | (CandidateSupabaseConfig & { status: "ready"; token: string; email: string | null })
   | { status: "not_configured" | "missing" | "expired" | "unreadable" };
 
-export function getCandidateSupabaseConfig(): { url: string; anonKey: string } | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+export function getCandidateSupabaseConfig(): CandidateSupabaseConfig | null {
+  const sourceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) return null;
+  if (!sourceUrl || !anonKey) return null;
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(sourceUrl);
     if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") return null;
-    return { url: parsed.toString().replace(/\/+$/, ""), anonKey };
+    const projectRef = parsed.hostname.split(".")[0];
+    if (!projectRef) return null;
+    const url = parsed.toString().replace(/\\/+$/, "");
+    return {
+      url,
+      anonKey,
+      projectRef,
+      storageKey: `sb-${projectRef}-auth-token`
+    };
   } catch {
     return null;
   }
 }
 
 /**
- * Read the shared Supabase browser session in one place so application screens
- * agree on configuration, missing sessions and token expiry.
+ * Read the shared candidate browser session in one place so every candidate
+ * screen agrees on project configuration, the session storage key, token
+ * validity and missing/expired/unreadable states.
  */
 export function getCandidateSessionState(): CandidateSessionState {
   const config = getCandidateSupabaseConfig();
@@ -27,9 +43,7 @@ export function getCandidateSessionState(): CandidateSessionState {
 
   let raw: string | null;
   try {
-    const projectRef = new URL(config.url).hostname.split(".")[0];
-    if (!projectRef) return { status: "not_configured" };
-    raw = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
+    raw = window.localStorage.getItem(config.storageKey);
   } catch {
     return { status: "unreadable" };
   }
@@ -50,7 +64,11 @@ export function getCandidateSessionState(): CandidateSessionState {
     return { status: "expired" };
   }
 
-  return { ...config, status: "ready", token: session.access_token };
+  const user = session.user && typeof session.user === "object"
+    ? session.user as Record<string, unknown>
+    : null;
+  const email = typeof user?.email === "string" ? user.email : null;
+  return { ...config, status: "ready", token: session.access_token, email };
 }
 
 export function getCandidateAccessToken(): string | null {
