@@ -73,6 +73,9 @@ function readSession(): Session {
   if (state.status === "unreadable") {
     throw new Error("Your browser session could not be read. Sign in again.");
   }
+  if (state.status !== "ready") {
+    throw new Error("Sign in to view your Kingsmen application tracker.");
+  }
   return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 
