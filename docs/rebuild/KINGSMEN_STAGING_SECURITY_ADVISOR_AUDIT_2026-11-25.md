@@ -18,24 +18,31 @@ This is a read-only snapshot of Supabase advisor findings. It is not a penetrati
 | Leaked-password protection disabled | 1 | WARN; authentication configuration action needed |
 | Unused index findings | 282 | INFO; not an index-removal plan |
 
-## 1. SECURITY DEFINER functions — first P0 review
+## 1. SECURITY DEFINER functions — live check completed
 
-All six listed functions are currently callable by the authenticated role through Supabase RPC and run as SECURITY DEFINER. That fact alone does not prove exploitability. For each function, review the body, fixed search_path, ownership checks (typically candidate identity mapped to auth.uid()), allowed state transitions, input bounds, audit records and exact EXECUTE grants. Verify whether calls should be browser-accessible at all or must be restricted to service role/backend.
+The live PostgreSQL catalogs were queried read-only using `pg_get_functiondef`, `pg_get_function_identity_arguments`, `prosecdef`, `proconfig`, ACL inspection and `has_function_privilege`. Each deployed function body was compared with the selected candidate source body from a historical branch after collapsing whitespace only.
 
-| Function | Arguments | Required review |
-|---|---|---|
-| get_candidate_cao_choices | p_application_id uuid | Confirm caller role, search_path, ownership/state guards, grants and audit semantics |
-| list_candidate_cao_parents | none | Confirm caller role, search_path, ownership/state guards, grants and audit semantics |
-| prepare_candidate_application_from_master_target | p_target_key text | Confirm caller role, search_path, ownership/state guards, grants and audit semantics |
-| prepare_candidate_manual_portal_submission | p_application_id uuid | Confirm caller role, search_path, ownership/state guards, grants and audit semantics |
-| record_candidate_application_outcome | p_application_id uuid, p_evidence_ref text, p_outcome_type text, p_provider_reference text, p_summary text, p_next_step text | Confirm caller role, search_path, ownership/state guards, grants and audit semantics |
-| save_candidate_cao_choices | p_application_id uuid, p_choices jsonb | Confirm caller role, search_path, ownership/state guards, grants and audit semantics |
+**Result:** all six deployed bodies match their selected historical source candidates after normalization. All six explicitly deny `EXECUTE` to `anon` and `PUBLIC`; all six allow `authenticated` and `service_role`. Five have the fixed search path `pg_catalog, public, kingsmen_security`; the outcome function has `pg_catalog, public`. The live owner is `postgres`.
 
-Recommended review sequence: inspect the current migration/function definition and deployed function signature; map every browser/API caller; run negative tests as anonymous, Candidate A, Candidate B, operator and founder; then prepare a separate migration to narrow grants or change execution semantics if evidence warrants it. Do not disable a function before callers and safe fallback are understood.
+This materially narrows the finding: the advisor warning means these functions are callable by signed-in users with definer rights; it does **not** establish anonymous access or a mismatch between the live body and reviewed historical source. The remaining P0 requirement is end-to-end negative testing with real authenticated roles and source-to-deployed grant/lineage sign-off.
+
+| Function | Historical source candidate | Body match | Anonymous/PUBLIC execute | Authenticated execute | Key body guard observed |
+|---|---|---:|---:|---:|---|
+| `get_candidate_cao_choices` | `0096_candidate_application_cao_choice_bridge.sql` | Exact after whitespace normalization | Denied | Allowed | Verified identity and owned parent application |
+| `list_candidate_cao_parents` | `0096_candidate_application_cao_choice_bridge.sql` | Exact after whitespace normalization | Denied | Allowed | Verified candidate identity/linkage; candidate-scoped results |
+| `save_candidate_cao_choices` | `0096_candidate_application_cao_choice_bridge.sql` | Exact after whitespace normalization | Denied | Allowed | Verified identity, owned draft, consent and constrained choice validation |
+| `prepare_candidate_application_from_master_target` | `0096_candidate_application_cao_choice_bridge.sql` | Exact after whitespace normalization | Denied | Allowed | Owned target, active consent, fresh official-source evidence and approved N15 match; creates draft only |
+| `prepare_candidate_manual_portal_submission` | `0092_candidate_manual_portal_handoff.sql` | Exact after whitespace normalization | Denied | Allowed | Verified identity, owned application, fresh HTTPS source; manual handoff only and `provider_submission_sent=false` |
+| `record_candidate_application_outcome` | `0095_verified_submission_and_outcome_workflow.sql` | Exact after whitespace normalization | Denied | Allowed | Requires an active `APPLICATION_REVIEWER` or `PLATFORM_ADMIN` and verified same-application evidence |
+
+The snapshot stores the candidate branch, source path, Git blob SHA, normalized body lengths, live owner, search path and ACL for every function. This confirms source-body equality and current catalog privileges; it does not replace browser/API tests for Candidate A versus Candidate B, operator versus founder, direct RPC access, or a formal migration-history review.
 
 ## 2. RLS-enabled tables with no policy
 
 The advisor reports the following 17 tables have RLS enabled but no RLS policies:
+
+A separate live privilege query checked SELECT, INSERT, UPDATE and DELETE for both `anon` and `authenticated` on all 17 tables. **All 17 deny all eight direct client-role privileges and have zero policies.** This supports classifying them as backend-only candidates, rather than adding broad client policies. The finding stays in the ledger until each table's intended access boundary and service-role usage has been documented and tested.
+
 
 - candidate_identity_review_audit
 - candidate_identity_review_evidence
