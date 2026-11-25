@@ -36,6 +36,26 @@ assert.equal(statusContract.normalizeCandidateFacingApplicationStatus(undefined)
 assert.equal(statusContract.candidateFacingApplicationStatusLabel("PROVIDER_REVIEW"), "Status not available");
 assert.equal(statusContract.candidateFacingApplicationStatusLabel("Under review"), "Under review");
 
+const expectedGuidance = {
+  "Draft": "Next step: continue your draft",
+  "Submitted to Kingsmen": "Next step: follow Kingsmen review updates",
+  "Under review": "Next step: check for a Kingsmen update",
+  "Action required": "Next step: review the required action",
+  "Prepared for provider": "Next step: verify provider submission instructions",
+  "Provider receipt confirmed": "Next step: keep the provider receipt evidence",
+  "Decision recorded": "Next step: review the recorded decision"
+};
+for (const [status, heading] of Object.entries(expectedGuidance)) {
+  assert.equal(statusContract.candidateApplicationStatusGuidance(status)?.heading, heading,
+    `Candidate guidance should exist for ${status}`);
+  assert.ok(statusContract.candidateApplicationStatusGuidance(status)?.detail.length > 20,
+    `Candidate guidance should explain the safe next step for ${status}`);
+}
+assert.equal(statusContract.candidateApplicationStatusGuidance("PROVIDER_REVIEW"), null,
+  "Unknown internal machine states must not receive an invented candidate action.");
+assert.equal(statusContract.candidateApplicationStatusGuidance(null), null,
+  "Missing status must keep the explicit unavailable-status fallback.");
+
 assert.equal(statusContract.isCandidateEditableApplicationStatus("Draft"), true);
 assert.equal(statusContract.isCandidateEditableApplicationStatus("Action required"), true);
 assert.equal(statusContract.isCandidateEditableApplicationStatus("Submitted to Kingsmen"), false);
