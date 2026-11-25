@@ -36,7 +36,22 @@
       "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
       "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
       "db/migrations/0110_n15_source_review_decision_atomicity.sql"
-    ]
+    ],
+    "historicalBranchSweep": {
+      "branchesScanned": 8,
+      "rawBranchSourceEntries": 414,
+      "uniqueSourcePathHashEntries": 86,
+      "uniqueSourcePaths": 83,
+      "ledgerRecordsWithCoreAndSequenceCandidate": 40,
+      "ledgerRecordsWithCoreOnlyCandidates": 27,
+      "ledgerRecordsWithoutHistoricalSourceNameCandidate": 63,
+      "ledgerRecordsWithMultipleDistinctSourceCandidates": 0,
+      "duplicateLedgerNames": 2,
+      "candidateSourceRecords": 67,
+      "ledgerWithoutAnyHistoricalSourceNameCandidate": 63,
+      "exactSqlBodyProvenanceMatches": 0,
+      "replayAuthorized": false
+    }
   },
   "ledgerRecords": [
     {
@@ -45,6 +60,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0001_n03_truth_vault.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0001_n03_truth_vault.sql",
+          "gitBlobSha": "2ee31de554c20dbcf522f5868af411d50d74173a",
+          "sequence": "0001",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -53,6 +87,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0002_n04_candidate_core.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0002_n04_candidate_core.sql",
+          "gitBlobSha": "ae02bbdd9ffce662506ed6e930786346a01e28e0",
+          "sequence": "0002",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -61,6 +114,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0003_n05_document_vault.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0003_n05_document_vault.sql",
+          "gitBlobSha": "2f6efa5d4c3f6686965952bbc774d4c701e9e922",
+          "sequence": "0003",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -69,6 +141,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0004_n06_route_universe.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0004_n06_route_universe.sql",
+          "gitBlobSha": "17b3a4f2880094464590d619643353a12fa3b6de",
+          "sequence": "0004",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -77,6 +168,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0005_n07_airtable_sync.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0005_n07_airtable_sync.sql",
+          "gitBlobSha": "689b8db53070390dfff0ce593314786325f33024",
+          "sequence": "0005",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -85,6 +195,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0006_n08_control_plane.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0006_n08_control_plane.sql",
+          "gitBlobSha": "e58946ac23294b58d4a1092a3c1a02591cfff8b8",
+          "sequence": "0006",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -93,6 +222,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0007_n09_notifications_communications.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0007_n09_notifications_communications.sql",
+          "gitBlobSha": "b782e056428db6c9049582d45e1cc78076857bc1",
+          "sequence": "0007",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -101,6 +249,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0008_n10_finance_payfast.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0008_n10_finance_payfast.sql",
+          "gitBlobSha": "7f8f6cbe1a751a8e199b5571baaaa9e0a3d82142",
+          "sequence": "0008",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -109,6 +276,25 @@
       "matchType": "CORE_ONLY_REVIEW_REQUIRED",
       "sourcePaths": [
         "db/migrations/0084_n11_ai_decision_matching.sql"
+      ],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0084_n11_ai_decision_matching.sql",
+          "gitBlobSha": "a9925c15cb6d10392eec2791b1d3bbd02ee61aeb",
+          "sequence": "0084",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -117,6 +303,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0010_n12_governance_policy.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0010_n12_governance_policy.sql",
+          "gitBlobSha": "51f68ca9dd2c28b72d154ee5223dd605d42a8f8f",
+          "sequence": "0010",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -125,6 +330,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0011_n13_observability_reports_incidents.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0011_n13_observability_reports_incidents.sql",
+          "gitBlobSha": "63cddf2a97ef10e06fba814a23bf81eb43ea18c9",
+          "sequence": "0011",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -133,6 +357,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0012_n14_integrations_workflow_connectors.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0012_n14_integrations_workflow_connectors.sql",
+          "gitBlobSha": "064bd89116810efa96d2047c9055deae356bbd2b",
+          "sequence": "0012",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -141,6 +384,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0013_n15_opportunity_engine.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0013_n15_opportunity_engine.sql",
+          "gitBlobSha": "78f84d8c2e903a37ff737fdd3b630e99082e49a7",
+          "sequence": "0013",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -149,6 +411,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0014_n16_orchestrator_execution.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0014_n16_orchestrator_execution.sql",
+          "gitBlobSha": "7c4220c92adae2a8a098af7a5c95e00163b32501",
+          "sequence": "0014",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -157,6 +438,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0015_n17_founder_command_ops.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0015_n17_founder_command_ops.sql",
+          "gitBlobSha": "b9757ca7b99a59b625eddbbbe608135d419e9e83",
+          "sequence": "0015",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -165,6 +465,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0016_n18_public_website.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0016_n18_public_website.sql",
+          "gitBlobSha": "ebf17142016d115afc35e993b20271b6d0b9cfca",
+          "sequence": "0016",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -173,6 +492,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0017_n19_candidate_mobile_public_portal.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0017_n19_candidate_mobile_public_portal.sql",
+          "gitBlobSha": "2ecfebfc94a1ffc5bc1e6d1e28d4222643f21a93",
+          "sequence": "0017",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -181,6 +519,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0018_n20_final_assembly_system_lock.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0018_n20_final_assembly_system_lock.sql",
+          "gitBlobSha": "901af0bc08819e8561738254c1219dd6cc81a242",
+          "sequence": "0018",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -189,127 +546,186 @@
       "matchType": "CORE_ONLY_REVIEW_REQUIRED",
       "sourcePaths": [
         "db/migrations/0009_rls_security_boundary.sql"
+      ],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0009_rls_security_boundary.sql",
+          "gitBlobSha": "1b74136123f1d37370c7cd62e941a8581f711704",
+          "sequence": "0009",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
       "version": "20261012155914",
       "name": "rls_helper_search_path_hardening_0020",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261012160432",
       "name": "foreign_key_index_hardening_0021",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261012173518",
       "name": "n10_commercial_schedule_v1_0022",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015151555",
       "name": "candidate_auth_private_storage_0023",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015151630",
       "name": "candidate_owned_application_document_reads_0024",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015152102",
       "name": "explicit_candidate_identity_binding",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015152345",
       "name": "require_verified_candidate_identity",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015152529",
       "name": "candidate_portal_durable_state",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015152933",
       "name": "harden_candidate_document_storage",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015153626",
       "name": "revoke_anon_candidate_data_access_0029",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261015153651",
       "name": "revoke_unneeded_candidate_mutations_0030",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017062557",
       "name": "n11_payfast_provider_idempotency_0036",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017062602",
       "name": "n11_payfast_retryable_rejected_itn_0037",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017062700",
       "name": "candidate_sessions_0038_legacy_compatible",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017062706",
       "name": "candidate_credentials_0039",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017062711",
       "name": "candidate_auth_identity_link_0040",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017082458",
       "name": "kingsmen_ecosystem_marketplace_0041",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017082554",
       "name": "public_verified_opportunity_read_0042",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017082751",
       "name": "marketplace_rls_performance_hardening_0043",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017083209",
       "name": "candidate_saved_routes_0044",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017083300",
@@ -317,6 +733,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0045_partner_pending_listing_intake.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0045_partner_pending_listing_intake.sql",
+          "gitBlobSha": "90515fe902e57e1d6363565fb8685d7d0914bfb4",
+          "sequence": "0045",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -325,6 +760,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0046_candidate_saved_routes_fk_index.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0046_candidate_saved_routes_fk_index.sql",
+          "gitBlobSha": "2ab802d988000c04b923dfbde849ee4e0d35c7a0",
+          "sequence": "0046",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -333,6 +787,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0047_candidate_route_application_tracker.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0047_candidate_route_application_tracker.sql",
+          "gitBlobSha": "8f7b6d0ad1dd2fdacee936576a92de5a3b974006",
+          "sequence": "0047",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -341,6 +814,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0048_candidate_route_application_unique_sources.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0048_candidate_route_application_unique_sources.sql",
+          "gitBlobSha": "d517f5558b02c35faab38418c8ce014c4eca9f3b",
+          "sequence": "0048",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -349,6 +841,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0049_candidate_application_source_integrity.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0049_candidate_application_source_integrity.sql",
+          "gitBlobSha": "2cc725966e563e2e221a3b1ea13a3adf35c78087",
+          "sequence": "0049",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -357,6 +868,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0050_marketplace_reviewer_queue.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0050_marketplace_reviewer_queue.sql",
+          "gitBlobSha": "ee88f23d78451a774ac226ca79ab803cf89aea7a",
+          "sequence": "0050",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -365,6 +895,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0051_published_listing_organisation_guard.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0051_published_listing_organisation_guard.sql",
+          "gitBlobSha": "5a2b2aa8eb5b93ed33920a7e5ab59c0048d64c74",
+          "sequence": "0051",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -373,6 +922,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0052_marketplace_review_audit_fields.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0052_marketplace_review_audit_fields.sql",
+          "gitBlobSha": "b8b33f8520b6570b59eb1bb4502a9d457f91139d",
+          "sequence": "0052",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -381,6 +949,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0053_marketplace_select_policy_consolidation.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0053_marketplace_select_policy_consolidation.sql",
+          "gitBlobSha": "df0cd18d60037f2da6107d0082dbaba349e73a6c",
+          "sequence": "0053",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -389,6 +976,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0054_marketplace_public_authenticated_select_split.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0054_marketplace_public_authenticated_select_split.sql",
+          "gitBlobSha": "16ca893cbf3acf83166f9085fc3646ae239af705",
+          "sequence": "0054",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -397,91 +1003,138 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0055_saved_partner_listings_verified_only.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0055_saved_partner_listings_verified_only.sql",
+          "gitBlobSha": "a77a40791db0307e8a05115471dd4c9f21abd966",
+          "sequence": "0055",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
       "version": "20261017084704",
       "name": "marketplace_review_event_audit_0056",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017085001",
       "name": "marketplace_https_url_constraints_0057",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017085438",
       "name": "marketplace_public_dns_url_constraints_0058",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017155008",
       "name": "0060_n06_application_pathway_runtime",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017155013",
       "name": "0061_n07_provider_review_operations",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017155018",
       "name": "0062_n08_outcomes_progression",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017155024",
       "name": "0063_n09_communications_follow_up",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017155029",
       "name": "0064_n10_packages_payments_refunds",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017155618",
       "name": "n10_finance_privilege_hardening",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017160630",
       "name": "n10_atomic_payfast_payment_confirmation",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017160636",
       "name": "n10_payfast_refund_reconciliation",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017160641",
       "name": "n10_atomic_finance_workflows",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017160751",
       "name": "n10_finance_rpc_only_writes",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261017174940",
       "name": "n03_truth_vault_0002_rls_hardening",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019065555",
@@ -489,67 +1142,106 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0072_staging_rls_search_path_hardening.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0072_staging_rls_search_path_hardening.sql",
+          "gitBlobSha": "f951457803823bdcbd6f5d2268d825574a2ba196",
+          "sequence": "0072",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
       "version": "20261019082917",
       "name": "n06_application_privilege_hardening_0073",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019095926",
       "name": "candidate_workspace_persistence_v1",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019101601",
       "name": "candidate_identity_review_requests_v1",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112437",
       "name": "candidate_identity_review_decision_workflow_0076",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112445",
       "name": "candidate_application_tracker_0077",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112452",
       "name": "candidate_application_preparation_readiness_0078",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112511",
       "name": "candidate_application_preparation_readiness_0078",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112516",
       "name": "candidate_private_document_vault_0079",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112521",
       "name": "authorised_candidate_document_review_0080",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019112627",
       "name": "candidate_document_preparation_detach_and_fk_indexes_0081",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261019122713",
@@ -557,127 +1249,270 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0082_fk_index_hardening.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0082_fk_index_hardening.sql",
+          "gitBlobSha": "d773302e65339597d63c2642896af1c13a911f32",
+          "sequence": "0082",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
       "version": "20261020031028",
       "name": "n12_candidate_private_document_review",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261022030303",
       "name": "reviewer_audit_tables_backend_only",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022030303_reviewer_audit_tables_backend_only.sql",
+          "gitBlobSha": "ae1e1c3230b2fd953093d0dedf916ab7bea88c7d",
+          "sequence": null,
+          "timestampPrefix": "20261022030303",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022031206",
       "name": "move_candidate_identity_helper_to_private_schema",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022031206_move_candidate_identity_helper_to_private_schema.sql",
+          "gitBlobSha": "e0297a7861c2381f35f4e3c52458cad9f5b7c4ba",
+          "sequence": null,
+          "timestampPrefix": "20261022031206",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022042942",
       "name": "candidate_identity_review_submission_rpc",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022042942_candidate_identity_review_submission_rpc.sql",
+          "gitBlobSha": "b9381853ee75a971594c6edabdb1563facf1e4e7",
+          "sequence": null,
+          "timestampPrefix": "20261022042942",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022043212",
       "name": "serialize_candidate_identity_review_submissions",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022050000_serialize_candidate_identity_review_submissions.sql",
+          "gitBlobSha": "6f53510a41192cc8e31c89a649bf392cc7bf0407",
+          "sequence": null,
+          "timestampPrefix": "20261022050000",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022183219",
       "name": "revoke_client_candidate_identity_link_table_access",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022183219_revoke_client_candidate_identity_link_table_access.sql",
+          "gitBlobSha": "d7eb5abd546d893ddd20c2b3c1fdfb1afcfd51e3",
+          "sequence": null,
+          "timestampPrefix": "20261022183219",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022184513",
       "name": "identity_review_server_side_submission_route",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022184513_identity_review_server_side_submission_route.sql",
+          "gitBlobSha": "232bb290644c96b95fd078b42b9374e9df0e3f91",
+          "sequence": null,
+          "timestampPrefix": "20261022184513",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022184626",
       "name": "identity_review_submission_audit_schema_compat",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261022184626_identity_review_submission_audit_schema_compat.sql",
+          "gitBlobSha": "fb300f77805217786aab36d2fd709c74e37bfcfd",
+          "sequence": null,
+          "timestampPrefix": "20261022184626",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261022194413",
       "name": "expand_sa_official_source_catalog",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261022202953",
       "name": "n09_communications_backend_only",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023040341",
       "name": "cross_module_application_outcome_truth_guards",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023132336",
       "name": "revoke_client_execute_application_outcome_guard_functions",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023133631",
       "name": "20261023170000_application_linked_private_document_evidence",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023135605",
       "name": "20261023180000_seed_verified_labour_vacancies",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023142155",
       "name": "20261023190000_route_availability_expiry_guards",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023142549",
       "name": "20261023200000_route_availability_sa_timezone",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023144551",
       "name": "n15_current_verified_opportunity_feed",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023145002",
       "name": "n15_public_safe_opportunity_feed",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023145908",
       "name": "n05_document_application_owner_index",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023152823",
       "name": "n11_ai_evidence_and_review_guards",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261023160910",
@@ -685,6 +1520,25 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0085_n15_source_authority_registry_bridge.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0085_n15_source_authority_registry_bridge.sql",
+          "gitBlobSha": "ffe3ee8a761fd37e6ffb517a27a09f1f647ce39e",
+          "sequence": "0085",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
@@ -693,199 +1547,589 @@
       "matchType": "NORMALIZED_EXACT",
       "sourcePaths": [
         "db/migrations/0086_n15_live_ingestion_candidate_feed.sql"
+      ],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0086_n15_live_ingestion_candidate_feed.sql",
+          "gitBlobSha": "efa81eab3fe945880906d4d86f7599b3f07ba6f3",
+          "sequence": "0086",
+          "timestampPrefix": null,
+          "branches": [
+            "rebuild/kingsmen-one-foundation-2026-11-17",
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "release/kingsmen-2026-10-25-rc1",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
       ]
     },
     {
       "version": "20261023164135",
       "name": "0020_n07_durable_outbox_leases_retry",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261025004936",
       "name": "n16_durable_worker_recovery_202610250001",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/202610250001_n16_durable_worker_recovery.sql",
+          "gitBlobSha": "3ccbf3827558b72e25265cb757b72b8fc3344868",
+          "sequence": "202610250001",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025004943",
       "name": "n16_worker_send_boundary_202610250002",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/202610250002_n16_worker_send_boundary.sql",
+          "gitBlobSha": "5dc910e2bb95311d6b9880362ad42e828f7e0aef",
+          "sequence": "202610250002",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025004952",
       "name": "n16_exhausted_lease_recovery_202610250003",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/202610250003_n16_exhausted_lease_recovery.sql",
+          "gitBlobSha": "88fd7dc04a9ea5280c26048c7eec8550d3384265",
+          "sequence": "202610250003",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025090643",
       "name": "n17_founder_brief_access_hardening",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261025090832",
       "name": "n17_founder_report_access_hardening",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261025101411",
       "name": "payfast_sandbox_atomic_settlement",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261025103000_payfast_sandbox_atomic_settlement.sql",
+          "gitBlobSha": "89aa9cc8a73e29e16919af7a309be6fc062a6764",
+          "sequence": null,
+          "timestampPrefix": "20261025103000",
+          "branches": [
+            "integration/payfast-sandbox-rc1-2026-10-27"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025105336",
       "name": "identity_review_least_privilege_role",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261025120000_identity_review_least_privilege_role.sql",
+          "gitBlobSha": "95af6909abf3eefd4d88b7bdac4018fc5cea65f6",
+          "sequence": null,
+          "timestampPrefix": "20261025120000",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025105411",
       "name": "identity_review_role_code_constraint",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261025121500_identity_review_role_code_constraint.sql",
+          "gitBlobSha": "c9facc4d37b52f151f305fab82643918a401ba06",
+          "sequence": null,
+          "timestampPrefix": "20261025121500",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025105520",
       "name": "identity_review_audit_actor_role",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261025123000_identity_review_audit_actor_role.sql",
+          "gitBlobSha": "4078a0ae5da87449cbaa77cdfb4ea3acfdc3a7b7",
+          "sequence": null,
+          "timestampPrefix": "20261025123000",
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025110908",
       "name": "unified_candidate_master_application",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0087_unified_candidate_master_application.sql",
+          "gitBlobSha": "d8b3fc27843b6e2e640c35eccbd1bf0f2c74585e",
+          "sequence": "0087",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025110918",
       "name": "unified_candidate_master_application_rpc",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0088_unified_candidate_master_application_rpc.sql",
+          "gitBlobSha": "2bddc3fceacdc05cf4e63c58f02713bc210a354c",
+          "sequence": "0088",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025111050",
       "name": "unified_master_application_source_confidence_guard",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0089_unified_master_application_source_confidence_guard.sql",
+          "gitBlobSha": "811041652a31efff16628e0527408c14eb7db8fc",
+          "sequence": "0089",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025111404",
       "name": "candidate_identity_review_private_evidence",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261025111404_candidate_identity_review_private_evidence.sql",
+          "gitBlobSha": "1c560efc3d7d6fc7221de358669a307cea5746d2",
+          "sequence": null,
+          "timestampPrefix": "20261025111404",
+          "branches": [
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025112103",
       "name": "candidate_identity_review_followup_status",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "supabase/migrations/20261025112103_candidate_identity_review_followup_status.sql",
+          "gitBlobSha": "45128375712ea98220b3cb479335e725df4da398",
+          "sequence": null,
+          "timestampPrefix": "20261025112103",
+          "branches": [
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025112853",
       "name": "master_target_to_application_lifecycle_bridge",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0090_master_target_to_application_lifecycle_bridge.sql",
+          "gitBlobSha": "2b2141403a7ee959636169a0746a73648a0b8411",
+          "sequence": "0090",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025113010",
       "name": "master_target_pathway_consistency_guard",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0091_master_target_pathway_consistency_guard.sql",
+          "gitBlobSha": "23ba1362ca26820ab8639dd4abdadcde08e298a2",
+          "sequence": "0091",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025113119",
       "name": "candidate_manual_portal_handoff",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0092_candidate_manual_portal_handoff.sql",
+          "gitBlobSha": "da6c992682ea3b6ae792b7fce38cf0289e1af0d3",
+          "sequence": "0092",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025113510",
       "name": "freeze_linked_master_application_targets",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0093_freeze_linked_master_application_targets.sql",
+          "gitBlobSha": "b9f865b0aac961213ebe90ea473c931fe6de1e50",
+          "sequence": "0093",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025113726",
       "name": "link_reviewed_documents_to_application_evidence",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0094_link_reviewed_documents_to_application_evidence.sql",
+          "gitBlobSha": "0aa1c1447818f6a4349d3f66a50898e495a2d95f",
+          "sequence": "0094",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025113938",
       "name": "verified_submission_and_outcome_workflow",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0095_verified_submission_and_outcome_workflow.sql",
+          "gitBlobSha": "8da91c83290f8ca3ea745b587c8088ce9860dc1a",
+          "sequence": "0095",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261025114110",
       "name": "lock_document_review_rpc_to_service_role",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0096_lock_document_review_rpc_to_service_role.sql",
+          "gitBlobSha": "19a109662ed085f8c89fc9d7d03e89468aaaa08e",
+          "sequence": "0096",
+          "timestampPrefix": null,
+          "branches": [
+            "release/kingsmen-2026-10-25-rc1",
+            "integration/payfast-sandbox-rc1-2026-10-27",
+            "integration/identity-review-ui-e2e-rc1"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029143144",
       "name": "canonical_package_benefits_universal_accommodation_20261029",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261029143414",
       "name": "seed_canonical_public_package_cards_20261029",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261029165245",
       "name": "0088_covering_indexes_for_live_foreign_keys",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0088_covering_indexes_for_live_foreign_keys.sql",
+          "gitBlobSha": "4159b312e61b402923779f6a7d58c6bdf79a43ba",
+          "sequence": "0088",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029174204",
       "name": "candidate_private_document_vault_workflows_0089",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "NO_HISTORICAL_SOURCE_NAME_CANDIDATE",
+      "historicalSourceCandidates": []
     },
     {
       "version": "20261029180233",
       "name": "atomic_payfast_checkout_bundle_0092",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0092_atomic_payfast_checkout_bundle.sql",
+          "gitBlobSha": "3295afefaac833b849e6dcc78fbf2b85f4434dce",
+          "sequence": "0092",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029180243",
       "name": "remove_duplicate_identity_review_open_request_index_0091",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0091_remove_duplicate_identity_review_open_request_index.sql",
+          "gitBlobSha": "3d8c5f92eca1a69bd2a479943a8c392ad31832c3",
+          "sequence": "0091",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029180632",
       "name": "seed_verified_labour_vacancy_deadlines_0093",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+          "gitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+          "sequence": "20261030",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029180642",
       "name": "seed_verified_labour_vacancy_deadlines_0093",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_MATCH_SEQUENCE_DIFFERENT_OR_ABSENT",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+          "gitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+          "sequence": "20261030",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029181155",
       "name": "harden_payfast_checkout_identity_locks_0094",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0094_harden_payfast_checkout_identity_locks.sql",
+          "gitBlobSha": "09c2a457da9b14829979b204ac4114742238d975",
+          "sequence": "0094",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     },
     {
       "version": "20261029193124",
       "name": "candidate_self_service_profile_bootstrap_0095",
       "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
-      "sourcePaths": []
+      "sourcePaths": [],
+      "historicalMatchType": "CORE_AND_SEQUENCE_MATCH",
+      "historicalSourceCandidates": [
+        {
+          "path": "db/migrations/0095_candidate_self_service_profile_bootstrap.sql",
+          "gitBlobSha": "030b11e43143b1dce3dc39ef89fa149d0246f6b9",
+          "sequence": "0095",
+          "timestampPrefix": null,
+          "branches": [
+            "ops/backup-restore-safety-current-rc-2026-10-30",
+            "feat/candidate-application-draft-persistence-2026-11-01",
+            "feat/candidate-experience-closeout-2026-10-30",
+            "feat/national-institution-network-source-coverage-2026-10-31"
+          ]
+        }
+      ]
     }
   ],
   "sourceFiles": [
@@ -1444,5 +2688,1431 @@
     "migrationsApplied": false,
     "releaseGateOpened": false
   },
-  "nextAction": "Reconcile every unmapped live ledger record against deployment commits and any archived source. Review duplicate names and core-only matches; produce a reviewed alias/lineage map before future schema changes."
+  "nextAction": "Review historical candidates and duplicate ledger names using migration deployment commits, branch history, schema evidence and source body hashes. The historical sweep finds candidate source names for 67/130 rows, but none is an automatic replay authorization.",
+  "historicalBranchTrees": [
+    {
+      "branch": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "treeSha": "392d7c68e662eb76ce1e07efd769e603e016adaa",
+      "migrationFiles": 41
+    },
+    {
+      "branch": "ops/backup-restore-safety-current-rc-2026-10-30",
+      "treeSha": "85e937ae43ff537765fd4b4ed36c7785e34966fd",
+      "migrationFiles": 52
+    },
+    {
+      "branch": "release/kingsmen-2026-10-25-rc1",
+      "treeSha": "edb8b857fd213fe774c90369cbb757eec341977c",
+      "migrationFiles": 57
+    },
+    {
+      "branch": "feat/candidate-application-draft-persistence-2026-11-01",
+      "treeSha": "8a36eef83e57e82113f5f47198084d0f27ddbb15",
+      "migrationFiles": 49
+    },
+    {
+      "branch": "feat/candidate-experience-closeout-2026-10-30",
+      "treeSha": "9db3d0425c4fdb21dc3867c1393682bb6ded9f40",
+      "migrationFiles": 46
+    },
+    {
+      "branch": "integration/payfast-sandbox-rc1-2026-10-27",
+      "treeSha": "1713bdfc72899059fb15bb05dc4f80b6c4e30e29",
+      "migrationFiles": 58
+    },
+    {
+      "branch": "integration/identity-review-ui-e2e-rc1",
+      "treeSha": "1cd36b730e3d704b11de47b3c4dd873781246208",
+      "migrationFiles": 60
+    },
+    {
+      "branch": "feat/national-institution-network-source-coverage-2026-10-31",
+      "treeSha": "1d8b20f26704982e803731ad959ecfb6f9d8e23b",
+      "migrationFiles": 51
+    }
+  ],
+  "historicalSourceFiles": [
+    {
+      "path": "database/migrations/000004_jarvis_postgresql_truth_vault.sql",
+      "basename": "000004_jarvis_postgresql_truth_vault",
+      "gitBlobSha": "65c28efbf8a9022f504ff834cd34fc36c5773bd8",
+      "sizeBytes": 6366,
+      "sequence": "000004",
+      "normalizedCoreName": "jarvis_postgresql_truth_vault",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0001_n03_truth_vault.sql",
+      "basename": "0001_n03_truth_vault",
+      "gitBlobSha": "2ee31de554c20dbcf522f5868af411d50d74173a",
+      "sizeBytes": 15387,
+      "sequence": "0001",
+      "normalizedCoreName": "n03_truth_vault",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0002_n04_candidate_core.sql",
+      "basename": "0002_n04_candidate_core",
+      "gitBlobSha": "ae02bbdd9ffce662506ed6e930786346a01e28e0",
+      "sizeBytes": 10072,
+      "sequence": "0002",
+      "normalizedCoreName": "n04_candidate_core",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0003_n05_document_vault.sql",
+      "basename": "0003_n05_document_vault",
+      "gitBlobSha": "2f6efa5d4c3f6686965952bbc774d4c701e9e922",
+      "sizeBytes": 11379,
+      "sequence": "0003",
+      "normalizedCoreName": "n05_document_vault",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0004_n06_route_universe.sql",
+      "basename": "0004_n06_route_universe",
+      "gitBlobSha": "17b3a4f2880094464590d619643353a12fa3b6de",
+      "sizeBytes": 17966,
+      "sequence": "0004",
+      "normalizedCoreName": "n06_route_universe",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0005_n07_airtable_sync.sql",
+      "basename": "0005_n07_airtable_sync",
+      "gitBlobSha": "689b8db53070390dfff0ce593314786325f33024",
+      "sizeBytes": 7191,
+      "sequence": "0005",
+      "normalizedCoreName": "n07_airtable_sync",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0006_n08_control_plane.sql",
+      "basename": "0006_n08_control_plane",
+      "gitBlobSha": "e58946ac23294b58d4a1092a3c1a02591cfff8b8",
+      "sizeBytes": 8301,
+      "sequence": "0006",
+      "normalizedCoreName": "n08_control_plane",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0007_n09_notifications_communications.sql",
+      "basename": "0007_n09_notifications_communications",
+      "gitBlobSha": "b782e056428db6c9049582d45e1cc78076857bc1",
+      "sizeBytes": 8835,
+      "sequence": "0007",
+      "normalizedCoreName": "n09_notifications_communications",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0008_n10_finance_payfast.sql",
+      "basename": "0008_n10_finance_payfast",
+      "gitBlobSha": "7f8f6cbe1a751a8e199b5571baaaa9e0a3d82142",
+      "sizeBytes": 10681,
+      "sequence": "0008",
+      "normalizedCoreName": "n10_finance_payfast",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0009_rls_security_boundary.sql",
+      "basename": "0009_rls_security_boundary",
+      "gitBlobSha": "1b74136123f1d37370c7cd62e941a8581f711704",
+      "sizeBytes": 8981,
+      "sequence": "0009",
+      "normalizedCoreName": "rls_security_boundary",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0010_n12_governance_policy.sql",
+      "basename": "0010_n12_governance_policy",
+      "gitBlobSha": "51f68ca9dd2c28b72d154ee5223dd605d42a8f8f",
+      "sizeBytes": 12725,
+      "sequence": "0010",
+      "normalizedCoreName": "n12_governance_policy",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0011_n13_observability_reports_incidents.sql",
+      "basename": "0011_n13_observability_reports_incidents",
+      "gitBlobSha": "63cddf2a97ef10e06fba814a23bf81eb43ea18c9",
+      "sizeBytes": 16541,
+      "sequence": "0011",
+      "normalizedCoreName": "n13_observability_reports_incidents",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0012_n14_integrations_workflow_connectors.sql",
+      "basename": "0012_n14_integrations_workflow_connectors",
+      "gitBlobSha": "064bd89116810efa96d2047c9055deae356bbd2b",
+      "sizeBytes": 10397,
+      "sequence": "0012",
+      "normalizedCoreName": "n14_integrations_workflow_connectors",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0013_n15_opportunity_engine.sql",
+      "basename": "0013_n15_opportunity_engine",
+      "gitBlobSha": "78f84d8c2e903a37ff737fdd3b630e99082e49a7",
+      "sizeBytes": 13373,
+      "sequence": "0013",
+      "normalizedCoreName": "n15_opportunity_engine",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0014_n16_orchestrator_execution.sql",
+      "basename": "0014_n16_orchestrator_execution",
+      "gitBlobSha": "7c4220c92adae2a8a098af7a5c95e00163b32501",
+      "sizeBytes": 14650,
+      "sequence": "0014",
+      "normalizedCoreName": "n16_orchestrator_execution",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0015_n17_founder_command_ops.sql",
+      "basename": "0015_n17_founder_command_ops",
+      "gitBlobSha": "b9757ca7b99a59b625eddbbbe608135d419e9e83",
+      "sizeBytes": 12833,
+      "sequence": "0015",
+      "normalizedCoreName": "n17_founder_command_ops",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0016_n18_public_website.sql",
+      "basename": "0016_n18_public_website",
+      "gitBlobSha": "ebf17142016d115afc35e993b20271b6d0b9cfca",
+      "sizeBytes": 12947,
+      "sequence": "0016",
+      "normalizedCoreName": "n18_public_website",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0017_n19_candidate_mobile_public_portal.sql",
+      "basename": "0017_n19_candidate_mobile_public_portal",
+      "gitBlobSha": "2ecfebfc94a1ffc5bc1e6d1e28d4222643f21a93",
+      "sizeBytes": 9948,
+      "sequence": "0017",
+      "normalizedCoreName": "n19_candidate_mobile_public_portal",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0018_n20_final_assembly_system_lock.sql",
+      "basename": "0018_n20_final_assembly_system_lock",
+      "gitBlobSha": "901af0bc08819e8561738254c1219dd6cc81a242",
+      "sizeBytes": 9070,
+      "sequence": "0018",
+      "normalizedCoreName": "n20_final_assembly_system_lock",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0045_partner_pending_listing_intake.sql",
+      "basename": "0045_partner_pending_listing_intake",
+      "gitBlobSha": "90515fe902e57e1d6363565fb8685d7d0914bfb4",
+      "sizeBytes": 662,
+      "sequence": "0045",
+      "normalizedCoreName": "partner_pending_listing_intake",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0046_candidate_saved_routes_fk_index.sql",
+      "basename": "0046_candidate_saved_routes_fk_index",
+      "gitBlobSha": "2ab802d988000c04b923dfbde849ee4e0d35c7a0",
+      "sizeBytes": 193,
+      "sequence": "0046",
+      "normalizedCoreName": "candidate_saved_routes_fk_index",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0047_candidate_route_application_tracker.sql",
+      "basename": "0047_candidate_route_application_tracker",
+      "gitBlobSha": "8f7b6d0ad1dd2fdacee936576a92de5a3b974006",
+      "sizeBytes": 4585,
+      "sequence": "0047",
+      "normalizedCoreName": "candidate_route_application_tracker",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0048_candidate_route_application_unique_sources.sql",
+      "basename": "0048_candidate_route_application_unique_sources",
+      "gitBlobSha": "d517f5558b02c35faab38418c8ce014c4eca9f3b",
+      "sizeBytes": 433,
+      "sequence": "0048",
+      "normalizedCoreName": "candidate_route_application_unique_sources",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0049_candidate_application_source_integrity.sql",
+      "basename": "0049_candidate_application_source_integrity",
+      "gitBlobSha": "2cc725966e563e2e221a3b1ea13a3adf35c78087",
+      "sizeBytes": 1466,
+      "sequence": "0049",
+      "normalizedCoreName": "candidate_application_source_integrity",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0050_marketplace_reviewer_queue.sql",
+      "basename": "0050_marketplace_reviewer_queue",
+      "gitBlobSha": "ee88f23d78451a774ac226ca79ab803cf89aea7a",
+      "sizeBytes": 1908,
+      "sequence": "0050",
+      "normalizedCoreName": "marketplace_reviewer_queue",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0051_published_listing_organisation_guard.sql",
+      "basename": "0051_published_listing_organisation_guard",
+      "gitBlobSha": "5a2b2aa8eb5b93ed33920a7e5ab59c0048d64c74",
+      "sizeBytes": 1155,
+      "sequence": "0051",
+      "normalizedCoreName": "published_listing_organisation_guard",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0052_marketplace_review_audit_fields.sql",
+      "basename": "0052_marketplace_review_audit_fields",
+      "gitBlobSha": "b8b33f8520b6570b59eb1bb4502a9d457f91139d",
+      "sizeBytes": 357,
+      "sequence": "0052",
+      "normalizedCoreName": "marketplace_review_audit_fields",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0053_marketplace_select_policy_consolidation.sql",
+      "basename": "0053_marketplace_select_policy_consolidation",
+      "gitBlobSha": "df0cd18d60037f2da6107d0082dbaba349e73a6c",
+      "sizeBytes": 1055,
+      "sequence": "0053",
+      "normalizedCoreName": "marketplace_select_policy_consolidation",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0054_marketplace_public_authenticated_select_split.sql",
+      "basename": "0054_marketplace_public_authenticated_select_split",
+      "gitBlobSha": "16ca893cbf3acf83166f9085fc3646ae239af705",
+      "sizeBytes": 872,
+      "sequence": "0054",
+      "normalizedCoreName": "marketplace_public_authenticated_select_split",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0055_saved_partner_listings_verified_only.sql",
+      "basename": "0055_saved_partner_listings_verified_only",
+      "gitBlobSha": "a77a40791db0307e8a05115471dd4c9f21abd966",
+      "sizeBytes": 567,
+      "sequence": "0055",
+      "normalizedCoreName": "saved_partner_listings_verified_only",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0072_staging_rls_search_path_hardening.sql",
+      "basename": "0072_staging_rls_search_path_hardening",
+      "gitBlobSha": "f951457803823bdcbd6f5d2268d825574a2ba196",
+      "sizeBytes": 2079,
+      "sequence": "0072",
+      "normalizedCoreName": "staging_rls_search_path_hardening",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0082_fk_index_hardening.sql",
+      "basename": "0082_fk_index_hardening",
+      "gitBlobSha": "d773302e65339597d63c2642896af1c13a911f32",
+      "sizeBytes": 5333,
+      "sequence": "0082",
+      "normalizedCoreName": "fk_index_hardening",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0083_retire_legacy_accommodation_checkout.sql",
+      "basename": "0083_retire_legacy_accommodation_checkout",
+      "gitBlobSha": "05e7c7808f622829bcd91def330116f23d057e60",
+      "sizeBytes": 698,
+      "sequence": "0083",
+      "normalizedCoreName": "retire_legacy_accommodation_checkout",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0084_n11_ai_decision_matching.sql",
+      "basename": "0084_n11_ai_decision_matching",
+      "gitBlobSha": "a9925c15cb6d10392eec2791b1d3bbd02ee61aeb",
+      "sizeBytes": 12697,
+      "sequence": "0084",
+      "normalizedCoreName": "n11_ai_decision_matching",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0085_n15_source_authority_registry_bridge.sql",
+      "basename": "0085_n15_source_authority_registry_bridge",
+      "gitBlobSha": "ffe3ee8a761fd37e6ffb517a27a09f1f647ce39e",
+      "sizeBytes": 2451,
+      "sequence": "0085",
+      "normalizedCoreName": "n15_source_authority_registry_bridge",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0086_n15_live_ingestion_candidate_feed.sql",
+      "basename": "0086_n15_live_ingestion_candidate_feed",
+      "gitBlobSha": "efa81eab3fe945880906d4d86f7599b3f07ba6f3",
+      "sizeBytes": 1622,
+      "sequence": "0086",
+      "normalizedCoreName": "n15_live_ingestion_candidate_feed",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+      "basename": "0107_application_capacity_entitlements_20261101",
+      "gitBlobSha": "25132f7b0b7da2981805a56331ec04fa41ef9226",
+      "sizeBytes": 28337,
+      "sequence": "20261101",
+      "normalizedCoreName": "application_capacity_entitlements",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17"
+      ]
+    },
+    {
+      "path": "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+      "basename": "0108_candidate_application_readiness_eligibility_deadline_gate_20261101",
+      "gitBlobSha": "530b8c8af9e519be442d445f8be267b17402af1d",
+      "sizeBytes": 19353,
+      "sequence": "20261101",
+      "normalizedCoreName": "candidate_application_readiness_eligibility_deadline_gate",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17"
+      ]
+    },
+    {
+      "path": "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+      "basename": "0109_candidate_application_draft_persistence_20261101",
+      "gitBlobSha": "2a8d650acebbf5c4a5ca1e5681e7ec9476f950de",
+      "sizeBytes": 17818,
+      "sequence": "20261101",
+      "normalizedCoreName": "candidate_application_draft_persistence",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17"
+      ]
+    },
+    {
+      "path": "db/migrations/0110_n15_source_review_decision_atomicity.sql",
+      "basename": "0110_n15_source_review_decision_atomicity",
+      "gitBlobSha": "a41ce80d794a618a59866a29aa981594fcd5618d",
+      "sizeBytes": 7438,
+      "sequence": "0110",
+      "normalizedCoreName": "n15_source_review_decision_atomicity",
+      "timestampPrefix": null,
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261016151400_payfast_finance_tx.sql",
+      "basename": "20261016151400_payfast_finance_tx",
+      "gitBlobSha": "0901a4e36d7bf128d451f0ed4a28e37b26d2550d",
+      "sizeBytes": 6601,
+      "sequence": null,
+      "normalizedCoreName": "payfast_finance_tx",
+      "timestampPrefix": "20261016151400",
+      "branches": [
+        "rebuild/kingsmen-one-foundation-2026-11-17",
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "release/kingsmen-2026-10-25-rc1",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0087_consolidate_redundant_rls_policies_and_index.sql",
+      "basename": "0087_consolidate_redundant_rls_policies_and_index",
+      "gitBlobSha": "658a9c6f45477565d955677ae81ecee35de6d195",
+      "sizeBytes": 4880,
+      "sequence": "0087",
+      "normalizedCoreName": "consolidate_redundant_rls_policies_and_index",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0088_covering_indexes_for_live_foreign_keys.sql",
+      "basename": "0088_covering_indexes_for_live_foreign_keys",
+      "gitBlobSha": "4159b312e61b402923779f6a7d58c6bdf79a43ba",
+      "sizeBytes": 1890,
+      "sequence": "0088",
+      "normalizedCoreName": "covering_indexes_for_live_foreign_keys",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0089_secure_candidate_private_document_vault_workflows.sql",
+      "basename": "0089_secure_candidate_private_document_vault_workflows",
+      "gitBlobSha": "aaa1777e1f8e5406b815c66e71227d15c386eeb0",
+      "sizeBytes": 13238,
+      "sequence": "0089",
+      "normalizedCoreName": "secure_candidate_private_document_vault_workflows",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0091_remove_duplicate_identity_review_open_request_index.sql",
+      "basename": "0091_remove_duplicate_identity_review_open_request_index",
+      "gitBlobSha": "3d8c5f92eca1a69bd2a479943a8c392ad31832c3",
+      "sizeBytes": 2012,
+      "sequence": "0091",
+      "normalizedCoreName": "remove_duplicate_identity_review_open_request_index",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0092_atomic_payfast_checkout_bundle.sql",
+      "basename": "0092_atomic_payfast_checkout_bundle",
+      "gitBlobSha": "3295afefaac833b849e6dcc78fbf2b85f4434dce",
+      "sizeBytes": 12694,
+      "sequence": "0092",
+      "normalizedCoreName": "atomic_payfast_checkout_bundle",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql",
+      "basename": "0093_seed_verified_labour_vacancy_deadlines_20261030",
+      "gitBlobSha": "7243c9d7456c64ba40fd0e8b379db8ecc4925bb5",
+      "sizeBytes": 6455,
+      "sequence": "20261030",
+      "normalizedCoreName": "seed_verified_labour_vacancy_deadlines",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0094_harden_payfast_checkout_identity_locks.sql",
+      "basename": "0094_harden_payfast_checkout_identity_locks",
+      "gitBlobSha": "09c2a457da9b14829979b204ac4114742238d975",
+      "sizeBytes": 13059,
+      "sequence": "0094",
+      "normalizedCoreName": "harden_payfast_checkout_identity_locks",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0095_candidate_self_service_profile_bootstrap.sql",
+      "basename": "0095_candidate_self_service_profile_bootstrap",
+      "gitBlobSha": "030b11e43143b1dce3dc39ef89fa149d0246f6b9",
+      "sizeBytes": 6200,
+      "sequence": "0095",
+      "normalizedCoreName": "candidate_self_service_profile_bootstrap",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0096_candidate_application_cao_choice_bridge.sql",
+      "basename": "0096_candidate_application_cao_choice_bridge",
+      "gitBlobSha": "d6d3766b45342fb6900c9f78a10a04efaeb7c280",
+      "sizeBytes": 28187,
+      "sequence": "0096",
+      "normalizedCoreName": "candidate_application_cao_choice_bridge",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/candidate-application-draft-persistence-2026-11-01",
+        "feat/candidate-experience-closeout-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0097_revoke_client_non_dml_privileges.sql",
+      "basename": "0097_revoke_client_non_dml_privileges",
+      "gitBlobSha": "b302a28c2950a3e135cbd11484cb2e4905c7955e",
+      "sizeBytes": 2213,
+      "sequence": "0097",
+      "normalizedCoreName": "revoke_client_non_dml_privileges",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0098_enforce_active_candidate_capacity.sql",
+      "basename": "0098_enforce_active_candidate_capacity",
+      "gitBlobSha": "196f750068b982dedcb6227a990cd60c3ffe6601",
+      "sizeBytes": 3709,
+      "sequence": "0098",
+      "normalizedCoreName": "enforce_active_candidate_capacity",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30",
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/202610250001_n16_durable_worker_recovery.sql",
+      "basename": "202610250001_n16_durable_worker_recovery",
+      "gitBlobSha": "3ccbf3827558b72e25265cb757b72b8fc3344868",
+      "sizeBytes": 16118,
+      "sequence": "202610250001",
+      "normalizedCoreName": "n16_durable_worker_recovery",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30"
+      ]
+    },
+    {
+      "path": "db/migrations/202610250002_n16_worker_send_boundary.sql",
+      "basename": "202610250002_n16_worker_send_boundary",
+      "gitBlobSha": "5dc910e2bb95311d6b9880362ad42e828f7e0aef",
+      "sizeBytes": 2131,
+      "sequence": "202610250002",
+      "normalizedCoreName": "n16_worker_send_boundary",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30"
+      ]
+    },
+    {
+      "path": "db/migrations/202610250003_n16_exhausted_lease_recovery.sql",
+      "basename": "202610250003_n16_exhausted_lease_recovery",
+      "gitBlobSha": "88fd7dc04a9ea5280c26048c7eec8550d3384265",
+      "sizeBytes": 1907,
+      "sequence": "202610250003",
+      "normalizedCoreName": "n16_exhausted_lease_recovery",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30"
+      ]
+    },
+    {
+      "path": "db/migrations/202611020001_n16_playwright_scout_worker_scope.sql",
+      "basename": "202611020001_n16_playwright_scout_worker_scope",
+      "gitBlobSha": "73120fdf4fe9744e54b32d1898f993a7e895de69",
+      "sizeBytes": 7394,
+      "sequence": "202611020001",
+      "normalizedCoreName": "n16_playwright_scout_worker_scope",
+      "timestampPrefix": null,
+      "branches": [
+        "ops/backup-restore-safety-current-rc-2026-10-30"
+      ]
+    },
+    {
+      "path": "db/migrations/0087_unified_candidate_master_application.sql",
+      "basename": "0087_unified_candidate_master_application",
+      "gitBlobSha": "d8b3fc27843b6e2e640c35eccbd1bf0f2c74585e",
+      "sizeBytes": 7515,
+      "sequence": "0087",
+      "normalizedCoreName": "unified_candidate_master_application",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0088_unified_candidate_master_application_rpc.sql",
+      "basename": "0088_unified_candidate_master_application_rpc",
+      "gitBlobSha": "2bddc3fceacdc05cf4e63c58f02713bc210a354c",
+      "sizeBytes": 5694,
+      "sequence": "0088",
+      "normalizedCoreName": "unified_candidate_master_application_rpc",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0089_unified_master_application_source_confidence_guard.sql",
+      "basename": "0089_unified_master_application_source_confidence_guard",
+      "gitBlobSha": "811041652a31efff16628e0527408c14eb7db8fc",
+      "sizeBytes": 659,
+      "sequence": "0089",
+      "normalizedCoreName": "unified_master_application_source_confidence_guard",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0090_master_target_to_application_lifecycle_bridge.sql",
+      "basename": "0090_master_target_to_application_lifecycle_bridge",
+      "gitBlobSha": "2b2141403a7ee959636169a0746a73648a0b8411",
+      "sizeBytes": 11197,
+      "sequence": "0090",
+      "normalizedCoreName": "master_target_to_application_lifecycle_bridge",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0091_master_target_pathway_consistency_guard.sql",
+      "basename": "0091_master_target_pathway_consistency_guard",
+      "gitBlobSha": "23ba1362ca26820ab8639dd4abdadcde08e298a2",
+      "sizeBytes": 10112,
+      "sequence": "0091",
+      "normalizedCoreName": "master_target_pathway_consistency_guard",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0092_candidate_manual_portal_handoff.sql",
+      "basename": "0092_candidate_manual_portal_handoff",
+      "gitBlobSha": "da6c992682ea3b6ae792b7fce38cf0289e1af0d3",
+      "sizeBytes": 5847,
+      "sequence": "0092",
+      "normalizedCoreName": "candidate_manual_portal_handoff",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0093_freeze_linked_master_application_targets.sql",
+      "basename": "0093_freeze_linked_master_application_targets",
+      "gitBlobSha": "b9f865b0aac961213ebe90ea473c931fe6de1e50",
+      "sizeBytes": 6936,
+      "sequence": "0093",
+      "normalizedCoreName": "freeze_linked_master_application_targets",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0094_link_reviewed_documents_to_application_evidence.sql",
+      "basename": "0094_link_reviewed_documents_to_application_evidence",
+      "gitBlobSha": "0aa1c1447818f6a4349d3f66a50898e495a2d95f",
+      "sizeBytes": 7562,
+      "sequence": "0094",
+      "normalizedCoreName": "link_reviewed_documents_to_application_evidence",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0095_verified_submission_and_outcome_workflow.sql",
+      "basename": "0095_verified_submission_and_outcome_workflow",
+      "gitBlobSha": "8da91c83290f8ca3ea745b587c8088ce9860dc1a",
+      "sizeBytes": 15876,
+      "sequence": "0095",
+      "normalizedCoreName": "verified_submission_and_outcome_workflow",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0096_lock_document_review_rpc_to_service_role.sql",
+      "basename": "0096_lock_document_review_rpc_to_service_role",
+      "gitBlobSha": "19a109662ed085f8c89fc9d7d03e89468aaaa08e",
+      "sizeBytes": 410,
+      "sequence": "0096",
+      "normalizedCoreName": "lock_document_review_rpc_to_service_role",
+      "timestampPrefix": null,
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022030303_reviewer_audit_tables_backend_only.sql",
+      "basename": "20261022030303_reviewer_audit_tables_backend_only",
+      "gitBlobSha": "ae1e1c3230b2fd953093d0dedf916ab7bea88c7d",
+      "sizeBytes": 944,
+      "sequence": null,
+      "normalizedCoreName": "reviewer_audit_tables_backend_only",
+      "timestampPrefix": "20261022030303",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022031206_move_candidate_identity_helper_to_private_schema.sql",
+      "basename": "20261022031206_move_candidate_identity_helper_to_private_schema",
+      "gitBlobSha": "e0297a7861c2381f35f4e3c52458cad9f5b7c4ba",
+      "sizeBytes": 969,
+      "sequence": null,
+      "normalizedCoreName": "move_candidate_identity_helper_to_private_schema",
+      "timestampPrefix": "20261022031206",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022042942_candidate_identity_review_submission_rpc.sql",
+      "basename": "20261022042942_candidate_identity_review_submission_rpc",
+      "gitBlobSha": "b9381853ee75a971594c6edabdb1563facf1e4e7",
+      "sizeBytes": 2967,
+      "sequence": null,
+      "normalizedCoreName": "candidate_identity_review_submission_rpc",
+      "timestampPrefix": "20261022042942",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022050000_serialize_candidate_identity_review_submissions.sql",
+      "basename": "20261022050000_serialize_candidate_identity_review_submissions",
+      "gitBlobSha": "6f53510a41192cc8e31c89a649bf392cc7bf0407",
+      "sizeBytes": 2950,
+      "sequence": null,
+      "normalizedCoreName": "serialize_candidate_identity_review_submissions",
+      "timestampPrefix": "20261022050000",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022183219_revoke_client_candidate_identity_link_table_access.sql",
+      "basename": "20261022183219_revoke_client_candidate_identity_link_table_access",
+      "gitBlobSha": "d7eb5abd546d893ddd20c2b3c1fdfb1afcfd51e3",
+      "sizeBytes": 669,
+      "sequence": null,
+      "normalizedCoreName": "revoke_client_candidate_identity_link_table_access",
+      "timestampPrefix": "20261022183219",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022184513_identity_review_server_side_submission_route.sql",
+      "basename": "20261022184513_identity_review_server_side_submission_route",
+      "gitBlobSha": "232bb290644c96b95fd078b42b9374e9df0e3f91",
+      "sizeBytes": 3173,
+      "sequence": null,
+      "normalizedCoreName": "identity_review_server_side_submission_route",
+      "timestampPrefix": "20261022184513",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261022184626_identity_review_submission_audit_schema_compat.sql",
+      "basename": "20261022184626_identity_review_submission_audit_schema_compat",
+      "gitBlobSha": "fb300f77805217786aab36d2fd709c74e37bfcfd",
+      "sizeBytes": 3156,
+      "sequence": null,
+      "normalizedCoreName": "identity_review_submission_audit_schema_compat",
+      "timestampPrefix": "20261022184626",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261025120000_identity_review_least_privilege_role.sql",
+      "basename": "20261025120000_identity_review_least_privilege_role",
+      "gitBlobSha": "95af6909abf3eefd4d88b7bdac4018fc5cea65f6",
+      "sizeBytes": 6480,
+      "sequence": null,
+      "normalizedCoreName": "identity_review_least_privilege_role",
+      "timestampPrefix": "20261025120000",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261025121500_identity_review_role_code_constraint.sql",
+      "basename": "20261025121500_identity_review_role_code_constraint",
+      "gitBlobSha": "c9facc4d37b52f151f305fab82643918a401ba06",
+      "sizeBytes": 491,
+      "sequence": null,
+      "normalizedCoreName": "identity_review_role_code_constraint",
+      "timestampPrefix": "20261025121500",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261025123000_identity_review_audit_actor_role.sql",
+      "basename": "20261025123000_identity_review_audit_actor_role",
+      "gitBlobSha": "4078a0ae5da87449cbaa77cdfb4ea3acfdc3a7b7",
+      "sizeBytes": 427,
+      "sequence": null,
+      "normalizedCoreName": "identity_review_audit_actor_role",
+      "timestampPrefix": "20261025123000",
+      "branches": [
+        "release/kingsmen-2026-10-25-rc1",
+        "integration/payfast-sandbox-rc1-2026-10-27",
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+      "basename": "0107_application_capacity_entitlements_20261101",
+      "gitBlobSha": "d2504595eb3b38b7d08b6ba5bb170d9ffbc73bb3",
+      "sizeBytes": 28337,
+      "sequence": "20261101",
+      "normalizedCoreName": "application_capacity_entitlements",
+      "timestampPrefix": null,
+      "branches": [
+        "feat/candidate-application-draft-persistence-2026-11-01"
+      ]
+    },
+    {
+      "path": "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+      "basename": "0108_candidate_application_readiness_eligibility_deadline_gate_20261101",
+      "gitBlobSha": "e64e82b1c5b58cdd7af4a44ffc93093540603107",
+      "sizeBytes": 18443,
+      "sequence": "20261101",
+      "normalizedCoreName": "candidate_application_readiness_eligibility_deadline_gate",
+      "timestampPrefix": null,
+      "branches": [
+        "feat/candidate-application-draft-persistence-2026-11-01"
+      ]
+    },
+    {
+      "path": "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+      "basename": "0109_candidate_application_draft_persistence_20261101",
+      "gitBlobSha": "602602cc7860ea9b456c491ddcd2c7b1d6fba8ee",
+      "sizeBytes": 17215,
+      "sequence": "20261101",
+      "normalizedCoreName": "candidate_application_draft_persistence",
+      "timestampPrefix": null,
+      "branches": [
+        "feat/candidate-application-draft-persistence-2026-11-01"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261025103000_payfast_sandbox_atomic_settlement.sql",
+      "basename": "20261025103000_payfast_sandbox_atomic_settlement",
+      "gitBlobSha": "89aa9cc8a73e29e16919af7a309be6fc062a6764",
+      "sizeBytes": 3769,
+      "sequence": null,
+      "normalizedCoreName": "payfast_sandbox_atomic_settlement",
+      "timestampPrefix": "20261025103000",
+      "branches": [
+        "integration/payfast-sandbox-rc1-2026-10-27"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261025111404_candidate_identity_review_private_evidence.sql",
+      "basename": "20261025111404_candidate_identity_review_private_evidence",
+      "gitBlobSha": "1c560efc3d7d6fc7221de358669a307cea5746d2",
+      "sizeBytes": 2806,
+      "sequence": null,
+      "normalizedCoreName": "candidate_identity_review_private_evidence",
+      "timestampPrefix": "20261025111404",
+      "branches": [
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261025112103_candidate_identity_review_followup_status.sql",
+      "basename": "20261025112103_candidate_identity_review_followup_status",
+      "gitBlobSha": "45128375712ea98220b3cb479335e725df4da398",
+      "sizeBytes": 2494,
+      "sequence": null,
+      "normalizedCoreName": "candidate_identity_review_followup_status",
+      "timestampPrefix": "20261025112103",
+      "branches": [
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261027103000_revoke_client_platform_reviewer_access.sql",
+      "basename": "20261027103000_revoke_client_platform_reviewer_access",
+      "gitBlobSha": "d81fe8b2129790ff7971132c52fefaae0fece723",
+      "sizeBytes": 660,
+      "sequence": null,
+      "normalizedCoreName": "revoke_client_platform_reviewer_access",
+      "timestampPrefix": "20261027103000",
+      "branches": [
+        "integration/identity-review-ui-e2e-rc1"
+      ]
+    },
+    {
+      "path": "db/migrations/0099_seed_dhet_public_institution_directory.sql",
+      "basename": "0099_seed_dhet_public_institution_directory",
+      "gitBlobSha": "7125c79c7079edb691ea10f49943d0815555a37c",
+      "sizeBytes": 94289,
+      "sequence": "0099",
+      "normalizedCoreName": "seed_dhet_public_institution_directory",
+      "timestampPrefix": null,
+      "branches": [
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "db/migrations/0100_seed_dhet_occupational_source_observations.sql",
+      "basename": "0100_seed_dhet_occupational_source_observations",
+      "gitBlobSha": "d161c20403022996f1f9e0c0ff9d19d35c9f964a",
+      "sizeBytes": 67497,
+      "sequence": "0100",
+      "normalizedCoreName": "seed_dhet_occupational_source_observations",
+      "timestampPrefix": null,
+      "branches": [
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    },
+    {
+      "path": "supabase/migrations/20261030150000_reconcile_cao_choice_bridge_0096_schema_drift.sql",
+      "basename": "20261030150000_reconcile_cao_choice_bridge_0096_schema_drift",
+      "gitBlobSha": "d17a1b6fa625988b8029ea66da5a75f46f206ff8",
+      "sizeBytes": 10103,
+      "sequence": null,
+      "normalizedCoreName": "reconcile_cao_choice_bridge_0096_schema_drift",
+      "timestampPrefix": "20261030150000",
+      "branches": [
+        "feat/national-institution-network-source-coverage-2026-10-31"
+      ]
+    }
+  ],
+  "historicalDuplicateLedgerNames": [
+    {
+      "name": "candidate_application_preparation_readiness_0078",
+      "versions": [
+        "20261019112452",
+        "20261019112511"
+      ]
+    },
+    {
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "versions": [
+        "20261029180632",
+        "20261029180642"
+      ]
+    }
+  ],
+  "matchingWarnings": [
+    "Current-branch matching and historical-branch matching are separate views; a file absent from the rebuild branch may exist in an old feature/release branch.",
+    "All matches are filename-derived candidates only. Matching a name and sequence does not prove the SQL body that ran in staging or its exact deployed commit.",
+    "Different parallel migration branches reuse numeric migration identifiers for different SQL bodies (including the 0087–0096 range). Never merge or replay files based on sequence number alone.",
+    "A source body may have a timestamped Supabase filename whose timestamp differs from the actual migration ledger version. It remains a semantic candidate until contents and deployment evidence are reconciled."
+  ]
 }
