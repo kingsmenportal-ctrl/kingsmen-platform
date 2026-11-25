@@ -1,7 +1,7 @@
 -- CI-only integration test for the candidate-facing status proposal.
 -- Run only against the disposable kingsmen_status_contract PostgreSQL database.
--- Integration contract for 0109 against disposable PostgreSQL 17 only.
--- Requires fixture setup and db/migrations/0109_candidate_application_draft_persistence_20261101.sql.
+-- Integration contract for the candidate-status proposal against disposable PostgreSQL 17 only.
+-- Requires lifecycle fixture bootstrap, migrations 0107/0108, and the proposal SQL.
 \set ON_ERROR_STOP on
 BEGIN;
 
