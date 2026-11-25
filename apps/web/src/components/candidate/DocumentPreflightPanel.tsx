@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -81,21 +82,23 @@ function statusText(status: string) {
   }
 }
 function readSession(): SessionConfig {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) throw new Error("Private document access is not configured for this deployment.");
-  let projectRef = "euhubhhnumtibbyufghm";
-  try { projectRef = new URL(url).hostname.split(".")[0] || projectRef; } catch {}
-  const raw = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
-  if (!raw) throw new Error("Sign in before accessing your private Document Vault.");
-  let session: { access_token?: string; expires_at?: number };
-  try { session = JSON.parse(raw) as { access_token?: string; expires_at?: number }; }
-  catch { throw new Error("Your browser session could not be read. Sign in again."); }
-  if (!session.access_token) throw new Error("Sign in before accessing your private Document Vault.");
-  if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
+  const state = getCandidateSessionState();
+  if (state.status === "not_configured") {
+    throw new Error("Private document access is not configured for this deployment.");
+  }
+  if (state.status === "missing") {
+    throw new Error("Sign in before accessing your private Document Vault.");
+  }
+  if (state.status === "expired") {
     throw new Error("Your session has expired. Sign in again to continue.");
   }
-  return { url, anonKey, token: session.access_token };
+  if (state.status === "unreadable") {
+    throw new Error("Your browser session could not be read. Sign in again.");
+  }
+  if (state.status !== "ready") {
+    throw new Error("Sign in before accessing your private Document Vault.");
+  }
+  return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 function serverError(status: number, body: ApiResponse) {
   const code = body.status || body.error || body.detail || body.message || `Request failed (HTTP ${status}).`;
