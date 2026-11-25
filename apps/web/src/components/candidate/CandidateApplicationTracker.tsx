@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { getCandidateSessionState } from "@/lib/candidate-session";
+import { canResumeCandidateApplicationDraft, candidateFacingApplicationStatusLabel, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Session = { url: string; anonKey: string; token: string };
@@ -10,6 +11,7 @@ type ParentApplication = {
   application_ref?: string | null;
   pathway_type: string;
   status: string;
+  kingsmen_status?: CandidateFacingApplicationStatus | string | null;
   readiness_status?: string | null;
   readiness_snapshot?: Record<string, unknown> | null;
   created_at?: string;
@@ -223,14 +225,14 @@ export default function CandidateApplicationTracker() {
                   <article key={application.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div><p className="text-xs font-bold uppercase tracking-[0.15em] text-amber-700">{label(application.pathway_type)}</p><h3 className="mt-2 text-lg font-bold">{application.application_ref || "Kingsmen application"}</h3></div>
-                      <span className="rounded-full border border-slate-300 px-3 py-1 text-xs font-bold">{label(application.status)}</span>
+                      <span className="rounded-full border border-slate-300 px-3 py-1 text-xs font-bold">{candidateFacingApplicationStatusLabel(application.kingsmen_status)}</span>
                     </div>
                     <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Readiness</dt><dd className="mt-1 font-semibold">{label(application.readiness_status)}</dd></div>
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Created</dt><dd className="mt-1">{formatDate(application.created_at)}</dd></div>
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Updated</dt><dd className="mt-1">{formatDate(application.updated_at)}</dd></div>
                     </dl>
-                    {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(application.status) ? (
+                    {canResumeCandidateApplicationDraft(application.kingsmen_status, application.status) ? (
                       <div className="mt-4">
                         <Link
                           href={`/candidate/applications/${application.id}`}
@@ -250,7 +252,7 @@ export default function CandidateApplicationTracker() {
                           {events.map((event, index) => (
                             <li key={event.event_type + event.created_at + index} className="border-l-2 border-amber-300 pl-3">
                               <p className="text-sm font-semibold">{label(event.event_type)}</p>
-                              <p className="mt-1 text-xs text-slate-600">{event.from_status ? label(event.from_status) + " → " : ""}{label(event.to_status)}{event.reason_code ? " · " + label(event.reason_code) : ""}</p>
+                              <p className="mt-1 text-xs text-slate-600">{event.reason_code ? "Reason: " + label(event.reason_code) : "Recorded in Kingsmen"}</p>
                               <p className="mt-1 text-xs text-slate-500">{formatDate(event.created_at)}</p>
                               {event.evidence_ref ? <p className="mt-1 break-all text-xs text-slate-500">Evidence reference: {event.evidence_ref}</p> : null}
                             </li>
