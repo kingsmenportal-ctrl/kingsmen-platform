@@ -1,0 +1,129 @@
+name: Kingsmen web dependency security audit
+
+on:
+  push:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - .github/workflows/kingsmen-web-dependency-security.yml
+      - apps/web/package.json
+      - apps/web/package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  web-dependency-security:
+    name: Patch Next.js and audit the locked web dependency tree
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out rebuild branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Upgrade within the supported Next.js 15 line and refresh Sharp
+        run: |
+          npm install --prefix apps/web --save-exact next@15.5.29
+          npm update --prefix apps/web sharp
+          npm audit fix --prefix apps/web
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          const lock = JSON.parse(fs.readFileSync("apps/web/package-lock.json", "utf8"));
+          const packages = lock.packages ?? {};
+          const next = packages["node_modules/next"]?.version;
+          const sharp = packages["node_modules/sharp"]?.version;
+          console.log("Resolved Next.js:", next);
+          console.log("Resolved Sharp:", sharp);
+          if (next !== "15.5.29") throw new Error("Expected patched Next.js 15.5.29");
+          const parts = String(sharp ?? "").split(".").map(Number);
+          if (!(parts[0] > 0 || (parts[0] === 0 && (parts[1] > 35 || (parts[1] === 35 && parts[2] >= 5))))) {
+            throw new Error("Sharp must resolve to 0.35.5 or newer in the 0.x line");
+          }
+          NODE
+      - name: Verify committed lock can install cleanly
+        run: npm ci --prefix apps/web
+      - name: Build the web application
+        run: npm run build --prefix apps/web
+      - name: Capture npm audit report and concise advisory details
+        shell: bash
+        run: |
+          set +e
+          npm audit --json --prefix apps/web > "$RUNNER_TEMP/kingsmen-npm-audit.json"
+          audit_exit=$?
+          set -e
+          node --input-type=module - "$RUNNER_TEMP/kingsmen-npm-audit.json" "$audit_exit" <<'NODE'
+          import fs from "node:fs";
+          const file = process.argv[2];
+          let audit;
+          try { audit = JSON.parse(fs.readFileSync(file, "utf8")); }
+          catch { throw new Error("npm audit did not produce valid JSON"); }
+          if (!audit.metadata?.vulnerabilities || typeof audit.metadata.vulnerabilities !== "object") throw new Error("npm audit report is missing vulnerability metadata; refusing to pass a failed or incomplete audit");
+          const counts = audit.metadata.vulnerabilities;
+          console.log("AUDIT_COUNTS", JSON.stringify(counts));
+          for (const [name, item] of Object.entries(audit.vulnerabilities ?? {})) {
+            console.log("PACKAGE", JSON.stringify({
+              name,
+              severity: item.severity,
+              isDirect: item.isDirect,
+              range: item.range,
+              fixAvailable: item.fixAvailable
+            }));
+            for (const via of item.via ?? []) {
+              if (typeof via === "object") console.log("ADVISORY", JSON.stringify({
+                package: name,
+                title: via.title,
+                url: via.url,
+                severity: via.severity,
+                range: via.range
+              }));
+            }
+          }
+          const fsCopy = fs.readFileSync(file);
+          fs.mkdirSync("security-refresh-output", { recursive: true });
+          fs.copyFileSync("apps/web/package.json", "security-refresh-output/package.json");
+          fs.copyFileSync("apps/web/package-lock.json", "security-refresh-output/package-lock.json");
+          fs.writeFileSync("security-refresh-output/npm-audit.json", fsCopy);
+          fs.writeFileSync("security-refresh-output/audit-summary.txt",
+            "npm audit exit code: " + process.argv[3] + "\ncounts: " + JSON.stringify(counts) + "\n");
+          NODE
+      - name: Upload generated lockfile and audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-web-dependency-security-refresh
+          path: security-refresh-output/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Require zero high or critical advisories
+        shell: bash
+        run: |
+          node --input-type=module - "$RUNNER_TEMP/kingsmen-npm-audit.json" <<'NODE'
+          import fs from "node:fs";
+          const audit = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+          if (!audit.metadata?.vulnerabilities || typeof audit.metadata.vulnerabilities !== "object") throw new Error("npm audit report is missing vulnerability metadata; refusing to pass a failed or incomplete audit");
+          const counts = audit.metadata.vulnerabilities;
+          const severe = (counts.high ?? 0) + (counts.critical ?? 0);
+          console.log("High + critical advisories:", severe);
+          if (severe > 0) process.exit(1);
+          NODE
+      - name: Commit the tested dependency manifest and lockfile to the rebuild branch
+        if: success()
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/package.json apps/web/package-lock.json
+          if git diff --cached --quiet; then
+            echo "The tested dependency manifest and lockfile already match the branch."
+            exit 0
+          fi
+          git commit -m "security(deps): resolve vulnerable web dependency tree"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -1,0 +1,867 @@
+{
+  "schema": "kingsmen.migration-provenance-audit.v1",
+  "capturedOn": "2026-11-25",
+  "status": "RECONCILIATION_REQUIRED",
+  "snapshotPath": "manifests/rebuild/kingsmen-staging-migration-provenance-2026-11-25.json",
+  "summary": {
+    "liveLedgerRecords": 130,
+    "trackedSourceFiles": 41,
+    "normalizedExactMatches": 32,
+    "coreOnlyCandidateMatches": 2,
+    "liveLedgerRecordsWithoutNameMatch": 96,
+    "sourceFilesWithoutLedgerMatch": 7,
+    "duplicateLedgerNames": 2,
+    "extraDuplicateRecords": 2,
+    "possiblePendingSourceMigrations": [
+      "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+      "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+      "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+      "db/migrations/0110_n15_source_review_decision_atomicity.sql"
+    ]
+  },
+  "findings": [
+    {
+      "severity": "P0",
+      "code": "MIGRATION_PROVENANCE_RECONCILIATION_REQUIRED",
+      "finding": "Current rebuild branch has 41 tracked SQL files and 96 live-ledger records without a matching source name on that branch. This current-branch gap must not be misreported as proof that all such source files are deleted."
+    },
+    {
+      "severity": "P0",
+      "code": "HISTORICAL_SOURCE_GAP",
+      "finding": "A read-only sweep of eight relevant current/historical feature and release branches found name-based source candidates for 67 of 130 ledger records: 40 with normalized core+sequence candidates and 27 with core-only / sequence-different candidates. The remaining 63 have no source-name candidate among the branches searched. These are filename candidates only, not proof of the exact SQL body that ran."
+    },
+    {
+      "severity": "P0",
+      "code": "NUMERIC_MIGRATION_SEQUENCE_COLLISIONS",
+      "finding": "Historical branches reuse numeric migration identifiers across different features. In particular, the 0087–0096 range differs between branches, so sequence number alone is not a safe provenance key. Match the exact source path, body/hash, migration version, commit, and schema evidence before any migration strategy is approved."
+    },
+    {
+      "severity": "P1",
+      "code": "DUPLICATE_LEDGER_NAMES",
+      "finding": "Two migration names each occur twice in the live ledger; review both versions and the deployment history before reconstructing a canonical migration chain."
+    },
+    {
+      "severity": "P1",
+      "code": "SOURCE_ONLY_FILES_ON_REBUILD_BRANCH",
+      "finding": "Seven tracked migration files on the current rebuild branch have no matching ledger name; the 0107–0110 application/source-review files are explicit review candidates and should not be applied without the documented chain/provenance review."
+    },
+    {
+      "severity": "P1",
+      "code": "CORE_ONLY_CANDIDATES",
+      "finding": "27 ledger records have a semantic core-name candidate in a historical branch but no matching sequence. Treat these as alias candidates for manual review; do not authorize replay by this match."
+    },
+    {
+      "severity": "P0",
+      "code": "SQL_BODY_PROVENANCE_PARTIALLY_RECONCILED",
+      "finding": "A read-only SHA-1 Git-blob comparison against supabase_migrations.schema_migrations.statements found exact byte-for-byte source-body matches for 30 of 130 ledger records (29 distinct SQL bodies). For 37 additional records, filename candidates exist but their bodies differ; 63 have no filename or body candidate in the eight-branch source corpus. The 100 unmatched records still require historical commit, backup/deployment or schema evidence; migration replay remains unauthorized."
+    }
+  ],
+  "exactMatches": 32,
+  "coreOnlyReviewCandidates": [
+    {
+      "version": "20261012155539",
+      "name": "n11_ai_decision_matching_0009",
+      "sourcePaths": [
+        "db/migrations/0084_n11_ai_decision_matching.sql"
+      ]
+    },
+    {
+      "version": "20261012155744",
+      "name": "rls_security_boundary_0019",
+      "sourcePaths": [
+        "db/migrations/0009_rls_security_boundary.sql"
+      ]
+    }
+  ],
+  "duplicateLedgerNames": [
+    {
+      "name": "candidate_application_preparation_readiness_0078",
+      "versions": [
+        "20261019112452",
+        "20261019112511"
+      ]
+    },
+    {
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "versions": [
+        "20261029180632",
+        "20261029180642"
+      ]
+    }
+  ],
+  "unmappedLedgerRecords": [
+    {
+      "version": "20261012155914",
+      "name": "rls_helper_search_path_hardening_0020"
+    },
+    {
+      "version": "20261012160432",
+      "name": "foreign_key_index_hardening_0021"
+    },
+    {
+      "version": "20261012173518",
+      "name": "n10_commercial_schedule_v1_0022"
+    },
+    {
+      "version": "20261015151555",
+      "name": "candidate_auth_private_storage_0023"
+    },
+    {
+      "version": "20261015151630",
+      "name": "candidate_owned_application_document_reads_0024"
+    },
+    {
+      "version": "20261015152102",
+      "name": "explicit_candidate_identity_binding"
+    },
+    {
+      "version": "20261015152345",
+      "name": "require_verified_candidate_identity"
+    },
+    {
+      "version": "20261015152529",
+      "name": "candidate_portal_durable_state"
+    },
+    {
+      "version": "20261015152933",
+      "name": "harden_candidate_document_storage"
+    },
+    {
+      "version": "20261015153626",
+      "name": "revoke_anon_candidate_data_access_0029"
+    },
+    {
+      "version": "20261015153651",
+      "name": "revoke_unneeded_candidate_mutations_0030"
+    },
+    {
+      "version": "20261017062557",
+      "name": "n11_payfast_provider_idempotency_0036"
+    },
+    {
+      "version": "20261017062602",
+      "name": "n11_payfast_retryable_rejected_itn_0037"
+    },
+    {
+      "version": "20261017062700",
+      "name": "candidate_sessions_0038_legacy_compatible"
+    },
+    {
+      "version": "20261017062706",
+      "name": "candidate_credentials_0039"
+    },
+    {
+      "version": "20261017062711",
+      "name": "candidate_auth_identity_link_0040"
+    },
+    {
+      "version": "20261017082458",
+      "name": "kingsmen_ecosystem_marketplace_0041"
+    },
+    {
+      "version": "20261017082554",
+      "name": "public_verified_opportunity_read_0042"
+    },
+    {
+      "version": "20261017082751",
+      "name": "marketplace_rls_performance_hardening_0043"
+    },
+    {
+      "version": "20261017083209",
+      "name": "candidate_saved_routes_0044"
+    },
+    {
+      "version": "20261017084704",
+      "name": "marketplace_review_event_audit_0056"
+    },
+    {
+      "version": "20261017085001",
+      "name": "marketplace_https_url_constraints_0057"
+    },
+    {
+      "version": "20261017085438",
+      "name": "marketplace_public_dns_url_constraints_0058"
+    },
+    {
+      "version": "20261017155008",
+      "name": "0060_n06_application_pathway_runtime"
+    },
+    {
+      "version": "20261017155013",
+      "name": "0061_n07_provider_review_operations"
+    },
+    {
+      "version": "20261017155018",
+      "name": "0062_n08_outcomes_progression"
+    },
+    {
+      "version": "20261017155024",
+      "name": "0063_n09_communications_follow_up"
+    },
+    {
+      "version": "20261017155029",
+      "name": "0064_n10_packages_payments_refunds"
+    },
+    {
+      "version": "20261017155618",
+      "name": "n10_finance_privilege_hardening"
+    },
+    {
+      "version": "20261017160630",
+      "name": "n10_atomic_payfast_payment_confirmation"
+    },
+    {
+      "version": "20261017160636",
+      "name": "n10_payfast_refund_reconciliation"
+    },
+    {
+      "version": "20261017160641",
+      "name": "n10_atomic_finance_workflows"
+    },
+    {
+      "version": "20261017160751",
+      "name": "n10_finance_rpc_only_writes"
+    },
+    {
+      "version": "20261017174940",
+      "name": "n03_truth_vault_0002_rls_hardening"
+    },
+    {
+      "version": "20261019082917",
+      "name": "n06_application_privilege_hardening_0073"
+    },
+    {
+      "version": "20261019095926",
+      "name": "candidate_workspace_persistence_v1"
+    },
+    {
+      "version": "20261019101601",
+      "name": "candidate_identity_review_requests_v1"
+    },
+    {
+      "version": "20261019112437",
+      "name": "candidate_identity_review_decision_workflow_0076"
+    },
+    {
+      "version": "20261019112445",
+      "name": "candidate_application_tracker_0077"
+    },
+    {
+      "version": "20261019112452",
+      "name": "candidate_application_preparation_readiness_0078"
+    },
+    {
+      "version": "20261019112511",
+      "name": "candidate_application_preparation_readiness_0078"
+    },
+    {
+      "version": "20261019112516",
+      "name": "candidate_private_document_vault_0079"
+    },
+    {
+      "version": "20261019112521",
+      "name": "authorised_candidate_document_review_0080"
+    },
+    {
+      "version": "20261019112627",
+      "name": "candidate_document_preparation_detach_and_fk_indexes_0081"
+    },
+    {
+      "version": "20261020031028",
+      "name": "n12_candidate_private_document_review"
+    },
+    {
+      "version": "20261022030303",
+      "name": "reviewer_audit_tables_backend_only"
+    },
+    {
+      "version": "20261022031206",
+      "name": "move_candidate_identity_helper_to_private_schema"
+    },
+    {
+      "version": "20261022042942",
+      "name": "candidate_identity_review_submission_rpc"
+    },
+    {
+      "version": "20261022043212",
+      "name": "serialize_candidate_identity_review_submissions"
+    },
+    {
+      "version": "20261022183219",
+      "name": "revoke_client_candidate_identity_link_table_access"
+    },
+    {
+      "version": "20261022184513",
+      "name": "identity_review_server_side_submission_route"
+    },
+    {
+      "version": "20261022184626",
+      "name": "identity_review_submission_audit_schema_compat"
+    },
+    {
+      "version": "20261022194413",
+      "name": "expand_sa_official_source_catalog"
+    },
+    {
+      "version": "20261022202953",
+      "name": "n09_communications_backend_only"
+    },
+    {
+      "version": "20261023040341",
+      "name": "cross_module_application_outcome_truth_guards"
+    },
+    {
+      "version": "20261023132336",
+      "name": "revoke_client_execute_application_outcome_guard_functions"
+    },
+    {
+      "version": "20261023133631",
+      "name": "20261023170000_application_linked_private_document_evidence"
+    },
+    {
+      "version": "20261023135605",
+      "name": "20261023180000_seed_verified_labour_vacancies"
+    },
+    {
+      "version": "20261023142155",
+      "name": "20261023190000_route_availability_expiry_guards"
+    },
+    {
+      "version": "20261023142549",
+      "name": "20261023200000_route_availability_sa_timezone"
+    },
+    {
+      "version": "20261023144551",
+      "name": "n15_current_verified_opportunity_feed"
+    },
+    {
+      "version": "20261023145002",
+      "name": "n15_public_safe_opportunity_feed"
+    },
+    {
+      "version": "20261023145908",
+      "name": "n05_document_application_owner_index"
+    },
+    {
+      "version": "20261023152823",
+      "name": "n11_ai_evidence_and_review_guards"
+    },
+    {
+      "version": "20261023164135",
+      "name": "0020_n07_durable_outbox_leases_retry"
+    },
+    {
+      "version": "20261025004936",
+      "name": "n16_durable_worker_recovery_202610250001"
+    },
+    {
+      "version": "20261025004943",
+      "name": "n16_worker_send_boundary_202610250002"
+    },
+    {
+      "version": "20261025004952",
+      "name": "n16_exhausted_lease_recovery_202610250003"
+    },
+    {
+      "version": "20261025090643",
+      "name": "n17_founder_brief_access_hardening"
+    },
+    {
+      "version": "20261025090832",
+      "name": "n17_founder_report_access_hardening"
+    },
+    {
+      "version": "20261025101411",
+      "name": "payfast_sandbox_atomic_settlement"
+    },
+    {
+      "version": "20261025105336",
+      "name": "identity_review_least_privilege_role"
+    },
+    {
+      "version": "20261025105411",
+      "name": "identity_review_role_code_constraint"
+    },
+    {
+      "version": "20261025105520",
+      "name": "identity_review_audit_actor_role"
+    },
+    {
+      "version": "20261025110908",
+      "name": "unified_candidate_master_application"
+    },
+    {
+      "version": "20261025110918",
+      "name": "unified_candidate_master_application_rpc"
+    },
+    {
+      "version": "20261025111050",
+      "name": "unified_master_application_source_confidence_guard"
+    },
+    {
+      "version": "20261025111404",
+      "name": "candidate_identity_review_private_evidence"
+    },
+    {
+      "version": "20261025112103",
+      "name": "candidate_identity_review_followup_status"
+    },
+    {
+      "version": "20261025112853",
+      "name": "master_target_to_application_lifecycle_bridge"
+    },
+    {
+      "version": "20261025113010",
+      "name": "master_target_pathway_consistency_guard"
+    },
+    {
+      "version": "20261025113119",
+      "name": "candidate_manual_portal_handoff"
+    },
+    {
+      "version": "20261025113510",
+      "name": "freeze_linked_master_application_targets"
+    },
+    {
+      "version": "20261025113726",
+      "name": "link_reviewed_documents_to_application_evidence"
+    },
+    {
+      "version": "20261025113938",
+      "name": "verified_submission_and_outcome_workflow"
+    },
+    {
+      "version": "20261025114110",
+      "name": "lock_document_review_rpc_to_service_role"
+    },
+    {
+      "version": "20261029143144",
+      "name": "canonical_package_benefits_universal_accommodation_20261029"
+    },
+    {
+      "version": "20261029143414",
+      "name": "seed_canonical_public_package_cards_20261029"
+    },
+    {
+      "version": "20261029165245",
+      "name": "0088_covering_indexes_for_live_foreign_keys"
+    },
+    {
+      "version": "20261029174204",
+      "name": "candidate_private_document_vault_workflows_0089"
+    },
+    {
+      "version": "20261029180233",
+      "name": "atomic_payfast_checkout_bundle_0092"
+    },
+    {
+      "version": "20261029180243",
+      "name": "remove_duplicate_identity_review_open_request_index_0091"
+    },
+    {
+      "version": "20261029180632",
+      "name": "seed_verified_labour_vacancy_deadlines_0093"
+    },
+    {
+      "version": "20261029180642",
+      "name": "seed_verified_labour_vacancy_deadlines_0093"
+    },
+    {
+      "version": "20261029181155",
+      "name": "harden_payfast_checkout_identity_locks_0094"
+    },
+    {
+      "version": "20261029193124",
+      "name": "candidate_self_service_profile_bootstrap_0095"
+    }
+  ],
+  "sourceFilesWithoutLedgerMatch": [
+    {
+      "path": "database/migrations/000004_jarvis_postgresql_truth_vault.sql",
+      "gitBlobSha": "65c28efbf8a9022f504ff834cd34fc36c5773bd8",
+      "sizeBytes": 6366
+    },
+    {
+      "path": "db/migrations/0083_retire_legacy_accommodation_checkout.sql",
+      "gitBlobSha": "05e7c7808f622829bcd91def330116f23d057e60",
+      "sizeBytes": 698
+    },
+    {
+      "path": "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+      "gitBlobSha": "25132f7b0b7da2981805a56331ec04fa41ef9226",
+      "sizeBytes": 28337
+    },
+    {
+      "path": "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+      "gitBlobSha": "530b8c8af9e519be442d445f8be267b17402af1d",
+      "sizeBytes": 19353
+    },
+    {
+      "path": "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+      "gitBlobSha": "2a8d650acebbf5c4a5ca1e5681e7ec9476f950de",
+      "sizeBytes": 17818
+    },
+    {
+      "path": "db/migrations/0110_n15_source_review_decision_atomicity.sql",
+      "gitBlobSha": "a41ce80d794a618a59866a29aa981594fcd5618d",
+      "sizeBytes": 7438
+    },
+    {
+      "path": "supabase/migrations/20261016151400_payfast_finance_tx.sql",
+      "gitBlobSha": "0901a4e36d7bf128d451f0ed4a28e37b26d2550d",
+      "sizeBytes": 6601
+    }
+  ],
+  "sourceHashChecks": "Each tracked source file records the Git blob SHA captured from the repository tree. The validator recomputes the Git blob SHA from the checked-out bytes.",
+  "safety": {
+    "schemaChanged": false,
+    "dataChanged": false,
+    "migrationsApplied": false,
+    "edgeFunctionsDeployed": false,
+    "releaseGateOpened": false
+  },
+  "nextAction": "Create a reviewed migration lineage map for the 130 ledger records using historical source files, Git commits, exact SQL-body hashes and available deployment/schema evidence. Keep schema changes blocked until this is approved.",
+  "currentBranchSummary": {
+    "trackedSourceFiles": 41,
+    "normalizedExactMatches": 32,
+    "coreOnlyCandidateMatches": 2,
+    "ledgerRecordsWithoutCurrentBranchNameMatch": 96,
+    "sourceFilesWithoutLedgerNameMatch": 7
+  },
+  "historicalBranchSweep": {
+    "branchesScanned": 8,
+    "rawBranchSourceEntries": 414,
+    "uniqueSourcePathHashEntries": 86,
+    "uniqueSourcePaths": 83,
+    "ledgerRecordsWithCoreAndSequenceCandidate": 40,
+    "ledgerRecordsWithCoreOnlyCandidates": 27,
+    "ledgerRecordsWithoutHistoricalSourceNameCandidate": 63,
+    "ledgerRecordsWithMultipleDistinctSourceCandidates": 0,
+    "duplicateLedgerNames": 2,
+    "candidateSourceRecords": 67,
+    "ledgerWithoutAnyHistoricalSourceNameCandidate": 63,
+    "exactSqlBodyProvenanceMatches": 0,
+    "replayAuthorized": false
+  },
+  "historicalBranches": [
+    {
+      "branch": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "treeSha": "392d7c68e662eb76ce1e07efd769e603e016adaa",
+      "migrationFiles": 41
+    },
+    {
+      "branch": "ops/backup-restore-safety-current-rc-2026-10-30",
+      "treeSha": "85e937ae43ff537765fd4b4ed36c7785e34966fd",
+      "migrationFiles": 52
+    },
+    {
+      "branch": "release/kingsmen-2026-10-25-rc1",
+      "treeSha": "edb8b857fd213fe774c90369cbb757eec341977c",
+      "migrationFiles": 57
+    },
+    {
+      "branch": "feat/candidate-application-draft-persistence-2026-11-01",
+      "treeSha": "8a36eef83e57e82113f5f47198084d0f27ddbb15",
+      "migrationFiles": 49
+    },
+    {
+      "branch": "feat/candidate-experience-closeout-2026-10-30",
+      "treeSha": "9db3d0425c4fdb21dc3867c1393682bb6ded9f40",
+      "migrationFiles": 46
+    },
+    {
+      "branch": "integration/payfast-sandbox-rc1-2026-10-27",
+      "treeSha": "1713bdfc72899059fb15bb05dc4f80b6c4e30e29",
+      "migrationFiles": 58
+    },
+    {
+      "branch": "integration/identity-review-ui-e2e-rc1",
+      "treeSha": "1cd36b730e3d704b11de47b3c4dd873781246208",
+      "migrationFiles": 60
+    },
+    {
+      "branch": "feat/national-institution-network-source-coverage-2026-10-31",
+      "treeSha": "1d8b20f26704982e803731ad959ecfb6f9d8e23b",
+      "migrationFiles": 51
+    }
+  ],
+  "historicalUnmappedLedgerRecords": [
+    {
+      "version": "20261012155914",
+      "name": "rls_helper_search_path_hardening_0020"
+    },
+    {
+      "version": "20261012160432",
+      "name": "foreign_key_index_hardening_0021"
+    },
+    {
+      "version": "20261012173518",
+      "name": "n10_commercial_schedule_v1_0022"
+    },
+    {
+      "version": "20261015151555",
+      "name": "candidate_auth_private_storage_0023"
+    },
+    {
+      "version": "20261015151630",
+      "name": "candidate_owned_application_document_reads_0024"
+    },
+    {
+      "version": "20261015152102",
+      "name": "explicit_candidate_identity_binding"
+    },
+    {
+      "version": "20261015152345",
+      "name": "require_verified_candidate_identity"
+    },
+    {
+      "version": "20261015152529",
+      "name": "candidate_portal_durable_state"
+    },
+    {
+      "version": "20261015152933",
+      "name": "harden_candidate_document_storage"
+    },
+    {
+      "version": "20261015153626",
+      "name": "revoke_anon_candidate_data_access_0029"
+    },
+    {
+      "version": "20261015153651",
+      "name": "revoke_unneeded_candidate_mutations_0030"
+    },
+    {
+      "version": "20261017062557",
+      "name": "n11_payfast_provider_idempotency_0036"
+    },
+    {
+      "version": "20261017062602",
+      "name": "n11_payfast_retryable_rejected_itn_0037"
+    },
+    {
+      "version": "20261017062700",
+      "name": "candidate_sessions_0038_legacy_compatible"
+    },
+    {
+      "version": "20261017062706",
+      "name": "candidate_credentials_0039"
+    },
+    {
+      "version": "20261017062711",
+      "name": "candidate_auth_identity_link_0040"
+    },
+    {
+      "version": "20261017082458",
+      "name": "kingsmen_ecosystem_marketplace_0041"
+    },
+    {
+      "version": "20261017082554",
+      "name": "public_verified_opportunity_read_0042"
+    },
+    {
+      "version": "20261017082751",
+      "name": "marketplace_rls_performance_hardening_0043"
+    },
+    {
+      "version": "20261017083209",
+      "name": "candidate_saved_routes_0044"
+    },
+    {
+      "version": "20261017084704",
+      "name": "marketplace_review_event_audit_0056"
+    },
+    {
+      "version": "20261017085001",
+      "name": "marketplace_https_url_constraints_0057"
+    },
+    {
+      "version": "20261017085438",
+      "name": "marketplace_public_dns_url_constraints_0058"
+    },
+    {
+      "version": "20261017155008",
+      "name": "0060_n06_application_pathway_runtime"
+    },
+    {
+      "version": "20261017155013",
+      "name": "0061_n07_provider_review_operations"
+    },
+    {
+      "version": "20261017155018",
+      "name": "0062_n08_outcomes_progression"
+    },
+    {
+      "version": "20261017155024",
+      "name": "0063_n09_communications_follow_up"
+    },
+    {
+      "version": "20261017155029",
+      "name": "0064_n10_packages_payments_refunds"
+    },
+    {
+      "version": "20261017155618",
+      "name": "n10_finance_privilege_hardening"
+    },
+    {
+      "version": "20261017160630",
+      "name": "n10_atomic_payfast_payment_confirmation"
+    },
+    {
+      "version": "20261017160636",
+      "name": "n10_payfast_refund_reconciliation"
+    },
+    {
+      "version": "20261017160641",
+      "name": "n10_atomic_finance_workflows"
+    },
+    {
+      "version": "20261017160751",
+      "name": "n10_finance_rpc_only_writes"
+    },
+    {
+      "version": "20261017174940",
+      "name": "n03_truth_vault_0002_rls_hardening"
+    },
+    {
+      "version": "20261019082917",
+      "name": "n06_application_privilege_hardening_0073"
+    },
+    {
+      "version": "20261019095926",
+      "name": "candidate_workspace_persistence_v1"
+    },
+    {
+      "version": "20261019101601",
+      "name": "candidate_identity_review_requests_v1"
+    },
+    {
+      "version": "20261019112437",
+      "name": "candidate_identity_review_decision_workflow_0076"
+    },
+    {
+      "version": "20261019112445",
+      "name": "candidate_application_tracker_0077"
+    },
+    {
+      "version": "20261019112452",
+      "name": "candidate_application_preparation_readiness_0078"
+    },
+    {
+      "version": "20261019112511",
+      "name": "candidate_application_preparation_readiness_0078"
+    },
+    {
+      "version": "20261019112516",
+      "name": "candidate_private_document_vault_0079"
+    },
+    {
+      "version": "20261019112521",
+      "name": "authorised_candidate_document_review_0080"
+    },
+    {
+      "version": "20261019112627",
+      "name": "candidate_document_preparation_detach_and_fk_indexes_0081"
+    },
+    {
+      "version": "20261020031028",
+      "name": "n12_candidate_private_document_review"
+    },
+    {
+      "version": "20261022194413",
+      "name": "expand_sa_official_source_catalog"
+    },
+    {
+      "version": "20261022202953",
+      "name": "n09_communications_backend_only"
+    },
+    {
+      "version": "20261023040341",
+      "name": "cross_module_application_outcome_truth_guards"
+    },
+    {
+      "version": "20261023132336",
+      "name": "revoke_client_execute_application_outcome_guard_functions"
+    },
+    {
+      "version": "20261023133631",
+      "name": "20261023170000_application_linked_private_document_evidence"
+    },
+    {
+      "version": "20261023135605",
+      "name": "20261023180000_seed_verified_labour_vacancies"
+    },
+    {
+      "version": "20261023142155",
+      "name": "20261023190000_route_availability_expiry_guards"
+    },
+    {
+      "version": "20261023142549",
+      "name": "20261023200000_route_availability_sa_timezone"
+    },
+    {
+      "version": "20261023144551",
+      "name": "n15_current_verified_opportunity_feed"
+    },
+    {
+      "version": "20261023145002",
+      "name": "n15_public_safe_opportunity_feed"
+    },
+    {
+      "version": "20261023145908",
+      "name": "n05_document_application_owner_index"
+    },
+    {
+      "version": "20261023152823",
+      "name": "n11_ai_evidence_and_review_guards"
+    },
+    {
+      "version": "20261023164135",
+      "name": "0020_n07_durable_outbox_leases_retry"
+    },
+    {
+      "version": "20261025090643",
+      "name": "n17_founder_brief_access_hardening"
+    },
+    {
+      "version": "20261025090832",
+      "name": "n17_founder_report_access_hardening"
+    },
+    {
+      "version": "20261029143144",
+      "name": "canonical_package_benefits_universal_accommodation_20261029"
+    },
+    {
+      "version": "20261029143414",
+      "name": "seed_canonical_public_package_cards_20261029"
+    },
+    {
+      "version": "20261029174204",
+      "name": "candidate_private_document_vault_workflows_0089"
+    }
+  ],
+  "historicalMatchCounts": {
+    "coreAndSequence": 40,
+    "coreOnlyOrSequenceDifferent": 27,
+    "noHistoricalSourceNameCandidate": 63
+  },
+  "bodyLevelProvenance": {
+    "status": "PARTIAL_EXACT_BODY_MATCHES_RECONCILIATION_REQUIRED",
+    "evidencePath": "manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json",
+    "queryPath": "scripts/staging/kingsmen-staging-migration-body-provenance.sql",
+    "summary": {
+      "ledgerRecords": 130,
+      "recordsWithOneStatement": 130,
+      "recordsWithOtherStatementCardinality": 0,
+      "exactBodyMatchLedgerRecords": 30,
+      "exactBodyMatchDistinctSqlBodies": 29,
+      "noExactBodyMatchLedgerRecords": 100,
+      "filenameCandidateButDifferentBody": 37,
+      "noFilenameOrBodyCandidateInSearchedBranches": 63,
+      "sourceFileReferences": 127,
+      "distinctSourceGitBlobHashes": 86
+    },
+    "rawSqlBodiesIncluded": false,
+    "replayAuthorized": false,
+    "finding": "30 ledger records (29 distinct SQL bodies) match tracked source blobs byte-for-byte. Another 37 have filename candidates whose body differs; 63 have no filename or body candidate in the eight-branch source corpus. The 100 unmatched records remain unresolved."
+  }
+}

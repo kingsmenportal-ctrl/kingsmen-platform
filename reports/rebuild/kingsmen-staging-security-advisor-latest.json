@@ -1,0 +1,88 @@
+{
+  "schema": "kingsmen.staging-security-advisor-audit.v1",
+  "capturedOn": "2026-11-25",
+  "status": "REMEDIATION_REVIEW_REQUIRED",
+  "snapshotPath": "manifests/rebuild/kingsmen-staging-security-advisor-2026-11-25.json",
+  "summary": {
+    "publicTables": 230,
+    "publicTablesWithRlsEnabled": 230,
+    "rlsEnabledNoPolicy": 17,
+    "authenticatedCallableSecurityDefinerFunctions": 6,
+    "multiplePermissivePolicies": 16,
+    "leakedPasswordProtectionWarning": 1,
+    "unusedIndexes": 282
+  },
+  "releaseImpact": "P0 — these live advisor findings must be reviewed and role-tested before public candidate records or live payments are enabled.",
+  "safety": {
+    "readOnly": true,
+    "schemaChanged": false,
+    "dataChanged": false,
+    "policiesChanged": false,
+    "functionDefinitionsChanged": false,
+    "functionPrivilegesChanged": false,
+    "authSettingsChanged": false,
+    "releaseGateOpened": false
+  },
+  "nextAction": "Add API/PostgREST negative tests for anon, Candidate A, Candidate B, operator/founder and service-role. Map direct table callers before preparing a forward-only least-privilege migration; do not apply blanket REVOKE or broad RLS changes from this audit alone.",
+  "liveDatabaseVerification": {
+    "securityDefinerBodiesExactlyMatchCandidateHistoricalSource": 6,
+    "flaggedFunctionsWithAnonExecute": 0,
+    "flaggedFunctionsWithPublicExecute": 0,
+    "flaggedFunctionsCallableByAuthenticated": 6,
+    "noPolicyTablesWithAnonOrAuthenticatedTableGrant": 0,
+    "noPolicyTablesChecked": 17
+  },
+  "disposition": {
+    "securityDefiner": "All six live function bodies match a historical source candidate after whitespace normalization. Live ACLs deny PUBLIC and anon; authenticated execution is permitted by design in the current grants. Keep the P0 role-isolation tests; do not revoke function access solely to silence the advisor.",
+    "noPolicyTables": "All 17 listed tables have RLS enabled, zero policies and no direct anon/authenticated SELECT/INSERT/UPDATE/DELETE privileges. Candidate disposition: backend-only unless a real client path is proven to require access.",
+    "remaining": "This review does not replace authenticated Candidate A/B negative tests, operator/founder access tests, security configuration change for leaked-password protection, or a source-to-deployed grant/migration lineage sign-off."
+  },
+  "livePolicyOverlapReview": {
+    "summary": {
+      "policyDefinitionsCaptured": 33,
+      "helperFunctionsCaptured": 7,
+      "rlsEnabledTablesReviewed": 8,
+      "tablesWithAnyAnonDirectGrant": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "tablesWithAnonAndAuthenticatedAllCrudGrants": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "tablesWithDirectAuthenticatedAllCrudGrants": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "anonGrantsRevokedOrChanged": 0,
+      "policyDefinitionsChanged": 0,
+      "liveApiNegativeRoleTestsRun": 0
+    },
+    "safety": {
+      "readOnly": true,
+      "schemaChanged": false,
+      "dataChanged": false,
+      "grantsChanged": false,
+      "policiesChanged": false,
+      "functionsChanged": false,
+      "releaseGateOpened": false
+    },
+    "priorityTables": [
+      "candidate_credentials",
+      "candidate_sessions",
+      "evidence_ledger",
+      "route_sources",
+      "workflow_runs"
+    ],
+    "priorityDisposition": "RLS is enabled, but direct anon/authenticated grants are broader than necessary on five tables. Current predicates are guarded by role/identity helpers, so no exploit is claimed. Run real API negative tests and map callers before a reviewed least-privilege migration."
+  }
+}

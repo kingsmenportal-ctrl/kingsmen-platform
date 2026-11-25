@@ -3,9 +3,9 @@ name: Kingsmen CI
 # One ordinary check for independently releasable streams.
 on:
   pull_request:
-    branches: [main]
+    branches: [main, rebuild/kingsmen-one-foundation-2026-11-17]
   push:
-    branches: [main]
+    branches: [main, rebuild/kingsmen-one-foundation-2026-11-17]
   workflow_dispatch:
 
 permissions:
@@ -35,6 +35,18 @@ jobs:
 
       - name: Run focused repository tests
         run: npm test
+
+      - name: Validate Kingsmen project status register
+        run: npm run kingsmen:status:validate
+
+      - name: Validate staging migration provenance snapshot
+        run: npm run kingsmen:migrations:provenance:validate
+
+      - name: Validate staging security advisor snapshot
+        run: npm run kingsmen:security-advisor:validate
+
+      - name: Validate branch protection verifier and policy tests
+        run: npm run repo:validate:branch-protection-capture
 
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund

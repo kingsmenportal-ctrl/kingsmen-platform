@@ -1,0 +1,1200 @@
+{
+  "schema": "kingsmen.simplified-rebuild-status.v1",
+  "statusDate": "2026-11-25",
+  "overallStatus": "REBUILD_IN_PROGRESS_PUBLIC_LAUNCH_BLOCKED",
+  "releaseStatus": "blocked_until_required_gates_pass",
+  "canonicalRepository": "kingsmenportal-ctrl/kingsmen-platform",
+  "defaultBranch": "main",
+  "implementationBranch": "rebuild/kingsmen-one-foundation-2026-11-17",
+  "statusRegisterPath": "docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md",
+  "validationCommand": "npm run kingsmen:status:validate",
+  "inventory": {
+    "trackedFilesOnImplementationBranch": 3389,
+    "webRoutePages": 78,
+    "nextApiRouteHandlers": 73,
+    "apiSourceFiles": 182,
+    "webSourceFiles": 332,
+    "validatorFiles": 221,
+    "candidateRoutePages": 15,
+    "founderRoutePages": 10,
+    "trackedSqlMigrationFiles": 41,
+    "migrationSourceDirectories": [
+      "db/migrations",
+      "database/migrations",
+      "supabase/migrations"
+    ],
+    "inventoryCapturedOn": "2026-11-25",
+    "inventoryCapturedAtCommit": "58306af161766d597f5cf90dbcd0cad30b6c9759"
+  },
+  "infrastructure": {
+    "stagingProvider": "Supabase",
+    "stagingProjectName": "kingsmen-portal-staging",
+    "stagingProjectRef": "euhubhhnumtibbyufghm",
+    "stagingStatus": "ACTIVE_HEALTHY",
+    "stagingRegion": "eu-west-1",
+    "postgresVersion": "17.11.0.003",
+    "appliedMigrationRecords": 130,
+    "publicTables": 230,
+    "publicTablesWithRlsEnabled": 230,
+    "tableInventoryReportedZeroRowsForEveryPublicTable": true,
+    "activeEdgeFunctions": 23,
+    "edgeFunctionsWithJwtVerification": 22,
+    "edgeFunctionsWithoutJwtVerification": [
+      "payfast-sandbox"
+    ],
+    "securityAdvisorFindings": {
+      "rlsEnabledWithoutPolicyInfo": 17,
+      "authenticatedSecurityDefinerCallableWarning": 6,
+      "multiplePermissivePolicyWarning": 16,
+      "leakedPasswordProtectionWarning": 1,
+      "unusedIndexInfo": 282
+    },
+    "netlifyProjectName": "kingsmen-jarvis-command-zungu",
+    "netlifyProjectId": "b739ffe9-3e8d-4aef-8616-701cdb163395",
+    "lastRecordedReadyDeployId": "6a4d9382c91e49ab899318da",
+    "lastRecordedReadyDeployDate": "2026-07-08",
+    "lastRecordedReadyDeployBranch": "main",
+    "productionDeployRepresentsCurrentRebuildBranch": false,
+    "migrationBodyProvenance": {
+      "capturedOn": "2026-11-25",
+      "evidencePath": "manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json",
+      "queryPath": "scripts/staging/kingsmen-staging-migration-body-provenance.sql",
+      "ledgerRecords": 130,
+      "recordsWithOneStatement": 130,
+      "exactBodyMatchLedgerRecords": 30,
+      "exactBodyMatchDistinctSqlBodies": 29,
+      "filenameCandidateButDifferentBody": 37,
+      "noFilenameOrBodyCandidateInSearchedBranches": 63,
+      "recordsWithoutExactBodyMatch": 100,
+      "replayAuthorized": false
+    }
+  },
+  "releaseGates": {
+    "required": 13,
+    "fullyPassed": 0,
+    "status": "blocked",
+    "items": [
+      {
+        "key": "repo_protection",
+        "status": "partial_ruleset_active_spec_gaps",
+        "remainingConstraint": "An active ruleset protects main, but its current strict checks are test-and-build and validate; the approved manifest additionally requires source-guard and Build, validate, and smoke-test plus stale-review dismissal, conversation resolution and linear history. Verify real CI contexts and reconcile this policy before release."
+      },
+      {
+        "key": "api_runtime",
+        "status": "foundation_built"
+      },
+      {
+        "key": "truth_vault_persistence",
+        "status": "foundation_built_pending_staging_proof"
+      },
+      {
+        "key": "tenant_security_rls",
+        "status": "foundation_built_pending_staging_proof"
+      },
+      {
+        "key": "web_runtime_boundary",
+        "status": "foundation_built_pending_staging_proof"
+      },
+      {
+        "key": "payments",
+        "status": "foundation_built_pending_real_sandbox_evidence"
+      },
+      {
+        "key": "backup_restore",
+        "status": "foundation_built_pending_staging_drill"
+      },
+      {
+        "key": "secrets_wiring",
+        "status": "foundation_built_pending_runtime_secret_health_proof"
+      },
+      {
+        "key": "communications",
+        "status": "foundation_built_pending_provider_staging_proof"
+      },
+      {
+        "key": "observability_incident",
+        "status": "foundation_built_pending_staging_monitoring_proof"
+      },
+      {
+        "key": "legal_privacy",
+        "status": "foundation_built_pending_legal_review_and_publication_proof"
+      },
+      {
+        "key": "staging_runtime_proof_pack",
+        "status": "foundation_built_pending_staging_evidence_capture"
+      },
+      {
+        "key": "final_assembly_evidence_capture",
+        "status": "foundation_built_pending_final_evidence_capture_review"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "N00",
+      "name": "Constitution / doctrine lock",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Preserve one authoritative product and release doctrine."
+    },
+    {
+      "id": "N01",
+      "name": "Foundation / monorepo / runtime",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Consolidate package/build workflow and protect branches."
+    },
+    {
+      "id": "N02",
+      "name": "Backend API kernel",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove API health, persistence, idempotency and retry behaviour."
+    },
+    {
+      "id": "N03",
+      "name": "Truth Vault / PostgreSQL",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Reconcile source migration files with 130 live migration records."
+    },
+    {
+      "id": "N04",
+      "name": "Candidate core / portal",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove authenticated candidate A/B isolation and profile persistence."
+    },
+    {
+      "id": "N05",
+      "name": "Document vault",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove private ownership, upload validation, signed-link expiry and review controls."
+    },
+    {
+      "id": "N06",
+      "name": "Route universe / workbench",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove application lifecycle from draft through evidence-backed outcome."
+    },
+    {
+      "id": "N07",
+      "name": "Airtable sync / mirror",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove durable outbox retries and keep PostgreSQL authoritative."
+    },
+    {
+      "id": "N08",
+      "name": "Operator command room",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove operator roles, queues, audit and approval boundaries."
+    },
+    {
+      "id": "N09",
+      "name": "Notifications / communications",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove provider send/receive, bounce, opt-out and channel rules."
+    },
+    {
+      "id": "N10",
+      "name": "Finance / PayFast",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove provider sandbox ITN, replay, amount/signature and refund-review cases."
+    },
+    {
+      "id": "N11",
+      "name": "AI decision engine",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Test source confidence and prevent unsupported match/outcome claims."
+    },
+    {
+      "id": "N12",
+      "name": "Governance / tribunal",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Close or justify policy/security advisor findings and run role tests."
+    },
+    {
+      "id": "N13",
+      "name": "Observability / incidents",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove staging alerts, redacted traces, DLQ recovery and incident drill."
+    },
+    {
+      "id": "N14",
+      "name": "Integrations registry",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Capture runtime/auth evidence for each provider marked live."
+    },
+    {
+      "id": "N15",
+      "name": "Opportunity engine / source intelligence",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove current source, opening, eligibility, deadline and review status."
+    },
+    {
+      "id": "N16",
+      "name": "Execution orchestrator",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove leases, retries, idempotency and manual fallback."
+    },
+    {
+      "id": "N17",
+      "name": "Founder control plane",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove founder-only access, approvals and auditable risk decisions."
+    },
+    {
+      "id": "N18",
+      "name": "Public website / front door",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Deploy and smoke-test the selected rebuild commit; publish approved legal surfaces."
+    },
+    {
+      "id": "N19",
+      "name": "Mobile PWA / candidate experience",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove responsive authenticated flows and accessibility."
+    },
+    {
+      "id": "N20",
+      "name": "Final assembly / production lock",
+      "source": "present",
+      "runtimeAcceptance": "blocked",
+      "next": "Close all 13 release gates and capture founder-reviewed evidence bundle."
+    }
+  ],
+  "timeline": {
+    "engineeringEffortDays": {
+      "minimum": 12,
+      "maximum": 21
+    },
+    "externalDependencyExtraWorkingDays": {
+      "minimum": 3,
+      "maximum": 10
+    },
+    "planningCalendarWeeks": {
+      "minimum": 3,
+      "maximum": 6
+    },
+    "phases": [
+      {
+        "id": 0,
+        "name": "Project control baseline",
+        "estimateDays": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "status": "completed",
+        "exit": "Status register, manifest, validator and start-of-chat rule are committed and validated."
+      },
+      {
+        "id": 1,
+        "name": "Repository and architecture consolidation",
+        "estimateDays": {
+          "minimum": 1,
+          "maximum": 2
+        },
+        "status": "in_progress",
+        "exit": "Clean CI on the intended rebuild branch and release branch protection confirmed.",
+        "currentProgress": [
+          "Status register and mandatory frontend/backend reporting contract are implemented in README/CLAUDE and checked in CI.",
+          "Free Destiny Map readiness preview is merged; its targeted browser test passed.",
+          "An active main branch ruleset is verified; strict protection policy still has documented gaps vs the project's approved protection manifest."
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Database provenance and security",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 3
+        },
+        "status": "in_progress_read_only_audit",
+        "exit": "Migration map approved and RLS/authenticated role tests pass.",
+        "currentProgress": [
+          "Eight-branch migration provenance snapshot captured; 67/130 ledger rows have filename candidates, 63 do not; exact SQL body/deployment lineage is not proven.",
+          "Live security checks confirm all six flagged SECURITY DEFINER function bodies match candidate historical source bodies; anon/PUBLIC execution is denied.",
+          "All 17 RLS/no-policy tables deny direct anon/authenticated SELECT/INSERT/UPDATE/DELETE; authenticated Candidate A/B/operator/founder role-level E2E tests remain open.",
+          "No staging schema, data, policies, function privileges, Auth settings or indexes were modified.",
+          "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies.",
+          "Live policy/grant review captured 33 policies and seven JWT-bound helper definitions across eight sensitive tables; five tables grant all direct CRUD to anon and authenticated, so P0 negative API tests are required before least-privilege changes.",
+          "Merged PR #335 after root tests, status-register validation, migration-provenance validation, security-advisor validation, API build and web build passed; no live database policy changed."
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Candidate foundation journey",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 4
+        },
+        "status": "in_progress_source_ci_passed_runtime_blocked",
+        "exit": "Authenticated candidate journey passes browser/API/database tests.",
+        "currentProgress": [
+          "Candidate entry/status/session/document journey merged in PR #344 after all four PR-head workflows passed.",
+          "Schema guard confirms the live candidate-preparation query does not request the uninstalled kingsmen_status column.",
+          "Seven candidate/browser regression paths and disposable PostgreSQL lifecycle contracts passed in CI.",
+          "Live staging candidate journey remains blocked by missing draft table/RPC/helper/event type and absent approved fixture actors."
+        ]
+      },
+      {
+        "id": 4,
+        "name": "Opportunity and application lifecycle",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 3
+        },
+        "status": "not_started",
+        "exit": "Saved opportunity, draft, status, manual fallback and provider receipt evidenced."
+      },
+      {
+        "id": 5,
+        "name": "Documents, finance and communications",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 4
+        },
+        "status": "not_started",
+        "exit": "Document security, payment sandbox, messaging and audit tests pass."
+      },
+      {
+        "id": 6,
+        "name": "Founder operations, Jarvis and mobile",
+        "estimateDays": {
+          "minimum": 1,
+          "maximum": 2
+        },
+        "status": "not_started",
+        "exit": "Founder control boundaries and responsive operational surfaces pass tests."
+      },
+      {
+        "id": 7,
+        "name": "Staging release and private beta",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 3
+        },
+        "status": "not_started",
+        "exit": "All 13 gates pass, final evidence bundle reviewed and founder approves beta."
+      }
+    ]
+  },
+  "currentPullRequests": [
+    {
+      "number": 319,
+      "title": "rebuild: Kingsmen One foundation and recovered candidate product slice",
+      "state": "open",
+      "draft": true,
+      "base": "main",
+      "role": "broader rebuild integration PR; release-gate evidence remains required"
+    },
+    {
+      "number": 327,
+      "title": "Establish authoritative Kingsmen status and completion roadmap",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "fbd8420d14ba6ee87174c77de7de58d213254f8c"
+    },
+    {
+      "number": 326,
+      "title": "Add browser-local readiness preview to Free Destiny Map intake",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "189b61a74a8c8bf2dace85203954fd5969e66629"
+    },
+    {
+      "number": 324,
+      "title": "Implement canonical Kingsmen candidate application status contract",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+    },
+    {
+      "number": 323,
+      "title": "Add read-only staging preflight for candidate application runtime",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+    },
+    {
+      "number": 330,
+      "title": "Clarify migration identifier ambiguity in provenance audit",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "84978bb62981ef41997b1fd23aed47a3cce0de26",
+      "ciRunId": 45637295249,
+      "ciResult": "success"
+    },
+    {
+      "number": 335,
+      "title": "Populate live security advisor overlap evidence",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
+      "ciRunId": 45640042482,
+      "ciResult": "success"
+    },
+    {
+      "number": 343,
+      "title": "Add read-only staging RLS API boundary probe",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "head": "194bc01f442fdc18114314078c6e2f3d19f39bb5",
+      "mergeCommitSha": "4adb15d963363202cdc6e81715f25dcc3f163857",
+      "role": "read-only staging RLS/API negative-access probe, offline contract and all PR CI workflows passed; live actor/fixture proof pending"
+    },
+    {
+      "number": 342,
+      "title": "Add canonical candidate applications entry route",
+      "state": "closed",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "role": "closed as superseded by schema-compatible candidate journey PR #344; the older branch diverged and contained a live query for an uninstalled status column"
+    },
+    {
+      "number": 344,
+      "title": "Reconcile candidate application journey with current staging schema",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "head": "994df9c4d58858a3f096a6979a2031100462e8df",
+      "mergeCommitSha": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "role": "candidate applications entry, tracker/workbench, status labels, shared session and document UI; schema-compatible edge query; all four PR CI workflows passed; live staging draft runtime still blocked"
+    },
+    {
+      "number": 345,
+      "title": "Add candidate draft runtime preflight and clarify ruleset evidence",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "head": "766fb6689e7721dc86abbc3d67545ec27a803ccd",
+      "mergeCommitSha": "712be387cfd5bd2411ba5644e39440f9428df9b8",
+      "role": "read-only candidate draft runtime preflight, SELECT-only SQL guard, explicit list-vs-detail ruleset evidence fields; all four PR workflows passed; live ruleset settings unchanged"
+    }
+  ],
+  "updateRules": [
+    "Every Kingsmen response begins with overall status, implementation phase, current branch/PR, last verified evidence, highest-priority blocker and next deliverable.",
+    "Only update completion status when tests or runtime evidence actually pass.",
+    "Keep this document, this manifest and the validation contract in sync after meaningful batches.",
+    "Never describe source presence or a ready historical deployment as proof of a complete production journey.",
+    "Do not apply migrations or modify live staging data without a reviewed plan and explicit approval."
+  ],
+  "recentBatches": [
+    {
+      "id": "status-register",
+      "pr": 327,
+      "state": "merged",
+      "mergeCommitSha": "fbd8420d14ba6ee87174c77de7de58d213254f8c",
+      "ciRunId": 45634438774,
+      "ciResult": "success",
+      "notes": "Project-wide status register, N00–N20 module map, 13 release gates, timeline, validator, README/CLAUDE references, and CI status contract."
+    },
+    {
+      "id": "free-destiny-preview",
+      "pr": 326,
+      "state": "merged",
+      "mergeCommitSha": "189b61a74a8c8bf2dace85203954fd5969e66629",
+      "ciRunId": 45634488651,
+      "ciResult": "success",
+      "notes": "Browser-local route-specific readiness preview; preview button does not submit; browser test and N15 source review tests passed."
+    },
+    {
+      "id": "migration-provenance-ci-validator-repair",
+      "pr": 330,
+      "state": "merged",
+      "mergeCommitSha": "84978bb62981ef41997b1fd23aed47a3cce0de26",
+      "ciRunId": 45637295249,
+      "ciResult": "success",
+      "notes": "Repaired status-register and migration-provenance wording contracts. Root tests, status validator, provenance validator, API build and web build passed. No database mutation."
+    },
+    {
+      "id": "security-advisor-overlap-detail-reconciliation",
+      "state": "merged",
+      "ciResult": "success",
+      "notes": "Merged PR #335. Read-only Supabase advisor and pg_policies requery populated all 16 role/action/policy combinations; validator rejects unknown placeholders. Root tests, status validator, migration provenance validator, security advisor validator, API build and web build passed. No database/schema/policy/Auth/candidate-data change.",
+      "pr": 335,
+      "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
+      "ciRunId": 45640042482
+    },
+    {
+      "id": "candidate-journey-schema-compatibility",
+      "pr": 344,
+      "state": "merged",
+      "branch": "feat/candidate-journey-schema-compatible-20261125",
+      "notes": "Schema-compatible candidate application/session/document journey merged; all PR CI, disposable PostgreSQL and browser regression checks passed. No staging/production mutation.",
+      "mergeCommitSha": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "ciResult": "success",
+      "ciRunIds": [
+        45695029317,
+        45695029373,
+        45695029370,
+        45695029333
+      ]
+    },
+    {
+      "id": "candidate-draft-runtime-preflight-and-ruleset-evidence",
+      "state": "merged",
+      "branch": "fix/staging-provenance-preflight-20261125",
+      "notes": "PR #345 merged; SELECT-only live SQL preflight executed successfully; 4 PR workflows passed. Ruleset report labels clarified without changing repository settings; actual main ruleset remains incomplete.",
+      "mergeCommitSha": "712be387cfd5bd2411ba5644e39440f9428df9b8",
+      "ciResult": "success",
+      "ciRunIds": [
+        45696638529,
+        45696638409,
+        45696638393,
+        45696638408
+      ],
+      "liveSqlPreflightResult": "success_read_only"
+    }
+  ],
+  "latestVerification": {
+    "statusDate": "2026-11-25",
+    "lastKnownPassingIntegratedCi": {
+      "runId": 45639316939,
+      "result": "success",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45639316939",
+      "commit": "af25ba4ecf94fde40739332d7c15a24092874974",
+      "checksPassed": [
+        "focused repository tests",
+        "Kingsmen status-register contract",
+        "migration-provenance contract",
+        "security-advisor contract",
+        "API build",
+        "Next.js web build"
+      ]
+    },
+    "statusRegisterCi": {
+      "runId": 45639316939,
+      "result": "success",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45639316939",
+      "commit": "af25ba4ecf94fde40739332d7c15a24092874974"
+    },
+    "migrationProvenance": {
+      "status": "historical_sweep_captured_live_ledger_tail_rechecked",
+      "ciRunId": 45639316939,
+      "currentBranchTrackedSourceFiles": 41,
+      "historicalBranchesScanned": 8,
+      "historicalNameCandidates": 67,
+      "historicalRecordsWithoutNameCandidate": 63,
+      "duplicateLedgerNames": 2,
+      "replayAuthorized": false,
+      "liveLedgerTailAudit": {
+        "checkedOn": "2026-11-25",
+        "exactPreflightSqlExecuted": true,
+        "ledgerRecordCount": 130,
+        "distinctVersionCount": 130,
+        "latestVersion": "20261029193124",
+        "latestName": "candidate_self_service_profile_bootstrap_0095",
+        "unmatchedMigrationIdentifiers": [
+          "0096",
+          "0097",
+          "0098",
+          "0107",
+          "0108",
+          "0109",
+          "0110"
+        ],
+        "historicalSourceSweep": {
+          "branchesScanned": 8,
+          "ledgerRowsWithoutSourceNameCandidate": 63,
+          "exactSqlBodyProvenanceMatches": 0
+        },
+        "replayAuthorized": false,
+        "migrationStatus": "RECONCILIATION_REQUIRED_DO_NOT_REPLAY"
+      }
+    },
+    "securityAdvisorAudit": {
+      "status": "live_policy_grant_review_captured_validator_pending",
+      "ciRunId": 45639316939,
+      "securityAdvisorAuditPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
+      "counts": {
+        "publicTables": 230,
+        "publicTablesWithRlsEnabled": 230,
+        "rlsEnabledNoPolicy": 17,
+        "authenticatedCallableSecurityDefinerFunctions": 6,
+        "multiplePermissivePolicies": 16,
+        "leakedPasswordProtectionWarning": 1,
+        "unusedIndexes": 282
+      },
+      "functionBodiesMatched": 6,
+      "anonOrPublicCanExecuteFlaggedFunction": 0,
+      "noPolicyTablesWithDirectAnonOrAuthenticatedGrant": 0,
+      "tablesWithAnonAndAuthenticatedAllCrudGrants": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "policyDefinitionsCaptured": 33,
+      "helperFunctionsCaptured": 7,
+      "liveApiNegativeRoleTestsRun": 0
+    },
+    "releaseProtectionCheck": {
+      "runId": 45639317054,
+      "workflowResult": "failure_classic_endpoint_returns_404",
+      "rulesetId": 26323884,
+      "result": "partial_ruleset_active_spec_gaps",
+      "reason": "Active ruleset is verified through the rulesets API; the project manifest asks for additional status checks and review/history requirements not yet present in the observed ruleset."
+    },
+    "branchProtectionVerifier": {
+      "status": "source_report_clarification_merged_live_policy_still_incomplete",
+      "sourceScript": "scripts/ci/capture-main-branch-protection.mjs",
+      "sourceValidator": "scripts/validators/validate-branch-protection-capture.mjs",
+      "unitTests": "scripts/ci/test-main-branch-protection-policy.mjs",
+      "ciCommand": "npm run repo:validate:branch-protection-capture",
+      "normalCiStepAdded": true,
+      "policyWasChanged": false,
+      "rulesetId": 26323884,
+      "activeRulesetCurrentStatus": "partial_ruleset_active_spec_gaps",
+      "branch": "fix/staging-provenance-preflight-20261125",
+      "sourceFieldsAdded": [
+        "listedRulesetsMatchingMainInListPayloadCount",
+        "selectedRulesetVerifiedApplicable",
+        "detailVerifiedApplicableRuleSetCount"
+      ],
+      "liveObservation": {
+        "checkedOn": "2026-11-25",
+        "rulesetId": 26323884,
+        "rulesetName": "main-branch-protection",
+        "rulesetActiveForMain": true,
+        "listedRulesetsMatchingMainInListPayloadCount": 0,
+        "selectedRulesetVerifiedApplicable": true,
+        "detailVerifiedApplicableRuleSetCount": 1,
+        "policyComplete": false,
+        "missingControls": [
+          "sourceGuardRequired",
+          "releaseEvidenceRequired",
+          "staleReviewsDismissed",
+          "conversationResolutionRequired",
+          "linearHistoryRequired",
+          "adminEnforcementEnabled"
+        ]
+      },
+      "repoSettingsChanged": false,
+      "mergeCommitSha": "712be387cfd5bd2411ba5644e39440f9428df9b8",
+      "postMergeEvidenceRun": {
+        "runId": 45697023473,
+        "status": "in_progress"
+      }
+    },
+    "candidateRuntimePreflight": {
+      "statusDate": "2026-11-25",
+      "environment": "Supabase staging",
+      "projectRef": "euhubhhnumtibbyufghm",
+      "method": "Read-only SQL; no schema or data changes",
+      "result": "BLOCKED_RUNTIME_PREREQUISITES_MISSING",
+      "present": [
+        "public.candidate_applications",
+        "public.candidate_application_events"
+      ],
+      "missing": [
+        "public.candidate_application_draft_answers",
+        "public.get_candidate_application_draft(uuid)",
+        "public.save_candidate_application_draft(uuid,jsonb,integer,text)",
+        "kingsmen_security.current_verified_kingsmen_candidate_id()"
+      ],
+      "additionalBlockers": [
+        "candidate_application_events_event_type_check does not allow APPLICATION_DRAFT_SAVED",
+        "no candidate_auth_identity_links rows",
+        "no candidate_master_profiles rows",
+        "no candidate_applications fixture rows",
+        "migration ledger lookups for 0096, 0097 and 0098 returned no matching entries",
+        "no current_verified_kingsmen_candidate_id helper found in public/private/kingsmen_security"
+      ],
+      "migrationOrDeploymentAuthorized": false,
+      "notes": "Preflight confirms the candidate application draft runtime is not deployable on current staging. Do not apply migrations 0107–0109 until exact migration provenance, restore rehearsal, schema compatibility, security review and change-control approval are complete."
+    },
+    "rlsApiBoundaryProbe": {
+      "status": "offline_contract_and_integrated_ci_passed_live_staging_pending",
+      "pullRequest": 343,
+      "branch": "security/staging-rls-api-boundary-20261125",
+      "implementationCommit": "3b2139f7ab91d1e9e2b2aac16f0276f1ec9f400a",
+      "validatedPullRequestHead": "194bc01f442fdc18114314078c6e2f3d19f39bb5",
+      "mergeCommit": "4adb15d963363202cdc6e81715f25dcc3f163857",
+      "workflows": [
+        {
+          "name": "Kingsmen staging RLS API boundary",
+          "runId": 45693309444,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309444"
+        },
+        {
+          "name": "Kingsmen CI",
+          "runId": 45693309467,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309467"
+        },
+        {
+          "name": "Kingsmen application draft contract",
+          "runId": 45693309777,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309777"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45693309886,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309886"
+        }
+      ],
+      "offlineContract": {
+        "result": "passed",
+        "runId": 45693309444,
+        "checks": 65,
+        "tables": [
+          "candidate_credentials",
+          "candidate_sessions",
+          "evidence_ledger",
+          "workflow_runs",
+          "route_sources"
+        ],
+        "actors": [
+          "anonymous",
+          "candidateA",
+          "candidateB",
+          "operator",
+          "founder"
+        ]
+      },
+      "liveStaging": {
+        "result": "not_run_fixture_and_actor_prerequisites_missing",
+        "liveApiNegativeRoleTestsRun": 0,
+        "databaseChanges": false,
+        "reason": "No approved staging fixture records or non-production test actor tokens; the probe does not create fixtures."
+      }
+    },
+    "candidateApplicationJourneyPR": {
+      "status": "merged_ci_passed_staging_runtime_prerequisites_missing",
+      "pullRequest": 344,
+      "validatedHead": "994df9c4d58858a3f096a6979a2031100462e8df",
+      "mergeCommit": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "workflows": [
+        {
+          "name": "Kingsmen CI",
+          "runId": 45695029317,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029317"
+        },
+        {
+          "name": "Kingsmen application draft contract",
+          "runId": 45695029373,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029373"
+        },
+        {
+          "name": "Kingsmen staging RLS API boundary",
+          "runId": 45695029370,
+          "result": "success_offline_live_probe_skipped",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029370"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45695029333,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029333"
+        }
+      ],
+      "statusContractAndSchemaGuard": "passed_on_validated_head",
+      "browserChecks": "passed_on_validated_head",
+      "liveStagingResult": "BLOCKED_RUNTIME_PREREQUISITES_MISSING",
+      "stagingOrProductionMutation": false
+    },
+    "candidateJourneySchemaCompatibility": {
+      "status": "merged_ci_passed_live_staging_pending",
+      "pullRequest": 344,
+      "branch": "feat/candidate-journey-schema-compatible-20261125",
+      "validatedHead": "994df9c4d58858a3f096a6979a2031100462e8df",
+      "mergeCommit": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "tests": {
+        "rootFocusedRepositoryTests": "passed",
+        "candidateStatusContract": "passed",
+        "schemaCompatibilityGuard": "passed",
+        "candidateDocumentSessionContract": "passed",
+        "candidateEntryRouteContract": "passed",
+        "draftSaveResumeIdempotencyConsentIsolation": "passed_in_disposable_postgresql",
+        "statusContractSqlProposal": "passed_in_disposable_postgresql_only",
+        "candidateTrackerDraftResumeBrowser": "passed",
+        "privateDocumentUploadFinalizeDownloadBrowser": "passed",
+        "candidateDraftBrowserSaveResume": "passed",
+        "profileSaveReloadConsentBrowser": "passed",
+        "targetToWorkbenchBrowser": "passed",
+        "freeDestinyMapBrowser": "passed",
+        "n15SourceReviewBrowser": "passed",
+        "apiBuild": "passed",
+        "nextProductionBuild": "passed"
+      },
+      "postMergeWorkflows": [
+        {
+          "name": "Kingsmen CI",
+          "runId": 45695427282,
+          "status": "in_progress"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45695427264,
+          "status": "in_progress"
+        },
+        {
+          "name": "Kingsmen Main Branch Protection Evidence",
+          "runId": 45695427225,
+          "status": "in_progress"
+        }
+      ],
+      "liveStaging": {
+        "result": "not_tested",
+        "blockers": [
+          "candidate_application_draft_answers missing",
+          "draft read/save RPCs missing",
+          "verified candidate security helper missing",
+          "APPLICATION_DRAFT_SAVED event type not allowed",
+          "kingsmen_status column absent",
+          "approved actor tokens and fixture records absent",
+          "migration provenance and restore/change-control gates unresolved"
+        ],
+        "schemaOrDataChanges": false
+      }
+    },
+    "candidateDraftRuntimePreflight": {
+      "status": "blocked_verified_by_live_read_only_preflight_sql",
+      "checkedOn": "2026-11-25",
+      "capturedAt": "2026-11-25T20:37:20.487695+00:00",
+      "projectRef": "euhubhhnumtibbyufghm",
+      "sourceQuery": "scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql",
+      "queryBlobSha": "00d66511bbc425e99115b9eb9ca2deef2480af56",
+      "executionResult": "success",
+      "exactQueryRunAgainstStaging": true,
+      "recordCount": 130,
+      "distinctVersionCount": 130,
+      "latestLedgerRecord": {
+        "version": "20261029193124",
+        "name": "candidate_self_service_profile_bootstrap_0095"
+      },
+      "migrationIdNameMatches": {
+        "0096": 0,
+        "0097": 0,
+        "0098": 0,
+        "0107": 0,
+        "0108": 0,
+        "0109": 0,
+        "0110": 0
+      },
+      "runtimeObjects": {
+        "candidateApplicationsTable": true,
+        "candidateApplicationsKingsmenStatusColumn": false,
+        "candidateApplicationDraftAnswersTable": false,
+        "getCandidateApplicationDraftRpc": false,
+        "saveCandidateApplicationDraftRpc": false,
+        "verifiedCandidateSecurityHelper": false,
+        "applicationDraftSavedEventAllowed": false
+      },
+      "safety": {
+        "readOnly": true,
+        "schemaChanged": false,
+        "dataChanged": false,
+        "migrationsApplied": false,
+        "policiesOrGrantsChanged": false,
+        "authChanged": false,
+        "deploymentChanged": false,
+        "migrationReplayAuthorized": false
+      },
+      "offlineContractTest": "scripts/staging/test-candidate-draft-runtime-preflight.mjs",
+      "offlineContractCi": "passed on PR #345",
+      "instructions": "docs/rebuild/CANDIDATE_DRAFT_RUNTIME_PREFLIGHT.md",
+      "nextAction": "Reconcile exact applied-SQL provenance and approved backup/restore/security/change-control gates before considering any status/draft migration; do not replay migrations from this report."
+    }
+  },
+  "migrationProvenance": {
+    "snapshotPath": "manifests/rebuild/kingsmen-staging-migration-provenance-2026-11-25.json",
+    "reportPath": "reports/rebuild/kingsmen-staging-migration-provenance-latest.json",
+    "documentationPath": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
+    "validatorPath": "scripts/validators/validate-kingsmen-migration-provenance.mjs",
+    "validatorCommand": "npm run kingsmen:migrations:provenance:validate",
+    "captureType": "read_only",
+    "status": "HISTORICAL_SWEEP_CAPTURED_PENDING_CI_VALIDATION",
+    "currentBranchSummary": {
+      "trackedSourceFiles": 41,
+      "normalizedExactMatches": 32,
+      "coreOnlyCandidateMatches": 2,
+      "ledgerRecordsWithoutCurrentBranchNameMatch": 96,
+      "sourceFilesWithoutLedgerNameMatch": 7
+    },
+    "historicalBranchSweep": {
+      "branchesScanned": 8,
+      "rawBranchSourceEntries": 414,
+      "uniqueSourcePathHashEntries": 86,
+      "uniqueSourcePaths": 83,
+      "ledgerRecordsWithCoreAndSequenceCandidate": 40,
+      "ledgerRecordsWithCoreOnlyCandidates": 27,
+      "ledgerRecordsWithoutHistoricalSourceNameCandidate": 63,
+      "candidateSourceRecords": 67,
+      "duplicateLedgerNames": 2,
+      "exactSqlBodyProvenanceMatches": 0,
+      "replayAuthorized": false
+    },
+    "nextAction": "Reconcile exact SQL body/commit/deployment provenance for all 130 ledger records; resolve duplicates and branch-sequence collisions before any schema change."
+  },
+  "securityAdvisorSnapshot": {
+    "snapshotPath": "manifests/rebuild/kingsmen-staging-security-advisor-2026-11-25.json",
+    "reportPath": "reports/rebuild/kingsmen-staging-security-advisor-latest.json",
+    "documentationPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
+    "validatorPath": "scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
+    "validatorCommand": "npm run kingsmen:security-advisor:validate",
+    "captureType": "read_only",
+    "status": "LIVE_BODY_GRANTS_POLICIES_CAPTURED_VALIDATOR_PENDING",
+    "summary": {
+      "publicTables": 230,
+      "publicTablesWithRlsEnabled": 230,
+      "rlsEnabledNoPolicy": 17,
+      "authenticatedCallableSecurityDefinerFunctions": 6,
+      "multiplePermissivePolicies": 16,
+      "leakedPasswordProtectionWarning": 1,
+      "unusedIndexes": 282,
+      "liveFunctionBodiesMatchedHistoricalSource": 6,
+      "flaggedFunctionsExecutableByAnonOrPublic": 0,
+      "noPolicyTablesWithDirectAnonOrAuthenticatedGrants": 0,
+      "noPolicyTablesPrivilegedChecked": 17,
+      "tablesWithAnonAndAuthenticatedAllCrudGrants": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "policyDefinitionsCaptured": 33,
+      "helperFunctionsCaptured": 7,
+      "liveApiNegativeRoleTestsRun": 0
+    },
+    "nextAction": "Run PostgREST/API negative tests for anonymous and cross-candidate access on candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs before proposing least-privilege grant changes."
+  },
+  "surfaceStatus": {
+    "frontend": {
+      "surface": "apps/web — Next.js App Router / React",
+      "status": "CANDIDATE_JOURNEY_SOURCE_CI_PASSED_STAGING_RUNTIME_BLOCKED",
+      "inventory": {
+        "routePages": 78,
+        "sourceFiles": 332,
+        "candidateRoutePages": 15,
+        "founderRoutePages": 10,
+        "nextApiRouteHandlers": 73
+      },
+      "builtOrVerified": [
+        "Candidate/dashboard, profile, identity, workbench, tracker, documents, finance, outcomes, messages and mobile route families exist in source.",
+        "PR #326 Free Destiny Map browser-local readiness preview merged; preview does not save or submit selections.",
+        "Free Destiny Map readiness-preview browser test passed in application draft contract workflow.",
+        "Next.js web build passed in PR #330 CI run 45637295249.",
+        "PR #344 ports candidate application navigation, tracker/workbench/editor, session expiry and document workflow; schema-compatibility guard added, CI pending.",
+        "PR #344 merged the schema-compatible candidate application and document journey; all PR CI and browser acceptance tests passed on the validated head."
+      ],
+      "remaining": [
+        "Run current post-security-audit Next.js build to completion.",
+        "Prove one full authenticated candidate browser/API/database journey on staging.",
+        "Verify route-to-route connectivity and mobile/accessibility acceptance for the critical journey.",
+        "Complete current CI for PR #344 and close stale predecessor PR #342; live application resume/edit remains blocked until approved status/draft schema and runtime security prerequisites are installed.",
+        "Complete the authorized staging runtime prerequisites and authenticated candidate application end-to-end proof; source/UI tests do not prove live backend functionality."
+      ],
+      "evidence": {
+        "readinessPreviewCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651",
+        "lastKnownWebBuildPass": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249",
+        "latestRebuildCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638710300"
+      }
+    },
+    "backend": {
+      "surface": "apps/api + apps/workers + Supabase/PostgreSQL + Edge Functions",
+      "status": "API_BUILD_PASSED_STAGING_SECURITY_TRIAGED_RUNTIME_ACCEPTANCE_PENDING",
+      "inventory": {
+        "apiSourceFiles": 182,
+        "publicTables": 230,
+        "activeEdgeFunctions": 23,
+        "liveMigrationLedgerRecords": 130,
+        "trackedSqlMigrationFiles": 41
+      },
+      "builtOrVerified": [
+        "Separate apps/api and typed command/state-machine foundation exist.",
+        "API build passed in PR #330 CI run 45637295249.",
+        "Read-only live PostgreSQL comparison: all six flagged SECURITY DEFINER function bodies exactly match selected historical source bodies after whitespace normalization.",
+        "Live ACL check: anon and PUBLIC cannot execute any of the six flagged functions; authenticated and service_role can.",
+        "Live privileges: all 17 RLS-enabled/no-policy tables deny anon and authenticated direct SELECT/INSERT/UPDATE/DELETE."
+      ],
+      "remaining": [
+        "Reconcile exact migration body/version/commit provenance for the 130 live ledger records; historical filename candidate map is not deployment proof.",
+        "Run real Candidate A/B, operator and founder negative/positive authorization tests across API/RPC/table boundaries.",
+        "Review 16 policy-overlap findings and enable/verify leaked-password protection through a separate reviewed Auth change.",
+        "Prove durable state, retries, idempotency, worker lease recovery, backup/restore and payment/communication sandbox paths.",
+        "Test anon/Candidate A/Candidate B/operator/founder direct REST/RPC access to candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs; grants are broad at table layer and current RLS predicates need runtime negative proof.",
+        "Complete approved staging actor/fixture setup and run the new GET-only RLS API boundary probe; retain release block until live proof passes.",
+        "Keep live candidate-preparation query compatible with the current schema; complete migration provenance, restore rehearsal, identity-helper review and authorized fixture design before any status/draft persistence migration.",
+        "Complete candidate status/draft persistence only after migration provenance, restore rehearsal, security review and change approval; then provision approved test actors/fixtures and prove the runtime journey."
+      ],
+      "evidence": {
+        "migrationAudit": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
+        "securityAudit": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
+        "lastKnownApiBuildPass": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249"
+      }
+    },
+    "integration": {
+      "status": "REBUILD_BRANCH_CI_ACTIVE_PRODUCTION_DEPLOY_NOT_RECONCILED",
+      "buildTargetBranch": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "lastKnownPassingIntegratedCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249",
+      "latestCiRun": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638710300",
+      "currentProductionDeploymentIsRebuildBranch": false,
+      "lastRecordedReadyDeploymentDate": "2026-07-08",
+      "topBlockers": [
+        "GitHub main-branch protection not verified by its evidence workflow (HTTP 404).",
+        "Latest post-change CI and web build must complete.",
+        "The rebuild branch is not proven deployed to the live Netlify site."
+      ],
+      "remaining": [
+        "Confirm ruleset-aware branch-protection CI passes; then have an authorized maintainer reconcile the active ruleset against the approved policy requirements."
+      ]
+    }
+  },
+  "githubRulesetObservation": {
+    "capturedOn": "2026-11-25",
+    "method": "Read-only GitHub REST repository ruleset query; classic branch-protection endpoint is not accessible through the integration and returns 403; the dedicated Actions verifier receives HTTP 404 on that endpoint because the repository uses a ruleset.",
+    "rulesetId": 26323884,
+    "name": "main-branch-protection",
+    "target": "branch",
+    "sourceType": "Repository",
+    "source": "kingsmenportal-ctrl/kingsmen-platform",
+    "enforcement": "active",
+    "refInclude": [
+      "refs/heads/main"
+    ],
+    "bypassActors": [],
+    "currentUserCanBypass": "never",
+    "observedRules": {
+      "deletionBlocked": true,
+      "creationBlocked": true,
+      "updateRestricted": true,
+      "pullRequestRequired": true,
+      "requiredApprovingReviewCount": 1,
+      "dismissStaleReviewsOnPush": false,
+      "strictStatusChecks": true,
+      "requiredStatusChecks": [
+        "test-and-build",
+        "validate"
+      ],
+      "nonFastForwardBlocked": true
+    },
+    "requiredByProjectManifestButNotObserved": [
+      "source-guard required status check",
+      "Build, validate, and smoke-test required status check",
+      "dismiss stale reviews",
+      "require conversation resolution",
+      "require linear history"
+    ],
+    "status": "partial_ruleset_active_spec_gaps",
+    "nextAction": "Update the read-only evidence script to support rulesets, then have an authorized maintainer decide/apply the full required policy without requiring non-existent status contexts. Reverify the actual ruleset and check names."
+  },
+  "currentLayerStatus": {
+    "statusDate": "2026-11-25",
+    "frontend": {
+      "layer": "FRONTEND",
+      "sourceStatus": "present",
+      "evidenceStatus": "SOURCE_TEST_PASSED",
+      "currentEvidence": [
+        "apps/web contains 78 route pages in the recorded inventory",
+        "Free Destiny Map browser-local readiness preview merged in PR #326; targeted browser test passed",
+        "Next.js production build passed in PR #335 CI run 45640042482",
+        "PR #344 ports the candidate application entry, tracker/workbench, shared session, document and seven-label status UI; schema-aware unavailable status fails closed pending an approved migration. PR checks pending.",
+        "PR #344 merged candidate application entry/status/tracker/workbench/session/document journey after API + Next production builds, contract tests, disposable PostgreSQL checks and seven browser journeys passed."
+      ],
+      "missing": [
+        "Full authenticated candidate journey through account/profile/documents/application tracker has not passed staging end-to-end",
+        "Current rebuild branch is not the recorded Netlify production deployment",
+        "Validate PR #344 candidate UI/status/session changes on current branch CI, then prove end-to-end behavior only after missing staging runtime prerequisites are resolved.",
+        "Staging candidate application resume/edit journey remains blocked until reviewed status/draft schema and runtime security prerequisites are installed and tested."
+      ]
+    },
+    "backendApi": {
+      "layer": "BACKEND/API",
+      "sourceStatus": "present",
+      "evidenceStatus": "SOURCE_TEST_PASSED",
+      "currentEvidence": [
+        "Separate apps/api package, typed command/state-machine and PostgreSQL Truth Vault foundation exist",
+        "API build passed in PR #335 CI run 45640042482",
+        "PR #344 removes absent kingsmen_status from the live candidate-preparation SELECT and adds a schema-compatibility regression guard; the status SQL remains proposal-only.",
+        "PR #344 removes the uninstalled kingsmen_status column from the live candidate-preparation query and adds a passing schema-compatibility guard; status/draft SQL remains proposal-only.",
+        "Added a read-only SELECT-only candidate draft runtime preflight SQL query and an offline contract test; it reports the live ledger tail and required table/column/RPC/helper/event prerequisites without changing staging.",
+        "PR #345 added and ran the exact read-only candidate draft runtime preflight SQL; returned 130 ledger records/latest 0095 and confirmed absence of draft table/read-save RPC/security helper/event allowance and candidate_applications.kingsmen_status column."
+      ],
+      "missing": [
+        "Prove real PostgreSQL persistence and idempotency on staging",
+        "Prove retry/worker lease/DLQ recovery, authorization boundaries and API/UI end-to-end",
+        "Staging draft persistence remains blocked by missing table/RPC/security helper/event type and unavailable approved fixtures; do not promote migrations until provenance/restore/security/change control pass.",
+        "Candidate draft runtime still lacks the draft-answer table, get/save RPCs, verified-candidate security helper and allowed APPLICATION_DRAFT_SAVED event; no approved actor/fixture dataset.",
+        "Migration provenance remains unresolved: staging ledger ends at candidate_self_service_profile_bootstrap_0095 and contains no name matches for 0096–0098 or 0107–0110; draft runtime objects are absent.",
+        "Exact deployed-SQL lineage remains unproven for 63 ledger rows without any source-name candidate across the historical sweep; migrations 0107–0110 cannot be replayed based on names alone."
+      ]
+    },
+    "databaseSecurity": {
+      "layer": "DATABASE/SECURITY",
+      "sourceStatus": "present",
+      "evidenceStatus": "READ_ONLY_AUDIT_RECONCILED_RUNTIME_TESTS_PENDING",
+      "currentEvidence": [
+        "Supabase staging ACTIVE_HEALTHY, PostgreSQL 17.11, 230 public tables with RLS enabled",
+        "Read-only migration lineage audit: 130 migration ledger records; 63 lack source-name candidates across eight branches; exact applied SQL body/deployment lineage remains unresolved",
+        "Six SECURITY DEFINER bodies match selected historical source candidates; anon/PUBLIC execution denied; 17 no-policy tables deny direct anon/authenticated privileges",
+        "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed",
+        "PR #343 merged at 4adb15d963363202cdc6e81715f25dcc3f163857; the GET-only staging RLS API probe, 65-check offline contract, Kingsmen CI, candidate application/PostgreSQL browser contract and Jarvis Live Runtime all passed on PR head 194bc01f442fdc18114314078c6e2f3d19f39bb5. This is source/CI proof only, not live staging role-isolation evidence.",
+        "PR #344 merged at aebd079f8072de96d13f675e065c891d2b0bae88 after all four PR-head CI workflows passed; status-contract, schema-compat guard, isolated PostgreSQL and seven browser checks passed. These are source/CI proofs only; live candidate runtime and RLS actor isolation remain untested.",
+        "Direct read-only staging query on 2026-11-25: 130 migration ledger rows, latest entry candidate_self_service_profile_bootstrap_0095; no ledger name matches for 0096–0098 or 0107–0110. Candidate draft answers table, get/save RPCs, verified-candidate helper and APPLICATION_DRAFT_SAVED event allowance are absent; candidate_applications.kingsmen_status is absent.",
+        "PR #345 merged at 712be387cfd5bd2411ba5644e39440f9428df9b8. The exact SELECT-only runtime preflight SQL was executed successfully against staging and confirmed 130 distinct ledger entries ending at candidate_self_service_profile_bootstrap_0095, no ledger name matches for 0096–0098 or 0107–0110, and absent draft runtime objects. No mutation.",
+        "PR #345 clarifies ruleset evidence: list endpoint result count is reported separately from detail-confirmed selected ruleset applicability. The actual live main ruleset remains incomplete; no GitHub settings changed."
+      ],
+      "missing": [
+        "Authenticated Candidate A/B, operator and founder runtime isolation tests",
+        "Five tables have direct anon/authenticated table grants and rely on RLS predicates; verify least-privilege negative API access",
+        "Leaked-password protection disabled; requires reviewed Auth-setting change",
+        "Migration lineage/restore/change-control approval before any migration changes",
+        "Prepare approved non-production actor tokens and pre-existing test fixtures, then run the GET-only RLS API probe. No fixture creation or policy changes are performed by the probe.",
+        "Reconcile 63 live ledger rows with no historical source-name candidates and prove exact deployed SQL-body lineage; do not replay migrations based on filename matches."
+      ]
+    },
+    "integrationsJarvis": {
+      "layer": "INTEGRATION/JARVIS",
+      "evidenceStatus": "SOURCE_PRESENT_RUNTIME_PARTIAL",
+      "currentEvidence": [
+        "Jarvis core, policy gate, tool registry and evidence ledger exist",
+        "Jarvis Live Runtime workflow has recently passed"
+      ],
+      "missing": [
+        "Provider integrations, queues/worker recovery, email/payment sandbox and every claimed live action need provider/runtime evidence"
+      ]
+    },
+    "infraCiDeploy": {
+      "layer": "INFRA/CI/DEPLOY",
+      "evidenceStatus": "PR_CI_PASSED_PRODUCTION_REBUILD_NOT_DEPLOYED",
+      "currentEvidence": [
+        "PR #335 CI run 45640042482 passed focused tests, all three validators, API build and web build",
+        "Active main-branch-protection ruleset `main-branch-protection` ID 26323884 exists"
+      ],
+      "missing": [
+        "Ruleset is partially compliant: source-guard and release-evidence checks, stale-review dismissal, conversation resolution and linear-history requirement are absent",
+        "Netlify's last recorded production deployment is 8 July 2026 on main, not the selected rebuild branch",
+        "All 13 canonical release gates remain open/pending; no public launch"
+      ]
+    }
+  }
+}

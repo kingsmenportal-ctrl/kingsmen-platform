@@ -25,6 +25,27 @@ export default function FounderControlPlanePage() {
       </section>
     
         <a
+          data-kingsmen-n15-source-review-entry="true"
+          href="/founder/opportunity-sources/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: "18px",
+            marginRight: "12px",
+            padding: "12px 16px",
+            borderRadius: "999px",
+            border: "1px solid rgba(214, 178, 94, 0.55)",
+            background: "rgba(214, 178, 94, 0.12)",
+            color: "#f8d77a",
+            fontWeight: 900,
+            textDecoration: "none"
+          }}
+        >
+          Open N15 Source Review
+        </a>
+
+        <a
           data-kingsmen-proof-centre-entry="true"
           href="/founder/proof-centre/"
           style={{

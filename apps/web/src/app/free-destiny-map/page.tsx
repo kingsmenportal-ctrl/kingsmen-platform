@@ -1,242 +1,88 @@
-﻿export default function FreeDestinyMapPage() {
+import { FreeDestinyMapApiForm } from "../../components/kingsmen/FreeDestinyMapApiForm";
+
+const corePathways = [
+  ["01", "Higher Education", "Universities, Universities of Technology and CAO programme choices."],
+  ["02", "TVET", "Vocational and technical learning, including public college routes."],
+  ["03", "SETA programmes & learnerships", "Skills programmes, learnerships and workplace learning."],
+  ["04", "Internships", "Work experience and structured early-career opportunities."],
+  ["05", "Apprenticeships", "Trade routes and practical occupational training."],
+  ["06", "Employment", "Vacancy discovery, CV preparation and employer application routes."]
+] as const;
+
+export const metadata = {
+  title: "Free Destiny Map | Kingsmen Portal",
+  description: "Start a South African education, training or employment route map with Kingsmen."
+};
+
+export default function FreeDestinyMapPage() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        padding: "32px",
-        background:
-          "radial-gradient(circle at top left, rgba(214,178,94,0.2), transparent 34%), #080a12",
-        color: "#f8f3e7",
-        fontFamily:
-          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-      }}
-    >
-      <section
-        data-kingsmen-free-destiny-map-identity="true"
-        style={{ maxWidth: "980px", margin: "0 auto", display: "grid", gap: "18px" }}
-      >
-        <p
-          style={{
-            margin: 0,
-            color: "#d6b25e",
-            fontSize: "13px",
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            fontWeight: 900
-          }}
-        >
-          Free Destiny Map
-        </p>
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <header className="border-b border-slate-800 bg-slate-950 text-white">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+          <a href="/" className="flex items-center gap-3 rounded focus:outline-none focus:ring-2 focus:ring-amber-300">
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-amber-200 to-amber-500 text-lg font-black text-slate-950">K</span>
+            <span><strong className="block text-sm tracking-[0.18em]">KINGSMEN</strong><span className="mt-1 block text-xs text-slate-300">FREE DESTINY MAP</span></span>
+          </a>
+          <nav aria-label="Main navigation" className="flex flex-wrap items-center gap-4 text-sm text-slate-200">
+            <a className="hover:text-amber-200" href="/">Home</a>
+            <a className="hover:text-amber-200" href="/packages/">Packages</a>
+            <a className="hover:text-amber-200" href="/candidate/dashboard">Candidate dashboard</a>
+          </nav>
+        </div>
+      </header>
 
-        <h1 style={{ margin: 0, fontSize: "44px", lineHeight: 1.05, color: "#fff7d6" }}>
-          Start your Kingsmen route discovery.
-        </h1>
-
-        <p style={{ maxWidth: "760px", color: "#d5d9e2", fontSize: "16px", lineHeight: 1.7 }}>
-          This safe public intake surface helps you describe your current stage, province, route
-          interest, biggest blocker, and readiness goal before any managed package. No payment is
-          required for this Free Destiny Map starting point.
-        </p>
-
-        <form
-          data-kingsmen-free-destiny-map-intake="true"
-          style={{
-            display: "grid",
-            gap: "14px",
-            padding: "22px",
-            borderRadius: "28px",
-            border: "1px solid rgba(214, 178, 94, 0.28)",
-            background: "rgba(255, 255, 255, 0.045)",
-            boxShadow: "0 22px 70px rgba(0,0,0,0.28)"
-          }}
-        >
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="current-stage" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Current stage
-            </label>
-            <select
-              id="current-stage"
-              data-kingsmen-intake-field="current-stage"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose your current stage
-              </option>
-              <option>Grade 9 - 11</option>
-              <option>Grade 12 / Matric</option>
-              <option>Matric completed</option>
-              <option>TVET / college student</option>
-              <option>Unemployed and seeking opportunity</option>
-              <option>Working and seeking upgrade</option>
-            </select>
+      <section className="bg-slate-950 px-4 pb-12 pt-10 text-white sm:px-6 sm:pb-16 sm:pt-14">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.24em] text-amber-300">South Africa · Free starting point</p>
+            <h1 className="mt-4 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">Map the next step. Keep every pathway open.</h1>
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">Describe your current stage, route interests and support needs. Kingsmen can use that intent to plan the next steps across education, skills, work and related support.</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a href="#intake" className="inline-flex min-h-11 items-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-slate-950">Start the map <span aria-hidden="true" className="ml-2">↓</span></a>
+              <a href="/packages/" className="inline-flex min-h-11 items-center rounded-xl border border-slate-600 px-5 py-3 text-sm font-semibold text-white hover:border-amber-300 hover:text-amber-200">Compare service plans</a>
+            </div>
+            <p className="mt-5 max-w-2xl text-xs leading-5 text-slate-400">The Free Destiny Map is for route discovery. It does not create a paid order or submit an official application, and it does not guarantee an admission, bursary, placement or job.</p>
           </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="province" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Province
-            </label>
-            <select
-              id="province"
-              data-kingsmen-intake-field="province"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose province
-              </option>
-              <option>Eastern Cape</option>
-              <option>Free State</option>
-              <option>Gauteng</option>
-              <option>KwaZulu-Natal</option>
-              <option>Limpopo</option>
-              <option>Mpumalanga</option>
-              <option>Northern Cape</option>
-              <option>North West</option>
-              <option>Western Cape</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="route-interest" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Route interest
-            </label>
-            <select
-              id="route-interest"
-              data-kingsmen-intake-field="route-interest"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose route
-              </option>
-              <option>University</option>
-              <option>TVET college</option>
-              <option>SETA / learnership</option>
-              <option>Internship / apprenticeship</option>
-              <option>Employment / CV path</option>
-              <option>Bursary / funding support</option>
-              <option>I am not sure yet</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="biggest-blocker" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Biggest blocker
-            </label>
-            <select
-              id="biggest-blocker"
-              data-kingsmen-intake-field="biggest-blocker"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose blocker
-              </option>
-              <option>I do not know what to apply for</option>
-              <option>I am missing documents</option>
-              <option>I need funding guidance</option>
-              <option>I need a better CV</option>
-              <option>I am worried about deadlines</option>
-              <option>I need backup options</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="readiness-goal" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Readiness goal
-            </label>
-            <textarea
-              id="readiness-goal"
-              data-kingsmen-intake-field="readiness-goal"
-              placeholder="Example: I want to know the safest route and what documents I need."
-              rows={4}
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7",
-                resize: "vertical"
-              }}
-            />
-          </div>
-
-          <label
-            style={{
-              display: "flex",
-              gap: "10px",
-              alignItems: "flex-start",
-              color: "#d5d9e2",
-              fontSize: "13px",
-              lineHeight: 1.6
-            }}
-          >
-            <input
-              id="intake-boundary-confirmation"
-              data-kingsmen-intake-field="boundary-confirmation"
-              type="checkbox"
-              style={{ marginTop: "4px" }}
-            />
-            I understand this is a safe Free Destiny Map starting surface only. It does not submit
-            my information yet, does not create an application, and does not guarantee acceptance,
-            funding, placement, or employment.
-          </label>
-
-          <button
-            data-kingsmen-intake-button="preview-path"
-            type="button"
-            style={{
-              display: "inline-flex",
-              width: "fit-content",
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: "8px",
-              padding: "13px 18px",
-              borderRadius: "999px",
-              border: "1px solid rgba(214, 178, 94, 0.62)",
-              background: "linear-gradient(135deg, rgba(214,178,94,0.22), rgba(214,178,94,0.08))",
-              color: "#f8d77a",
-              fontWeight: 900,
-              textDecoration: "none",
-              boxShadow: "0 16px 48px rgba(0,0,0,0.24)"
-            }}
-          >
-            Preview my readiness path
-          </button>
-        </form>
-
-        <p style={{ color: "#aeb7c5", fontSize: "13px", lineHeight: 1.6 }}>
-          Boundary: this page is a public intake surface only. It does not collect personal contact channels,
-          official personal identifiers, documents, payments, outbound messages, urgent channel messages, production
-          credentials, or Oracle deployment proof.
-        </p>
+          <aside className="rounded-3xl border border-slate-700 bg-slate-900/70 p-5 sm:p-7">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">The Kingsmen route map</p>
+            <h2 className="mt-3 text-2xl font-bold">Six core pathways</h2>
+            <div className="mt-4 divide-y divide-slate-700">
+              {corePathways.map(([number, title, description]) => (
+                <div key={number} className="flex gap-4 py-4">
+                  <span className="pt-1 text-xs font-black text-amber-300">{number}</span>
+                  <div><h3 className="font-semibold text-white">{title}</h3><p className="mt-1 text-sm leading-5 text-slate-400">{description}</p></div>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
       </section>
+
+      <section className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-start lg:py-14">
+        <aside className="space-y-4">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-amber-700">Before you begin</p>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-tight">Start with intent, not paperwork.</h2>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h3 className="font-bold">You will not need payment details</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">The map is a separate R0 starting point. Paid service plans affect application volume and managed-route capacity—not access to the six pathways.</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h3 className="font-bold">Keep sensitive documents out of this form</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Do not enter official ID/passport numbers, account passwords, card data or document contents. Use the authenticated Document Vault only when its secure upload connection is confirmed.</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h3 className="font-bold">Verify before applying</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Directory listings and candidate interests are not proof that an opportunity is open. Deadline, eligibility and provider receipt require their own evidence.</p>
+          </div>
+        </aside>
+        <FreeDestinyMapApiForm />
+      </section>
+
+      <footer className="border-t border-slate-200 bg-white px-4 py-6 text-xs leading-5 text-slate-500 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:justify-between"><span>© Kingsmen Portal · South Africa</span><span>Public route mapping only · No official application submitted</span></div>
+      </footer>
     </main>
   );
 }
-

@@ -176,7 +176,7 @@ Deno.serve(async (req: Request) => {
     if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401);
     const reviewerClient = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: reviewer, error: reviewerError } = await reviewerClient.from("platform_reviewers")
-      .select("role_code").eq("auth_user_id", userData.user.id).eq("is_active", true)
+      .select("role_code").eq("auth_user_id", userData.user.id).eq("is_active", true).is("revoked_at", null)
       .in("role_code", ["PLATFORM_ADMIN", "PROVIDER_OPERATOR", "APPLICATION_REVIEWER", "EVIDENCE_VERIFIER"])
       .limit(1).maybeSingle();
     if (reviewerError) return json({ status: "DATABASE_ERROR", reason: "REVIEWER_AUTHORIZATION_LOOKUP_FAILED" }, 500);
@@ -190,8 +190,8 @@ Deno.serve(async (req: Request) => {
   });
   if (runError) return json({ status: "DATABASE_ERROR", reason: "INGESTION_RUN_CREATE_FAILED" }, 500);
   const { data: authorities, error: authorityError } = await supabase.from("opportunity_source_authorities")
-    .select("authority_ref,authority_name,authority_type,base_url,active,sector_scope")
-    .eq("active", true).order("authority_ref").limit(100);
+    .select("authority_ref,authority_name,authority_type,base_url,active,sector_scope,confidence_band")
+    .eq("active", true).in("confidence_band", ["HIGH", "OFFICIAL_VERIFIED"]).order("authority_ref").limit(100);
   if (authorityError) {
     await supabase.from("n15_ingestion_runs").update({ status: "FAILED", finished_at: new Date().toISOString(), summary: { error: "AUTHORITY_READ_FAILED" } }).eq("run_ref", runRef);
     return json({ status: "DATABASE_ERROR", reason: "AUTHORITY_READ_FAILED", run_ref: runRef }, 500);

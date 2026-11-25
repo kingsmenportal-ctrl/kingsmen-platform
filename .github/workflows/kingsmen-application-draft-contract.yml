@@ -1,0 +1,253 @@
+name: Kingsmen application draft contract
+
+on:
+  pull_request:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - apps/web/src/app/api/candidate/application-draft/route.ts
+      - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/app/candidate/applications/page.tsx
+      - apps/web/src/app/candidate/dashboard/page.tsx
+      - scripts/staging/test-candidate-applications-entry-route.mjs
+      - scripts/staging/test-candidate-application-tracker-ui.mjs
+      - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
+      - apps/web/src/lib/candidate-session.ts
+      - apps/web/src/components/candidate/CandidateAuthForm.tsx
+      - apps/web/src/components/candidate/CandidateSessionControl.tsx
+      - apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx
+      - apps/web/src/components/candidate/CandidateMasterProfileForm.tsx
+      - scripts/staging/test-candidate-document-session-contract.mjs
+      - scripts/staging/test-candidate-document-vault-ui.mjs
+      - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
+      - scripts/staging/test-candidate-application-status-contract.mjs
+      - scripts/staging/test-candidate-preparation-schema-compat.mjs
+      - scripts/staging/test-candidate-application-preparation-identity-boundary.mjs
+      - scripts/staging/test-candidate-draft-runtime-preflight.mjs
+      - scripts/staging/test-candidate-application-draft-api-boundary.mjs
+      - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
+      - supabase/functions/candidate-application-preparation/index.ts
+      - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
+      - docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
+      - scripts/staging/test-candidate-application-status-postgres.sql
+      - apps/web/src/lib/candidate-application-status.ts
+      - apps/web/src/lib/read-limited-json.ts
+      - apps/web/package.json
+      - apps/web/package-lock.json
+      - scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - scripts/validators/validate-n15-source-review-decision.mjs
+      - scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
+      - scripts/staging/test-application-draft-postgres.sql
+      - scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
+      - scripts/staging/test-application-lifecycle-postgres.sql
+      - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
+      - scripts/staging/test-n15-source-review-postgres.sql
+      - scripts/staging/test-n15-source-review-ui.mjs
+      - scripts/staging/test-free-destiny-map-preview-ui.mjs
+      - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+      - scripts/validators/validate-free-destiny-map-preview.mjs
+      - package.json
+      - scripts/staging/test-candidate-application-draft-ui.mjs
+      - scripts/staging/test-candidate-profile-ui.mjs
+      - scripts/staging/test-candidate-workbench-ui.mjs
+      - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
+      - apps/web/src/components/founder/N15SourceReviewConsole.tsx
+      - apps/web/src/app/founder/opportunity-sources/page.tsx
+      - supabase/functions/n15-source-review-decision/index.ts
+      - supabase/functions/n15-source-ingestion/index.ts
+      - .github/workflows/kingsmen-application-draft-contract.yml
+  push:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - apps/web/src/app/api/candidate/application-draft/route.ts
+      - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/app/candidate/applications/page.tsx
+      - apps/web/src/app/candidate/dashboard/page.tsx
+      - scripts/staging/test-candidate-applications-entry-route.mjs
+      - scripts/staging/test-candidate-application-tracker-ui.mjs
+      - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
+      - apps/web/src/lib/candidate-session.ts
+      - apps/web/src/components/candidate/CandidateAuthForm.tsx
+      - apps/web/src/components/candidate/CandidateSessionControl.tsx
+      - apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx
+      - apps/web/src/components/candidate/CandidateMasterProfileForm.tsx
+      - scripts/staging/test-candidate-document-session-contract.mjs
+      - scripts/staging/test-candidate-document-vault-ui.mjs
+      - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
+      - scripts/staging/test-candidate-application-status-contract.mjs
+      - scripts/staging/test-candidate-preparation-schema-compat.mjs
+      - scripts/staging/test-candidate-draft-runtime-preflight.mjs
+      - scripts/staging/test-candidate-application-draft-api-boundary.mjs
+      - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
+      - supabase/functions/candidate-application-preparation/index.ts
+      - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
+      - docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
+      - scripts/staging/test-candidate-application-status-postgres.sql
+      - apps/web/src/lib/candidate-application-status.ts
+      - apps/web/src/lib/read-limited-json.ts
+      - apps/web/package.json
+      - apps/web/package-lock.json
+      - scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - scripts/validators/validate-n15-source-review-decision.mjs
+      - scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
+      - scripts/staging/test-application-draft-postgres.sql
+      - scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
+      - scripts/staging/test-application-lifecycle-postgres.sql
+      - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
+      - scripts/staging/test-n15-source-review-postgres.sql
+      - scripts/staging/test-n15-source-review-ui.mjs
+      - scripts/staging/test-free-destiny-map-preview-ui.mjs
+      - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+      - scripts/validators/validate-free-destiny-map-preview.mjs
+      - package.json
+      - scripts/staging/test-candidate-application-draft-ui.mjs
+      - scripts/staging/test-candidate-profile-ui.mjs
+      - scripts/staging/test-candidate-workbench-ui.mjs
+      - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
+      - apps/web/src/components/founder/N15SourceReviewConsole.tsx
+      - apps/web/src/app/founder/opportunity-sources/page.tsx
+      - supabase/functions/n15-source-review-decision/index.ts
+      - supabase/functions/n15-source-ingestion/index.ts
+      - .github/workflows/kingsmen-application-draft-contract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  application-draft-contract:
+    name: Validate draft security contract and PostgreSQL integration
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-project.supabase.test
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-only-not-a-real-anon-key
+    steps:
+      - name: Check out rebuild branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install web dependencies from committed lockfile
+        run: npm ci --prefix apps/web
+      - name: Validate candidate application draft contract
+        run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - name: Test canonical candidate application status contract
+        run: node scripts/staging/test-candidate-application-status-contract.mjs
+      - name: Guard candidate preparation against an uninstalled status column
+        run: node scripts/staging/test-candidate-preparation-schema-compat.mjs
+      - name: Test candidate preparation verified identity boundary
+        run: node scripts/staging/test-candidate-application-preparation-identity-boundary.mjs
+      - name: Test read-only candidate draft runtime preflight contract
+        run: npm run db:preflight:candidate-draft:validate
+      - name: Test candidate document session and navigation contract
+        run: node scripts/staging/test-candidate-document-session-contract.mjs
+      - name: Test canonical candidate applications entry route
+        run: node scripts/staging/test-candidate-applications-entry-route.mjs
+      - name: Validate N15 source-review security contract
+        run: node scripts/validators/validate-n15-source-review-decision.mjs
+      - name: Validate Free Destiny Map browser-local readiness preview
+        run: node scripts/validators/validate-free-destiny-map-preview.mjs
+      - name: Locate disposable PostgreSQL service container
+        shell: bash
+        run: |
+          set -euo pipefail
+          container_id="$(docker ps --format '{{.ID}} {{.Image}}' | awk '$2 == "postgres:17" { print $1; exit }')"
+          if [[ -z "$container_id" ]]; then
+            echo "PostgreSQL 17 service container was not found." >&2
+            exit 1
+          fi
+          echo "KINGSMEN_POSTGRES_CONTAINER_ID=$container_id" >> "$GITHUB_ENV"
+      - name: Bootstrap isolated PostgreSQL draft fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
+      - name: Apply draft-persistence migration to disposable PostgreSQL
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - name: Test draft save, idempotency, consent and candidate isolation
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/test-application-draft-postgres.sql
+      - name: Create isolated candidate status-contract database
+        run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_status_contract"
+      - name: Bootstrap candidate status-contract database
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
+      - name: Apply capacity migration 0107 for status-contract fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - name: Apply verified-readiness migration 0108 for status-contract fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - name: Apply candidate status proposal to disposable PostgreSQL only
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
+      - name: Test candidate status proposal database contract
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < scripts/staging/test-candidate-application-status-postgres.sql
+      - name: Create isolated lifecycle database
+        run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_lifecycle"
+      - name: Bootstrap full lifecycle dependency fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
+      - name: Apply capacity migration 0107
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - name: Apply verified-readiness migration 0108
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - name: Apply application-draft migration 0109
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - name: Test full verified-match to application-draft lifecycle
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < scripts/staging/test-application-lifecycle-postgres.sql
+      - name: Create isolated N15 source-review database
+        run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_source_review"
+      - name: Bootstrap isolated source-review fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
+      - name: Apply N15 source-review migration 0110
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - name: Test N15 source-review atomicity, authority and privileges
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < scripts/staging/test-n15-source-review-postgres.sql
+      - name: Build Next.js application with CI-only Supabase config
+        run: npm --prefix apps/web run build
+      - name: Test candidate draft API authentication and input boundary
+        timeout-minutes: 3
+        run: npm run candidate:draft:api:test
+      - name: Install Chromium for browser smoke tests
+        run: apps/web/node_modules/.bin/playwright install chromium
+      - name: Test application tracker and saved draft resume journey
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-application-tracker-ui.mjs
+      - name: Test private document upload, finalisation and download journey
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-document-vault-ui.mjs
+      - name: Test candidate draft browser save and resume
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-application-draft-ui.mjs
+      - name: Test candidate profile save, reload and consent
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-profile-ui.mjs
+      - name: Test saved target to parent application workbench journey
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-workbench-ui.mjs
+      - name: Test Free Destiny Map local readiness preview
+        timeout-minutes: 3
+        run: node scripts/staging/test-free-destiny-map-preview-ui.mjs
+      - name: Test N15 source-review queue and decisions
+        timeout-minutes: 3
+        run: node scripts/staging/test-n15-source-review-ui.mjs
