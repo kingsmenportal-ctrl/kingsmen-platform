@@ -36,6 +36,9 @@ jobs:
       - name: Run focused repository tests
         run: npm test
 
+      - name: Validate Kingsmen project status register
+        run: npm run kingsmen:status:validate
+
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund
 
