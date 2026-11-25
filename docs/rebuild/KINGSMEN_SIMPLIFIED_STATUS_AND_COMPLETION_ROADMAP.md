@@ -14,6 +14,7 @@ This is the current, evidence-based project status register. It supersedes older
 - **Free Destiny Map readiness preview merged:** PR [#326](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/326), merge commit `189b61a74a8c8bf2dace85203954fd5969e66629`. The preview is browser-local, separate from the existing consent-gated submit action, and tested not to call the intake API or save selections.
 - **Verified pre-merge checks:** [PR #327 Kingsmen CI](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634438774) passed focused tests, status validation, API build and web build. [PR #326 application contract workflow](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651) passed PostgreSQL/UI contract coverage, the Free Destiny Map preview browser test and the N15 source-review browser test.
 - **Post-merge validation:** rebuild-branch CI is running again after the two merges. The separate main-branch-protection evidence job continues to fail to verify protection (HTTP 404); this remains a release blocker.
+- **Migration provenance snapshot captured:** 130 live ledger records were compared to 41 tracked SQL files. The first-pass naming audit found 32 normalized exact matches, 2 sequence-ambiguous candidate matches, 96 ledger records without a name match and 7 source files without a ledger-name match. Two migration names are duplicated in the live ledger. This is a reconciliation report—not proof that unmatched migrations are deleted—and staging was not changed. The new snapshot validator is pending CI.
 
 ## 1. Executive status
 
@@ -31,7 +32,7 @@ The rebuild strategy remains: preserve the repository and its history; consolida
 | Candidate experience | Candidate dashboard, profile, identity review, workbench, tracker, saved opportunities, documents, finance, outcomes, messages and mobile routes exist in source | UI/routes exist; full journey not yet accepted |
 | API | Separate apps/api package and typed command/state-machine code exist | Buildable foundation; persistent staging behaviour must be proved |
 | Database | kingsmen-portal-staging is ACTIVE_HEALTHY; PostgreSQL 17.11; 230 public tables; RLS reported enabled on all public tables | Database is available; schema/migration/security reconciliation remains open |
-| Migration history | 130 migration records reported by staging; 41 SQL migration files tracked across three source directories | Source-to-database provenance is not reconciled; do not blindly apply migrations |
+| Migration history | 130 staging ledger records; 41 SQL files; first-pass map: 32 normalized name matches, 2 ambiguous core-only candidates, 96 unmatched ledger names, 7 source-only names, 2 duplicate ledger names | Provenance reconciliation is now captured, but the 96 records and duplicates need source/deployment-history review; do not blindly apply migrations |
 | Staging contents | Supabase table inventory reported zero rows for every public table | Inventory signal, not proof that every test flow or storage object is empty; verify with controlled read-only checks |
 | Edge Functions | 23 functions reported ACTIVE; 22 have JWT verification enabled, while payfast-sandbox has verify_jwt=false for external callback compatibility | Deployed code exists; compare hashes to source and prove each critical runtime path |
 | Security advisor | 6 authenticated-callable SECURITY DEFINER functions; 17 RLS-enabled tables without policies; 16 multiple-permissive-policy findings; leaked-password-protection warning | Must be reviewed and closed or explicitly justified before release |
@@ -130,7 +131,7 @@ These are source/inventory observations, not claims that every item has passed p
 ### P0 — must close before public candidate data or live payments
 
 1. **Branch governance:** branch-protection evidence currently says protection could not be verified (HTTP 404). Inspect repository rulesets/settings and establish required successful checks for release.
-2. **Migration provenance:** staging has 130 migration records; the tree has 41 SQL files across db/migrations, database/migrations and supabase/migrations. Build and review a version/name/checksum map before applying schema changes.
+2. **Migration provenance:** the read-only first-pass snapshot is now captured at `manifests/rebuild/kingsmen-staging-migration-provenance-2026-11-25.json`. It maps 32 applied records by normalized name, flags two ambiguous sequence-only matches, leaves 96 ledger records without a source-name match, flags 7 source-only files and identifies two duplicate ledger names. Review Git history and deployment evidence, then build an authoritative version/name/hash alias map before applying schema changes.
 3. **Database role security:** review six authenticated-callable SECURITY DEFINER functions. Confirm intended caller, row ownership, argument validation and execute grants; revoke or change unsafe public execution paths.
 4. **RLS policy findings:** review 17 RLS-enabled tables without policies and 16 multiple-permissive-policy findings. Backend-only review/founder tables may intentionally have no client policies, but each exception needs explicit role tests and documented justification.
 5. **Authentication setting:** enable and verify leaked-password protection or document an approved security exception.
@@ -223,6 +224,7 @@ Then perform work in small, verifiable batches. At the end of a batch, update th
 ## 9. Commands and links
 
 - **Status validator:** npm run kingsmen:status:validate
+- **Migration provenance validator:** npm run kingsmen:migrations:provenance:validate
 - **Full repository tests:** npm test
 - **Build API:** npm run api:build
 - **Launch audit:** npm run kingsmen:launch:audit
