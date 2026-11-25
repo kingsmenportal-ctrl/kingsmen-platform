@@ -29,10 +29,11 @@ INSERT INTO public.privacy_consent_records
   ('dddddddd-dddd-4ddd-8ddd-ddddddddddd2', 'CAND-B', 'PROFILE_PROCESSING', 'ACTIVE', NULL, 'Fixture consent B', now() - interval '1 minute'),
   ('dddddddd-dddd-4ddd-8ddd-ddddddddddd3', 'CAND-C', 'PROFILE_PROCESSING', 'ACTIVE', NULL, 'Fixture consent C', now() - interval '1 minute');
 
-INSERT INTO public.candidate_opportunities (id, title, provider_name, source_url, closes_at) VALUES
-  ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1', 'Fixture opportunity A', 'Fixture provider', 'https://provider.example/a', now() + interval '30 days'),
-  ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2', 'Fixture opportunity B', 'Fixture provider', 'https://provider.example/b', now() + interval '30 days'),
-  ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3', 'Fixture opportunity C', 'Fixture provider', 'https://provider.example/c', now() + interval '30 days');
+INSERT INTO public.candidate_opportunities
+  (id, opportunity_ref, title, provider_name, pathway_type, source_url, closes_at) VALUES
+  ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1', 'FIXTURE-OPP-A', 'Fixture opportunity A', 'Fixture provider', 'EMPLOYMENT', 'https://provider.example/a', now() + interval '30 days'),
+  ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2', 'FIXTURE-OPP-B', 'Fixture opportunity B', 'Fixture provider', 'TVET', 'https://provider.example/b', now() + interval '30 days'),
+  ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3', 'FIXTURE-OPP-C', 'Fixture opportunity C', 'Fixture provider', 'INTERNSHIP', 'https://provider.example/c', now() + interval '30 days');
 
 INSERT INTO public.candidate_applications
   (id, application_ref, candidate_id, opportunity_id, pathway_type, status, kingsmen_status, readiness_status, readiness_snapshot) VALUES
