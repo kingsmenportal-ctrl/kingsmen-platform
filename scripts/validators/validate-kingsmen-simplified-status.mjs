@@ -50,7 +50,9 @@ assert.match(doc, /ACTIVE_HEALTHY/);
 assert.match(doc, /SECURITY DEFINER/);
 assert.match(doc, /3–6 calendar weeks/);
 assert.match(claude, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
-assert.match(claude, /every Kingsmen response must (?:start|follow)/i);\nassert.match(claude, /frontend, backend\/API, database\/security, integrations\/Jarvis and CI\/deployment/i, "Every Kingsmen response must report each product/operations layer separately.");\nassert.match(claude, /KINGSMEN_CHAT_STATUS_PROTOCOL\.md/);
+assert.match(claude, /every Kingsmen response must (?:start|follow)/i);
+assert.match(claude, /frontend, backend\/API, database\/security, integrations\/Jarvis and CI\/deployment/i, "Every Kingsmen response must report each product/operations layer separately.");
+assert.match(claude, /KINGSMEN_CHAT_STATUS_PROTOCOL\.md/);
 assert.match(readme, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
 assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);
 
