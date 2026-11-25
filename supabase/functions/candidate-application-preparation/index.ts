@@ -28,10 +28,30 @@ Deno.serve(async(req:Request)=>{
  if(authError||!authData.user)return reply(401,{error:"Your session is invalid or expired. Sign in again."},origin);
  let p:Record<string,unknown>;try{p=await req.json();}catch{return reply(400,{error:"Request body must be valid JSON."},origin);}
  const admin=createClient(URL,SERVICE,{auth:{persistSession:false,autoRefreshToken:false}});
- const {data:link,error:linkError}=await admin.from("candidate_auth_identity_links").select("candidate_id").eq("supabase_user_id",authData.user.id).eq("link_status","VERIFIED").not("verified_at","is",null).limit(1).maybeSingle();
+ const identityCheckedAt = new Date().toISOString();
+ const {data:identityLinks,error:linkError}=await admin.from("candidate_auth_identity_links")
+  .select("candidate_id,verified_at,verified_by")
+  .eq("supabase_user_id",authData.user.id)
+  .eq("link_status","VERIFIED")
+  .not("verified_at","is",null)
+  .not("verified_by","is",null)
+  .lte("verified_at",identityCheckedAt)
+  .order("id",{ascending:true})
+  .limit(2);
  if(linkError){console.error("application identity lookup failed",linkError.code??"unknown");return reply(503,{error:"Could not verify candidate access."},origin);}
- if(!link?.candidate_id)return reply(403,{code:"IDENTITY_NOT_VERIFIED",error:"Application records remain locked until an authorised reviewer verifies your candidate identity link."},origin);
- const candidateId=link.candidate_id as string;
+ if(!Array.isArray(identityLinks)||identityLinks.length!==1||
+    typeof identityLinks[0]?.candidate_id!=="string"||
+    typeof identityLinks[0]?.verified_by!=="string"||
+    !identityLinks[0]?.verified_at||
+    !Number.isFinite(Date.parse(identityLinks[0].verified_at))||
+    Date.parse(identityLinks[0].verified_at)>Date.parse(identityCheckedAt)){
+  return reply(403,{code:"IDENTITY_NOT_VERIFIED",error:"Application records remain locked until exactly one valid, reviewer-verified candidate identity link is present."},origin);
+ }
+ const candidateId=identityLinks[0].candidate_id;
+ const {data:activeCandidate,error:activeCandidateError}=await admin.from("candidates")
+  .select("id").eq("id",candidateId).eq("is_active",true).maybeSingle();
+ if(activeCandidateError){console.error("application candidate activity lookup failed",activeCandidateError.code??"unknown");return reply(503,{error:"Could not verify candidate access."},origin);}
+ if(!activeCandidate?.id)return reply(403,{code:"ACTIVE_CANDIDATE_REQUIRED",error:"Application records remain locked because the linked candidate account is inactive."},origin);
  if(p.action==="save_n15_match"){
   const matchRef=typeof p.match_ref==="string"?p.match_ref.trim():"";
   const pathwayType=typeof p.pathway_type==="string"?p.pathway_type:"";
