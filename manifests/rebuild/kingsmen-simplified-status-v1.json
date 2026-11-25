@@ -299,7 +299,8 @@
           "Status register and start-of-chat discipline merged",
           "Rebuild branch now has CI triggers and a status contract step",
           "Browser-local Free Destiny Map readiness preview merged with passing UI test",
-          "Captured read-only staging migration ledger vs source-file provenance report; 96 ledger entries remain unmapped for historical reconciliation."
+          "Captured read-only staging migration ledger vs source-file provenance report; 96 ledger entries remain unmapped for historical reconciliation.",
+          "Merged PR #330 after passing root tests, status-register validation, migration-provenance validation, API build and web build."
         ]
       },
       {
@@ -402,6 +403,16 @@
       "state": "open",
       "draft": true,
       "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+    },
+    {
+      "number": 330,
+      "title": "Clarify migration identifier ambiguity in provenance audit",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "84978bb62981ef41997b1fd23aed47a3cce0de26",
+      "ciRunId": 45637295249,
+      "ciResult": "success"
     }
   ],
   "updateRules": [
@@ -429,6 +440,15 @@
       "ciRunId": 45634488651,
       "ciResult": "success",
       "notes": "Browser-local route-specific readiness preview; preview button does not submit; browser test and N15 source review tests passed."
+    },
+    {
+      "id": "migration-provenance-ci-validator-repair",
+      "pr": 330,
+      "state": "merged",
+      "mergeCommitSha": "84978bb62981ef41997b1fd23aed47a3cce0de26",
+      "ciRunId": 45637295249,
+      "ciResult": "success",
+      "notes": "Fixed exact wording contracts for the current migration-ledger status and historical numeric migration identifier ambiguity. Root tests, status validator, migration provenance validator, API build and Next.js web build passed. No database mutation."
     }
   ],
   "latestVerification": {
