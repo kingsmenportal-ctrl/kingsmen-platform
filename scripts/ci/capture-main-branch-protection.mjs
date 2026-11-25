@@ -156,21 +156,53 @@ if (classicResponse.ok) {
     process.exit(1);
   }
 
-  const evaluation = evaluateMainBranchProtection(preferred);
+  let detailResponse;
+  try {
+    detailResponse = await apiGet(`/repos/${repository}/rulesets/${preferred.id}`);
+  } catch {
+    const report = await finish('BLOCKED_GITHUB_API_UNREACHABLE', blockedChecks('The active ruleset was listed but its detailed rule definitions could not be fetched.'), null, {
+      verificationEndpoint: 'repository_rulesets_detail',
+      classicEndpointStatus: classicResponse.status,
+      rulesetId: preferred.id ?? null,
+      rulesetName: preferred.name ?? null
+    });
+    console.log(JSON.stringify(report, null, 2));
+    process.exit(1);
+  }
+
+  if (!detailResponse.ok) {
+    const status = detailResponse.status === 401 || detailResponse.status === 403
+      ? 'UNVERIFIED_PERMISSION_DENIED'
+      : 'BLOCKED_RULESET_DETAILS_NOT_VISIBLE';
+    const report = await finish(status, blockedChecks('The active ruleset was listed but its detailed rule definitions could not be read.'), detailResponse.status, {
+      verificationEndpoint: 'repository_rulesets_detail',
+      classicEndpointStatus: classicResponse.status,
+      rulesetListStatus: rulesetsResponse.status,
+      rulesetId: preferred.id ?? null,
+      rulesetName: preferred.name ?? null
+    });
+    console.log(JSON.stringify(report, null, 2));
+    process.exit(1);
+  }
+
+  const detailedRuleset = await detailResponse.json();
+  const evaluation = evaluateMainBranchProtection(detailedRuleset);
   const report = await finish(
     evaluation.passed ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE' : 'BLOCKED_PROTECTION_INCOMPLETE',
     {
       ...evaluation.checks,
-      verificationEndpoint: 'repository_rulesets',
+      verificationEndpoint: 'repository_rulesets_detail',
       classicEndpointStatus: classicResponse.status,
+      rulesetListStatus: rulesetsResponse.status,
       applicableActiveRulesetCount: candidates.length
     },
-    rulesetsResponse.status,
+    detailResponse.status,
     {
-      verificationEndpoint: 'repository_rulesets',
+      verificationEndpoint: 'repository_rulesets_detail',
       classicEndpointStatus: classicResponse.status,
-      rulesetId: preferred.id ?? null,
-      rulesetName: preferred.name ?? null,
+      rulesetListStatus: rulesetsResponse.status,
+      rulesetId: detailedRuleset.id ?? preferred.id ?? null,
+      rulesetName: detailedRuleset.name ?? preferred.name ?? null,
       applicableActiveRulesetCount: candidates.length
     }
   );
