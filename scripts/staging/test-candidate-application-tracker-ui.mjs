@@ -39,6 +39,7 @@ const application = {
   application_ref: "CI-APPLICATION-001",
   pathway_type: "EMPLOYMENT",
   status: "DRAFT",
+  kingsmen_status: "Draft",
   readiness_status: "NOT_CHECKED",
   readiness_snapshot: {},
   title: "CI fixture opportunity",
