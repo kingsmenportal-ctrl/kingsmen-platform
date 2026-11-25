@@ -4,6 +4,26 @@ Before any Kingsmen work, read docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPL
 
 Every Kingsmen response must start with overall status, active phase, implementation branch/current PR, last verified evidence, highest-priority blocker and next deliverable. Every meaningful implementation batch must update the status document and manifest, then run npm run kingsmen:status:validate. Never equate route/file/function existence with end-to-end acceptance. Do not apply staging migrations, modify live candidate data, enable live payments or deploy production without a reviewed plan and required approval.
 
+## Mandatory Kingsmen reporting contract — every Kingsmen chat
+
+At the start of every response that concerns Kingsmen, display a compact status report with these separate fields:
+
+- **Overall:** active phase, launch state, and completion estimate.
+- **Frontend:** what UI/pages/forms were changed; what exists; tests/build state; what remains.
+- **Backend/data:** API, database, migrations, RLS/auth/security, Edge Functions and worker changes; what exists; tests/runtime proof; what remains.
+- **Integration/deployment:** API-to-UI integration, staging and deployed commit/environment status; do not confuse a historical ready deployment with the selected rebuild branch.
+- **This batch:** exact files, branch/PR/commit and whether each change is FRONTEND, BACKEND/DATABASE, INTEGRATION/CI, or DOCUMENTATION/GOVERNANCE.
+- **Evidence:** precise passing/failing/pending test names or CI links, never inferred passes.
+- **Top blockers and next milestone:** named blocker, next deliverable, acceptance test and current engineering estimate.
+
+After the opening status, show what was built in this batch and what remains. Distinguish **source exists**, **builds**, **passes tests**, **works in staging**, and **deployed to the intended environment** as different states. Update the canonical status document and JSON manifest after meaningful work, including frontend/backend surface statuses. A session is not “finished” just because a commit or page exists.
+
+For a Kingsmen task in a chat that has not loaded the repository context, the assistant must first retrieve/read the canonical register rather than invent status from chat memory. Canonical documents:
+- docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md
+- manifests/rebuild/kingsmen-simplified-status-v1.json
+- docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md
+- docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md
+
 # CLAUDE START HERE — KINGSMEN / JARVIS
 
 You are continuing the Kingsmen / Jarvis build for the Commander.
