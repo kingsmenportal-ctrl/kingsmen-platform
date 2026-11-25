@@ -7,6 +7,8 @@ const routePath = "apps/web/src/app/candidate/applications/page.tsx";
 const route = fs.readFileSync(path.join(root, routePath), "utf8");
 const trackerPath = "apps/web/src/app/candidate/tracker/page.tsx";
 const tracker = fs.readFileSync(path.join(root, trackerPath), "utf8");
+const sessionPath = "apps/web/src/lib/candidate-session.ts";
+const session = fs.readFileSync(path.join(root, sessionPath), "utf8");
 const dashboardPath = "apps/web/src/app/candidate/dashboard/page.tsx";
 const dashboard = fs.readFileSync(path.join(root, dashboardPath), "utf8");
 const workflowPath = ".github/workflows/kingsmen-application-draft-contract.yml";
@@ -16,6 +18,14 @@ assert.match(route, /import\s*\{\s*redirect\s*\}\s*from\s*["']next\/navigation["
   "The canonical applications entry must use Next.js server-side redirect.");
 assert.match(route, /redirect\(["']\/candidate\/tracker["']\)/,
   "The canonical applications entry must converge on the authenticated tracker.");
+assert.match(session, /export function getCandidateSessionState\(\)/,
+  "Candidate application screens must share one session-reading boundary.");
+assert.match(session, /session\.expires_at[\s\S]*Date\.now\(\)/,
+  "Expired candidate sessions must be rejected before application data requests.");
+assert.match(tracker, /getCandidateSessionState/,
+  "The application tracker must use the shared candidate session helper.");
+assert.doesNotMatch(tracker, /window\.localStorage|JSON\.parse\(raw\)/,
+  "The tracker must not maintain a second implementation of browser session parsing.");
 assert.match(tracker, /CandidateApplicationTracker/,
   "The destination must render the existing authenticated tracker rather than a second data path.");
 assert.doesNotMatch(route, /localStorage|sessionStorage|createClient|SUPABASE_SERVICE_ROLE_KEY/,
