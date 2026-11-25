@@ -18,6 +18,8 @@ assert.match(component, /onClick=\{\(event\) => previewReadinessPath\(event\.cur
 assert.match(component, /function previewReadinessPath\(form: HTMLFormElement \| null\)/, "Preview handler must require the local form reference.");
 assert.match(component, /data-kingsmen-readiness-preview="ready"/, "Generated preview state must be identifiable.");
 assert.match(component, /data-kingsmen-readiness-preview-steps="true"/, "Generated steps must be identifiable.");
+assert.match(component, /data-kingsmen-readiness-preview-routes="true"/, "Selected route labels must be rendered in the preview.");
+assert.match(component, /preview\.routes\.map\(\(route\)/, "Preview must show the names of selected routes.");
 assert.match(component, /data-kingsmen-readiness-preview-error="true" role="alert"/, "Preview validation errors must be accessible.");
 assert.match(component, /aria-live="polite"/, "Preview output must announce updates accessibly.");
 assert.match(component, /not a verified live match/i, "Preview must not claim verified live availability.");
