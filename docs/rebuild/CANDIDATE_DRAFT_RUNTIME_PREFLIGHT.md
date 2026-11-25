@@ -40,8 +40,11 @@ Direct read-only queries against the stated staging project on 25 November 2026 
 | `kingsmen_security.current_verified_kingsmen_candidate_id()` | Absent |
 | `APPLICATION_DRAFT_SAVED` event allowance | Absent from `candidate_application_events_event_type_check` |
 
-The selected rebuild branch contains proposed migrations 0107–0110, but a filename is not proof of the exact SQL deployed in staging. The historical source sweep still reports 63 ledger records without a source-name candidate and zero exact deployed-SQL-body provenance matches. Migration replay authorization remains false.
+The selected rebuild branch contains proposed migrations 0107–0110, but a filename is not proof of the exact SQL deployed in staging. A follow-up read-only body-hash capture found exact byte-for-byte source-body matches for 30 ledger records (29 distinct SQL bodies). Another 37 have filename candidates whose bodies differ, and 63 have no filename or body candidate in the eight-branch corpus; 100 of 130 remain without an exact body match. Migration replay authorization remains false.
 
 ## Release decision
 
 The application draft runtime is **not ready**. Do not enable draft save/resume against staging until migration provenance has been reconciled, backup/restore rehearsal is complete, schema compatibility and RLS/auth isolation have been reviewed, and authorized change control approves the sequence. After that, provision approved non-production test actors and fixture rows; the separate GET-only RLS probe does not create fixtures.
+
+
+The body-level evidence and repeatable SELECT-only fingerprint query are recorded in `manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json` and `scripts/staging/kingsmen-staging-migration-body-provenance.sql`. These hashes strengthen source identification but do not replace commit/deployment evidence or authorize migration replay.
