@@ -57,16 +57,16 @@ function makeCases(ids) {
     row("candidate_credentials:candidate_a_row", "candidate_credentials", "candidate_id", ids.candidateAId, operatorAndFounder),
     row("candidate_credentials:candidate_b_row", "candidate_credentials", "candidate_id", ids.candidateBId, operatorAndFounder),
 
-    row("candidate_sessions:candidate_a_session", "candidate_sessions", "id", ids.sessionAId, candidateSessionsAllowed("candidateA")),
-    row("candidate_sessions:candidate_b_session", "candidate_sessions", "id", ids.sessionBId, candidateSessionsAllowed("candidateB")),
+    row("candidate_sessions:candidate_a_session", "candidate_sessions", "id", ids.sessionAId, candidateSessionsAllowed("candidateA"), { candidate_id: `eq.${ids.candidateAId}` }),
+    row("candidate_sessions:candidate_b_session", "candidate_sessions", "id", ids.sessionBId, candidateSessionsAllowed("candidateB"), { candidate_id: `eq.${ids.candidateBId}` }),
 
-    row("evidence_ledger:candidate_a_safe", "evidence_ledger", "id", ids.evidenceSafeAId, evidenceAllowed("candidateA"), { protected_data: "eq.false" }),
-    row("evidence_ledger:candidate_b_safe", "evidence_ledger", "id", ids.evidenceSafeBId, evidenceAllowed("candidateB"), { protected_data: "eq.false" }),
-    row("evidence_ledger:candidate_a_protected", "evidence_ledger", "id", ids.evidenceProtectedAId, operatorAndFounder, { protected_data: "eq.true" }),
-    row("evidence_ledger:candidate_b_protected", "evidence_ledger", "id", ids.evidenceProtectedBId, operatorAndFounder, { protected_data: "eq.true" }),
+    row("evidence_ledger:candidate_a_safe", "evidence_ledger", "id", ids.evidenceSafeAId, evidenceAllowed("candidateA"), { candidate_id: `eq.${ids.candidateAId}`, protected_data: "eq.false" }),
+    row("evidence_ledger:candidate_b_safe", "evidence_ledger", "id", ids.evidenceSafeBId, evidenceAllowed("candidateB"), { candidate_id: `eq.${ids.candidateBId}`, protected_data: "eq.false" }),
+    row("evidence_ledger:candidate_a_protected", "evidence_ledger", "id", ids.evidenceProtectedAId, operatorAndFounder, { candidate_id: `eq.${ids.candidateAId}`, protected_data: "eq.true" }),
+    row("evidence_ledger:candidate_b_protected", "evidence_ledger", "id", ids.evidenceProtectedBId, operatorAndFounder, { candidate_id: `eq.${ids.candidateBId}`, protected_data: "eq.true" }),
 
-    row("workflow_runs:candidate_a_run", "workflow_runs", "id", ids.workflowAId, candidateSessionsAllowed("candidateA")),
-    row("workflow_runs:candidate_b_run", "workflow_runs", "id", ids.workflowBId, candidateSessionsAllowed("candidateB")),
+    row("workflow_runs:candidate_a_run", "workflow_runs", "id", ids.workflowAId, candidateSessionsAllowed("candidateA"), { candidate_id: `eq.${ids.candidateAId}` }),
+    row("workflow_runs:candidate_b_run", "workflow_runs", "id", ids.workflowBId, candidateSessionsAllowed("candidateB"), { candidate_id: `eq.${ids.candidateBId}` }),
 
     row("route_sources:verified_a_band", "route_sources", "id", ids.routeSourceVerifiedId, ACTOR_NAMES, { status: "eq.VERIFIED", confidence_band: "eq.A" }),
     row("route_sources:unverified_hidden", "route_sources", "id", ids.routeSourceUnverifiedId, operatorAndFounder, { status: "eq.DRAFT", confidence_band: "eq.A" }),
