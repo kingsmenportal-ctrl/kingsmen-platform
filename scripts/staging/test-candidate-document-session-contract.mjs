@@ -7,6 +7,8 @@ const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf
 const panel = read("apps/web/src/components/candidate/DocumentPreflightPanel.tsx");
 const session = read("apps/web/src/lib/candidate-session.ts");
 const documentsPage = read("apps/web/src/app/candidate/documents/page.tsx");
+const profilePage = read("apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
+const savedOpportunitiesPage = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
 const profile = read("apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
 const savedOpportunities = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
 const sessionControl = read("apps/web/src/components/candidate/CandidateSessionControl.tsx");
@@ -33,6 +35,10 @@ assert.match(session, /session\.expires_at[\s\S]*Date\.now\(\)/,
   "Shared session validation must enforce token expiry.");
 assert.match(documentsPage, /href=["']\/candidate\/applications["']>Applications<\/a>/,
   "The document vault must link back to the canonical applications journey.");
+assert.match(profilePage, /href=["']\/candidate\/applications["']>Applications<\/a>/,
+  "The profile must link back to the canonical applications journey.");
+assert.match(savedOpportunitiesPage, /href=["']\/candidate\/applications["']>Applications<\/a>/,
+  "Saved opportunities must link back to the canonical applications journey.");
 assert.match(profile, /getCandidateSessionState\(\)/,
   "Candidate profile persistence must use the shared candidate session boundary.");
 assert.match(savedOpportunities, /getCandidateSessionState\(\)/,
