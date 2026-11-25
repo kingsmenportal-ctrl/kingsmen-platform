@@ -42,6 +42,9 @@ jobs:
       - name: Validate staging migration provenance snapshot
         run: npm run kingsmen:migrations:provenance:validate
 
+      - name: Validate staging security advisor snapshot
+        run: npm run kingsmen:security-advisor:validate
+
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund
 
