@@ -172,117 +172,190 @@
       "policies": [
         {
           "table": "applications",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.applications\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{applications_authenticated_own_account_read,applications_candidate_read_own,applications_founder_operator_read}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "applications_authenticated_own_account_read",
+            "applications_candidate_read_own",
+            "applications_founder_operator_read"
+          ],
+          "detail": "Table \\`public.applications\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{applications_authenticated_own_account_read,applications_candidate_read_own,applications_founder_operator_read}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_credentials",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`anon\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+          "role": "anon",
+          "action": "SELECT",
+          "policies": [
+            "candidate_credentials_founder_operator_read",
+            "candidate_credentials_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`anon\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_credentials",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "candidate_credentials_founder_operator_read",
+            "candidate_credentials_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_credentials",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`authenticator\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+          "role": "authenticator",
+          "action": "SELECT",
+          "policies": [
+            "candidate_credentials_founder_operator_read",
+            "candidate_credentials_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`authenticator\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_credentials",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`dashboard_user\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+          "role": "dashboard_user",
+          "action": "SELECT",
+          "policies": [
+            "candidate_credentials_founder_operator_read",
+            "candidate_credentials_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`dashboard_user\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_credentials",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`supabase_privileged_role\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+          "role": "supabase_privileged_role",
+          "action": "SELECT",
+          "policies": [
+            "candidate_credentials_founder_operator_read",
+            "candidate_credentials_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`supabase_privileged_role\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_profiles",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_profiles\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_profiles_authenticated_own_account_read,candidate_profiles_candidate_read_own,candidate_profiles_founder_operator_read}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "candidate_profiles_authenticated_own_account_read",
+            "candidate_profiles_candidate_read_own",
+            "candidate_profiles_founder_operator_read"
+          ],
+          "detail": "Table \\`public.candidate_profiles\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_profiles_authenticated_own_account_read,candidate_profiles_candidate_read_own,candidate_profiles_founder_operator_read}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_sessions",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`anon\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+          "role": "anon",
+          "action": "SELECT",
+          "policies": [
+            "candidate_sessions_candidate_read_own",
+            "candidate_sessions_founder_operator_read",
+            "candidate_sessions_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`anon\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_sessions",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "candidate_sessions_candidate_read_own",
+            "candidate_sessions_founder_operator_read",
+            "candidate_sessions_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_sessions",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`authenticator\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+          "role": "authenticator",
+          "action": "SELECT",
+          "policies": [
+            "candidate_sessions_candidate_read_own",
+            "candidate_sessions_founder_operator_read",
+            "candidate_sessions_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`authenticator\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_sessions",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`dashboard_user\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+          "role": "dashboard_user",
+          "action": "SELECT",
+          "policies": [
+            "candidate_sessions_candidate_read_own",
+            "candidate_sessions_founder_operator_read",
+            "candidate_sessions_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`dashboard_user\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidate_sessions",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`supabase_privileged_role\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+          "role": "supabase_privileged_role",
+          "action": "SELECT",
+          "policies": [
+            "candidate_sessions_candidate_read_own",
+            "candidate_sessions_founder_operator_read",
+            "candidate_sessions_service_role_backend_all"
+          ],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`supabase_privileged_role\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "candidates",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.candidates\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidates_authenticated_own_account_read,candidates_candidate_read_own,candidates_founder_operator_read}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "candidates_authenticated_own_account_read",
+            "candidates_candidate_read_own",
+            "candidates_founder_operator_read"
+          ],
+          "detail": "Table \\`public.candidates\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidates_authenticated_own_account_read,candidates_candidate_read_own,candidates_founder_operator_read}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "evidence_ledger",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.evidence_ledger\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{evidence_ledger_candidate_read_own_safe,evidence_ledger_founder_operator_read}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "evidence_ledger_candidate_read_own_safe",
+            "evidence_ledger_founder_operator_read"
+          ],
+          "detail": "Table \\`public.evidence_ledger\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{evidence_ledger_candidate_read_own_safe,evidence_ledger_founder_operator_read}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "route_sources",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.route_sources\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{route_sources_founder_operator_read,route_sources_public_verified_read}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "route_sources_founder_operator_read",
+            "route_sources_public_verified_read"
+          ],
+          "detail": "Table \\`public.route_sources\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{route_sources_founder_operator_read,route_sources_public_verified_read}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         },
         {
           "table": "workflow_runs",
-          "role": null,
-          "action": null,
-          "policies": [],
-          "detail": "Table \\`public.workflow_runs\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{workflow_runs_candidate_read_own,workflow_runs_founder_operator_read}\\`"
+          "role": "authenticated",
+          "action": "SELECT",
+          "policies": [
+            "workflow_runs_candidate_read_own",
+            "workflow_runs_founder_operator_read"
+          ],
+          "detail": "Table \\`public.workflow_runs\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{workflow_runs_candidate_read_own,workflow_runs_founder_operator_read}\\`",
+          "observedAt": "2026-11-25T14:58:15.089Z"
         }
-      ]
+      ],
+      "recheckedAt": "2026-11-25T14:58:15.089Z"
     },
     "unusedIndexes": {
       "level": "INFO",
