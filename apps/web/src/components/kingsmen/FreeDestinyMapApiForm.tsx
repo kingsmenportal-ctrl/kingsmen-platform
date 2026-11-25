@@ -30,6 +30,162 @@ const provinces = [
   "Mpumalanga", "Northern Cape", "North West", "Western Cape"
 ];
 
+type LocalReadinessPreview = {
+  title: string;
+  summary: string;
+  region: string;
+  steps: string[];
+};
+
+const localReadinessGuidance: Record<string, { title: string; summary: string; steps: string[] }> = {
+  higher_education: {
+    title: "Higher education",
+    summary: "Prepare a route through university, university of technology or CAO programme choices.",
+    steps: [
+      "Use the institution's official admissions page and confirm the current application cycle.",
+      "Check the programme's subject, qualification and selection requirements.",
+      "Make a private checklist of the documents the institution currently requests."
+    ]
+  },
+  tvet: {
+    title: "TVET",
+    summary: "Identify a relevant vocational or technical programme and confirm the intake with the college.",
+    steps: [
+      "Find the official college, campus, programme and latest prospectus.",
+      "Verify intake dates, entry requirements, fees and any available funding directly with the college.",
+      "Prepare only the supporting records required by that programme."
+    ]
+  },
+  seta_learnership: {
+    title: "SETA programmes and learnerships",
+    summary: "Verify the employer or training provider and eligibility before relying on an opportunity advert.",
+    steps: [
+      "Identify the official SETA, employer or accredited training provider.",
+      "Confirm eligibility, the application channel, the closing date and whether any fee is legitimate.",
+      "Prepare a truthful CV and only the records the provider requests."
+    ]
+  },
+  internship: {
+    title: "Internships",
+    summary: "Match your current qualifications and experience to a verifiable internship route.",
+    steps: [
+      "Locate the opportunity on the employer's or programme provider's official page.",
+      "Check qualification requirements, location, duration and closing date.",
+      "Prepare a truthful CV and record the official source and date checked."
+    ]
+  },
+  apprenticeship: {
+    title: "Apprenticeships",
+    summary: "Compare trade and occupational-training routes against entry requirements and location.",
+    steps: [
+      "Identify the employer, college or training provider responsible for the apprenticeship.",
+      "Verify trade requirements, workplace or campus location, intake and deadline.",
+      "Prepare the certificates and supporting records specifically requested."
+    ]
+  },
+  employment: {
+    title: "Employment",
+    summary: "Build a job-search route around verified vacancies and an accurate application.",
+    steps: [
+      "Find vacancies on the employer's own careers page or another verifiable source.",
+      "Compare the role requirements with your actual qualifications and experience.",
+      "Tailor your CV truthfully and record the official source and closing date."
+    ]
+  },
+  nsfas_bursary: {
+    title: "NSFAS and bursary support",
+    summary: "Check funding fit, eligibility and dates with the official funder before applying.",
+    steps: [
+      "Identify the official funder and the study or training routes it supports.",
+      "Verify eligibility, covered costs, required records and the current closing date.",
+      "Make a private checklist and identify an alternative funding route where practical."
+    ]
+  },
+  accommodation: {
+    title: "Accommodation support",
+    summary: "Plan accommodation research around a real campus, workplace or training location.",
+    steps: [
+      "Confirm the institution or work location before narrowing the search area.",
+      "Compare location, transport, safety, affordability and the published rental terms.",
+      "Verify the landlord or provider independently; do not pay based only on an unverified listing."
+    ]
+  },
+  cv_revamp: {
+    title: "CV Revamp",
+    summary: "Prepare a truthful CV that reflects your real qualifications and experience.",
+    steps: [
+      "Collect accurate education, skills, experience and contact details privately.",
+      "Choose the target role or pathway so the CV can be tailored to relevant requirements.",
+      "Check that every claim is accurate and that the final CV has been reviewed before use."
+    ]
+  },
+  documents: {
+    title: "Document readiness",
+    summary: "Prepare a private checklist before using any official application portal.",
+    steps: [
+      "Use the provider's current document list rather than a generic checklist alone.",
+      "Check that files are legible, current and match the applicant's official records.",
+      "Upload documents only through the verified provider or Kingsmen's approved private document flow."
+    ]
+  },
+  source_check: {
+    title: "Opportunity and source check",
+    summary: "A named organisation or advert must be checked before its status is treated as current.",
+    steps: [
+      "Find the original official provider page or announcement.",
+      "Check eligibility, source authority, application channel and closing date.",
+      "Record when the source was checked; treat missing or stale evidence as unverified."
+    ]
+  },
+  confused_full_map: {
+    title: "Full route discovery",
+    summary: "Keep all six core pathways open while you narrow down a realistic first step.",
+    steps: [
+      "Compare higher education, TVET, SETA/learnerships, internships, apprenticeships and employment.",
+      "Consider your qualifications, province, affordability and the type of outcome you are pursuing.",
+      "Choose a first-choice path and at least one practical alternative to verify."
+    ]
+  }
+};
+
+function buildLocalReadinessPreview(form: HTMLFormElement): LocalReadinessPreview | null {
+  const values = new FormData(form);
+  const selectedRoutes = values.getAll("routeInterests").map(String).filter((value) =>
+    Object.prototype.hasOwnProperty.call(localReadinessGuidance, value)
+  );
+  const needsFunding = values.get("needsFundingHelp") === "on";
+  const needsCv = values.get("needsCvHelp") === "on";
+  const needsAccommodation = values.get("needsAccommodation") === "on";
+  const hasIntent = selectedRoutes.length > 0 || needsFunding || needsCv || needsAccommodation;
+  if (!hasIntent) return null;
+
+  const selected = selectedRoutes.length > 0
+    ? selectedRoutes
+    : [
+        ...(needsFunding ? ["nsfas_bursary"] : []),
+        ...(needsCv ? ["cv_revamp"] : []),
+        ...(needsAccommodation ? ["accommodation"] : [])
+      ];
+  const guidance = selected.map((route) => localReadinessGuidance[route]);
+  const priorities = [
+    ...(needsFunding && !selected.includes("nsfas_bursary") ? [localReadinessGuidance.nsfas_bursary.steps[0]] : []),
+    ...(needsCv && !selected.includes("cv_revamp") ? [localReadinessGuidance.cv_revamp.steps[0]] : []),
+    ...(needsAccommodation && !selected.includes("accommodation") ? [localReadinessGuidance.accommodation.steps[0]] : [])
+  ];
+  const steps = [...priorities, ...guidance.flatMap((item) => item.steps)]
+    .filter((step, index, all) => all.indexOf(step) === index)
+    .slice(0, 6);
+  const first = guidance[0];
+  return {
+    title: selected.length > 1 ? "Your combined readiness path" : first.title,
+    summary: selected.length > 1
+      ? "Use these route-specific checks as a starting point. Verify each opportunity with its official provider."
+      : first.summary,
+    region: String(values.get("province") ?? "").trim(),
+    steps
+  };
+}
+
 const fieldClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200";
 const labelClass = "block text-sm font-semibold text-slate-800";
 
@@ -37,6 +193,23 @@ export function FreeDestinyMapApiForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<FreeDestinyMapClientResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<LocalReadinessPreview | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  function previewReadinessPath(form: HTMLFormElement | null) {
+    setPreviewError(null);
+    setPreview(null);
+    if (!form) {
+      setPreviewError("The readiness form is not available. Please refresh and try again.");
+      return;
+    }
+    const nextPreview = buildLocalReadinessPreview(form);
+    if (!nextPreview) {
+      setPreviewError("Select at least one route interest or support need to build a preview.");
+      return;
+    }
+    setPreview(nextPreview);
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -169,9 +342,41 @@ export function FreeDestinyMapApiForm() {
           <p className="text-xs leading-5 text-slate-600">This form does not collect contact details or official identifiers. Consent does not mean a message will be sent, and the request is not an application submission.</p>
         </div>
 
-        <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-sm transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:w-fit">
+        <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
+          <button
+            type="button"
+            data-kingsmen-readiness-preview-button="true"
+            onClick={(event) => previewReadinessPath(event.currentTarget.form)}
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-800 shadow-sm transition hover:border-amber-500 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 sm:w-fit"
+          >
+            Preview my readiness path
+          </button>
+          <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-sm transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:w-fit">
+            {isSubmitting ? "Sending intake request…" : "Submit Free Destiny Map request"} <span aria-hidden="true" className="ml-2">→</span>
+          </button>
+        </div>
+ className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-sm transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:w-fit">
           {isSubmitting ? "Sending intake request…" : "Submit Free Destiny Map request"} <span aria-hidden="true" className="ml-2">→</span>
-        </button>
+        </div>
+        {previewError ? (
+          <div data-kingsmen-readiness-preview-error="true" role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-900">
+            {previewError}
+          </div>
+        ) : null}
+        {preview ? (
+          <section data-kingsmen-readiness-preview="ready" aria-live="polite" aria-labelledby="kingsmen-readiness-preview-title" className="grid gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800">Local preview · not a verified live match</p>
+              <h3 id="kingsmen-readiness-preview-title" className="mt-2 text-xl font-extrabold text-slate-950">{preview.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{preview.summary}</p>
+              {preview.region ? <p className="mt-2 text-xs font-semibold text-slate-600">Province selected: {preview.region}</p> : null}
+            </div>
+            <ol data-kingsmen-readiness-preview-steps="true" className="grid list-decimal gap-2.5 pl-5 text-sm leading-6 text-slate-800">
+              {preview.steps.map((step) => <li key={step}>{step}</li>)}
+            </ol>
+            <p className="text-xs leading-5 text-slate-600">Planning guidance only. This preview does not check live openings, eligibility, deadlines or outcomes; does not submit this form; and does not save or send the selections used to create the preview. Verify every opportunity with its official provider.</p>
+          </section>
+        ) : null}
       </form>
 
       <div className="border-t border-slate-200 bg-slate-50 p-5 sm:p-8">
