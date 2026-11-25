@@ -298,7 +298,8 @@
         "currentProgress": [
           "Status register and start-of-chat discipline merged",
           "Rebuild branch now has CI triggers and a status contract step",
-          "Browser-local Free Destiny Map readiness preview merged with passing UI test"
+          "Browser-local Free Destiny Map readiness preview merged with passing UI test",
+          "Captured read-only staging migration ledger vs source-file provenance report; 96 ledger entries remain unmapped for historical reconciliation."
         ]
       },
       {
@@ -443,14 +444,39 @@
       "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651"
     },
     "postMergeBuild": {
-      "runId": 45634765943,
-      "status": "in_progress",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634765943"
+      "runId": 45635347893,
+      "status": "queued",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45635347893"
     },
     "releaseProtectionCheck": {
       "runId": 45634928235,
       "result": "failure",
       "reason": "Branch-protection verifier returned HTTP 404 and could not verify protection; release remains blocked."
     }
+  },
+  "migrationProvenance": {
+    "snapshotPath": "manifests/rebuild/kingsmen-staging-migration-provenance-2026-11-25.json",
+    "reportPath": "reports/rebuild/kingsmen-staging-migration-provenance-latest.json",
+    "documentationPath": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
+    "validatorPath": "scripts/validators/validate-kingsmen-migration-provenance.mjs",
+    "validatorCommand": "npm run kingsmen:migrations:provenance:validate",
+    "captureType": "read_only",
+    "status": "CAPTURED_PENDING_CI_VALIDATION",
+    "summary": {
+      "liveLedgerRecords": 130,
+      "trackedSourceFiles": 41,
+      "normalizedExactMatches": 32,
+      "coreOnlyReviewCandidates": 2,
+      "ledgerRecordsWithoutSourceNameMatch": 96,
+      "sourceFilesWithoutLedgerNameMatch": 7,
+      "duplicateLedgerNames": 2,
+      "possiblePendingSourceMigrations": [
+        "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+        "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+        "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+        "db/migrations/0110_n15_source_review_decision_atomicity.sql"
+      ]
+    },
+    "nextAction": "Run and pass snapshot validator; reconcile unmapped ledger records and duplicate names using Git/deployment history. No migrations may be replayed from name matching alone."
   }
 }
