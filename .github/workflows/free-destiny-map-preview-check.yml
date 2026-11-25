@@ -37,7 +37,7 @@ concurrency:
 jobs:
   verify:
     name: Route preview, browser E2E and web build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Checkout repository
