@@ -19,6 +19,7 @@ on:
     paths:
       - "apps/web/src/app/free-destiny-map/page.tsx"
       - "scripts/staging/test-free-destiny-map-local-preview.mjs"
+      - "scripts/staging/e2e-free-destiny-map-preview.mjs"
       - "package.json"
       - "package-lock.json"
       - "apps/web/package.json"
