@@ -12,6 +12,7 @@ on:
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
+      - scripts/staging/test-candidate-applications-entry-route.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/lib/read-limited-json.ts
@@ -50,6 +51,7 @@ on:
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
+      - scripts/staging/test-candidate-applications-entry-route.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/lib/read-limited-json.ts
@@ -116,6 +118,8 @@ jobs:
         run: npm ci --prefix apps/web
       - name: Validate candidate application draft contract
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - name: Test canonical candidate applications entry route
+        run: node scripts/staging/test-candidate-applications-entry-route.mjs
       - name: Validate N15 source-review security contract
         run: node scripts/validators/validate-n15-source-review-decision.mjs
       - name: Validate Free Destiny Map browser-local readiness preview
