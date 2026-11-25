@@ -20,7 +20,7 @@ export function getCandidateSupabaseConfig(): CandidateSupabaseConfig | null {
     if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") return null;
     const projectRef = parsed.hostname.split(".")[0];
     if (!projectRef) return null;
-    const url = parsed.toString().replace(/\\/+$/, "");
+    const url = parsed.toString().replace(/\/+$/, "");
     return {
       url,
       anonKey,
