@@ -67,6 +67,33 @@
       "noFilenameOrBodyCandidateInSearchedBranches": 63,
       "recordsWithoutExactBodyMatch": 100,
       "replayAuthorized": false
+    },
+    "candidateApplicationIdentityAlignment": {
+      "capturedOn": "2026-11-25",
+      "status": "REVIEW_PATCH_PROPOSAL_CI_PENDING_NOT_DEPLOYED",
+      "stagingProjectRef": "euhubhhnumtibbyufghm",
+      "candidateFacingRpcCount": 5,
+      "affectedFunctions": [
+        "public.prepare_candidate_application_from_master_target(text)",
+        "public.prepare_candidate_manual_portal_submission(uuid)",
+        "public.get_candidate_cao_choices(uuid)",
+        "public.list_candidate_cao_parents()",
+        "public.save_candidate_cao_choices(uuid,jsonb)"
+      ],
+      "newIdentitySource": "public.candidate_auth_identity_links",
+      "legacyIdentitySource": "kingsmen_security.current_authenticated_candidate_id() -> public.candidate_accounts",
+      "observedStagingRows": {
+        "candidateAccounts": 0,
+        "candidateAuthIdentityLinks": 0
+      },
+      "proposalPath": "scripts/staging/proposals/candidate-application-verified-identity-rpc-alignment.proposal.sql",
+      "offlineTestPath": "scripts/staging/test-candidate-application-verified-identity-rpc-alignment.mjs",
+      "officialMigrationGenerated": false,
+      "stagingFunctionsChanged": false,
+      "grantsOrRlsChanged": false,
+      "authChanged": false,
+      "replayAuthorized": false,
+      "nextAction": "Validate proposal contract in CI; then complete migration provenance and restore review, test the patch against a disposable PostgreSQL schema, generate a forward-only Supabase CLI migration, review it and obtain explicit change-control approval before staging."
     }
   },
   "releaseGates": {
@@ -1044,7 +1071,8 @@
         "Test anon/Candidate A/Candidate B/operator/founder direct REST/RPC access to candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs; grants are broad at table layer and current RLS predicates need runtime negative proof.",
         "Complete approved staging actor/fixture setup and run the new GET-only RLS API boundary probe; retain release block until live proof passes.",
         "Keep live candidate-preparation query compatible with the current schema; complete migration provenance, restore rehearsal, identity-helper review and authorized fixture design before any status/draft persistence migration.",
-        "Complete candidate status/draft persistence only after migration provenance, restore rehearsal, security review and change approval; then provision approved test actors/fixtures and prove the runtime journey."
+        "Complete candidate status/draft persistence only after migration provenance, restore rehearsal, security review and change approval; then provision approved test actors/fixtures and prove the runtime journey.",
+        "Resolve the candidate identity model split: five authenticated candidate application RPCs still call the legacy candidate_accounts helper while the deployed candidate onboarding flow verifies candidate_auth_identity_links; review-only RPC alignment proposal and CI contract added, not deployed."
       ],
       "evidence": {
         "migrationAudit": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
