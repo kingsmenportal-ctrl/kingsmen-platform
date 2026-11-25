@@ -1,31 +1,77 @@
 "use client";
 
-export function getCandidateAccessToken(): string | null {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base || typeof window === "undefined") return null;
+export type CandidateSupabaseConfig = {
+  url: string;
+  anonKey: string;
+  projectRef: string;
+  storageKey: string;
+};
+
+export type CandidateSessionState =
+  | (CandidateSupabaseConfig & { status: "ready"; token: string; email: string | null })
+  | { status: "not_configured" | "missing" | "expired" | "unreadable" };
+
+export function getCandidateSupabaseConfig(): CandidateSupabaseConfig | null {
+  const sourceUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!sourceUrl || !anonKey) return null;
   try {
-    const projectRef = new URL(base).hostname.split(".")[0];
+    const parsed = new URL(sourceUrl);
+    if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") return null;
+    const projectRef = parsed.hostname.split(".")[0];
     if (!projectRef) return null;
-    const raw = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
-    if (!raw) return null;
-    const session = JSON.parse(raw) as Record<string, unknown>;
-    return typeof session.access_token === "string" && session.access_token.length > 20
-      ? session.access_token
-      : null;
+    const url = parsed.toString().replace(/\/+$/, "");
+    return {
+      url,
+      anonKey,
+      projectRef,
+      storageKey: `sb-${projectRef}-auth-token`
+    };
   } catch {
     return null;
   }
 }
 
-export function getCandidateSupabaseConfig(): { url: string; anonKey: string } | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) return null;
+/**
+ * Read the shared candidate browser session in one place so every candidate
+ * screen agrees on project configuration, the session storage key, token
+ * validity and missing/expired/unreadable states.
+ */
+export function getCandidateSessionState(): CandidateSessionState {
+  const config = getCandidateSupabaseConfig();
+  if (!config) return { status: "not_configured" };
+
+  let raw: string | null;
   try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") return null;
-    return { url: parsed.toString().replace(/\/+$/, ""), anonKey };
+    raw = window.localStorage.getItem(config.storageKey);
   } catch {
-    return null;
+    return { status: "unreadable" };
   }
+
+  if (!raw) return { status: "missing" };
+
+  let session: Record<string, unknown>;
+  try {
+    session = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return { status: "unreadable" };
+  }
+
+  if (typeof session.access_token !== "string" || session.access_token.length <= 20) {
+    return { status: "missing" };
+  }
+  if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
+    return { status: "expired" };
+  }
+
+  const user = session.user && typeof session.user === "object"
+    ? session.user as Record<string, unknown>
+    : null;
+  const email = typeof user?.email === "string" ? user.email : null;
+  return { ...config, status: "ready", token: session.access_token, email };
+}
+
+export function getCandidateAccessToken(): string | null {
+  const state = getCandidateSessionState();
+  return state.status === "ready" ? state.token : null;
 }

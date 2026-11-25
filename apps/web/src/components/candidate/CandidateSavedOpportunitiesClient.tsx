@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useCallback, useEffect, useState } from "react";
 
 type SavedOpportunity = {
@@ -27,36 +28,24 @@ const PATHWAY_LABELS: Record<string, string> = {
   accommodation: "Accommodation support"
 };
 
-function authConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  let storageKey = "sb-euhubhhnumtibbyufghm-auth-token";
-  try {
-    if (url) {
-      const ref = new URL(url).hostname.split(".")[0];
-      if (ref) storageKey = `sb-${ref}-auth-token`;
-    }
-  } catch {}
-  return { url, anonKey, storageKey };
-}
-
 function accessToken() {
-  const config = authConfig();
-  if (!config.url || !config.anonKey) throw new Error("Saved-opportunity access is not configured for this deployment.");
-  let raw: string | null = null;
-  try { raw = window.localStorage.getItem(config.storageKey); } catch {}
-  if (!raw) throw new Error("Sign in to view saved opportunities.");
-  try {
-    const session = JSON.parse(raw) as { access_token?: string; expires_at?: number };
-    if (!session.access_token) throw new Error("Sign in to view saved opportunities.");
-    if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
-      throw new Error("Your session has expired. Sign in again to continue.");
-    }
-    return { ...config, token: session.access_token };
-  } catch (caught) {
-    if (caught instanceof Error && (caught.message.startsWith("Sign in") || caught.message.startsWith("Your session"))) throw caught;
+  const state = getCandidateSessionState();
+  if (state.status === "not_configured") {
+    throw new Error("Saved-opportunity access is not configured for this deployment.");
+  }
+  if (state.status === "missing") {
+    throw new Error("Sign in to view saved opportunities.");
+  }
+  if (state.status === "expired") {
+    throw new Error("Your session has expired. Sign in again to continue.");
+  }
+  if (state.status === "unreadable") {
     throw new Error("Your browser session could not be read. Sign in again.");
   }
+  if (state.status !== "ready") {
+    throw new Error("Sign in to view saved opportunities.");
+  }
+  return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 
 function displayDate(value?: string | null) {
@@ -145,7 +134,7 @@ export default function CandidateSavedOpportunitiesClient() {
       <div className="public-notice"><span aria-hidden="true" /> SAVED OPPORTUNITIES · Authenticated records with row-level security</div>
       <header className="public-header"><div className="public-container public-header-inner">
         <a className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></a>
-        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/profile/">Profile</a><a href="/candidate/opportunity-matches/">Opportunities ↗</a><a href="/candidate/workbench/">Workbench</a></nav>
+        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/applications">Applications</a><a href="/candidate/profile/">Profile</a><a href="/candidate/opportunity-matches/">Opportunities ↗</a><a href="/candidate/workbench/">Workbench</a></nav>
       </div></header>
       <div className="public-container candidate-page-body">
         <header className="candidate-page-heading"><div><div className="public-eyebrow"><span /> YOUR SHORTLIST</div><h1>Saved opportunities <em>and next steps.</em></h1><p>Saved records belong to the authenticated candidate workspace. Saving a verified match prepares a parent application draft; it does not submit an application to the provider.</p></div><span className="candidate-preview-chip">{loading ? "LOADING" : identityStatus === "VERIFIED" ? "IDENTITY VERIFIED" : "REVIEW REQUIRED"}</span></header>
