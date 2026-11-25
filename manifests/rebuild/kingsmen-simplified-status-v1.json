@@ -293,8 +293,13 @@
           "minimum": 1,
           "maximum": 2
         },
-        "status": "not_started",
-        "exit": "Clean CI on the intended rebuild branch and release branch protection confirmed."
+        "status": "in_progress",
+        "exit": "Clean CI on the intended rebuild branch and release branch protection confirmed.",
+        "currentProgress": [
+          "Status register and start-of-chat discipline merged",
+          "Rebuild branch now has CI triggers and a status contract step",
+          "Browser-local Free Destiny Map readiness preview merged with passing UI test"
+        ]
       },
       {
         "id": 2,
@@ -360,11 +365,28 @@
   },
   "currentPullRequests": [
     {
-      "number": 326,
-      "title": "Add browser-local readiness preview to Free Destiny Map intake",
+      "number": 319,
+      "title": "rebuild: Kingsmen One foundation and recovered candidate product slice",
       "state": "open",
       "draft": true,
-      "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+      "base": "main",
+      "role": "broader rebuild integration PR; release-gate evidence remains required"
+    },
+    {
+      "number": 327,
+      "title": "Establish authoritative Kingsmen status and completion roadmap",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "fbd8420d14ba6ee87174c77de7de58d213254f8c"
+    },
+    {
+      "number": 326,
+      "title": "Add browser-local readiness preview to Free Destiny Map intake",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "189b61a74a8c8bf2dace85203954fd5969e66629"
     },
     {
       "number": 324,
@@ -387,5 +409,48 @@
     "Keep this document, this manifest and the validation contract in sync after meaningful batches.",
     "Never describe source presence or a ready historical deployment as proof of a complete production journey.",
     "Do not apply migrations or modify live staging data without a reviewed plan and explicit approval."
-  ]
+  ],
+  "recentBatches": [
+    {
+      "id": "status-register",
+      "pr": 327,
+      "state": "merged",
+      "mergeCommitSha": "fbd8420d14ba6ee87174c77de7de58d213254f8c",
+      "ciRunId": 45634438774,
+      "ciResult": "success",
+      "notes": "Project-wide status register, N00–N20 module map, 13 release gates, timeline, validator, README/CLAUDE references, and CI status contract."
+    },
+    {
+      "id": "free-destiny-preview",
+      "pr": 326,
+      "state": "merged",
+      "mergeCommitSha": "189b61a74a8c8bf2dace85203954fd5969e66629",
+      "ciRunId": 45634488651,
+      "ciResult": "success",
+      "notes": "Browser-local route-specific readiness preview; preview button does not submit; browser test and N15 source review tests passed."
+    }
+  ],
+  "latestVerification": {
+    "statusDate": "2026-11-25",
+    "statusRegisterCi": {
+      "runId": 45634438774,
+      "result": "success",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634438774"
+    },
+    "readinessPreviewCi": {
+      "runId": 45634488651,
+      "result": "success",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651"
+    },
+    "postMergeBuild": {
+      "runId": 45634765943,
+      "status": "in_progress",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634765943"
+    },
+    "releaseProtectionCheck": {
+      "runId": 45634928235,
+      "result": "failure",
+      "reason": "Branch-protection verifier returned HTTP 404 and could not verify protection; release remains blocked."
+    }
+  }
 }
