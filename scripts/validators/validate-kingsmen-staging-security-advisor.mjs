@@ -70,4 +70,22 @@ assert.match(doc,/live check completed/i);
 assert.match(doc,/all six deployed bodies match/i);
 assert.match(doc,/deny all eight direct client-role privileges/i);
 
+
+assert.equal(snapshot.livePolicyOverlapReview.summary.policyDefinitionsCaptured,33);
+assert.equal(snapshot.livePolicyOverlapReview.tables.length,8);
+assert.equal(snapshot.livePolicyOverlapReview.identityAndRoleHelpers.length,7);
+assert.deepEqual(snapshot.livePolicyOverlapReview.summary.tablesWithAnyAnonDirectGrant,["candidate_credentials","candidate_sessions","evidence_ledger","route_sources","workflow_runs"]);
+assert.deepEqual(snapshot.livePolicyOverlapReview.summary.tablesWithAnonAndAuthenticatedAllCrudGrants,["candidate_credentials","candidate_sessions","evidence_ledger","route_sources","workflow_runs"]);
+assert.equal(snapshot.livePolicyOverlapReview.summary.liveApiNegativeRoleTestsRun,0);
+assert.equal(snapshot.livePolicyOverlapReview.safety.grantsChanged,false);
+assert.equal(snapshot.livePolicyOverlapReview.safety.policiesChanged,false);
+for(const table of snapshot.livePolicyOverlapReview.tables){
+ assert.equal(table.rlsEnabled,true,"RLS must be enabled on reviewed table "+table.table);
+}
+assert.equal(snapshot.livePolicyOverlapReview.tables.find(t=>t.table==="route_sources").policies.find(p=>p.name==="route_sources_public_verified_read")?.roles,"{anon,authenticated,service_role}");
+assert.equal(snapshot.livePolicyOverlapReview.tables.find(t=>t.table==="candidate_credentials").policies.find(p=>p.name==="candidate_credentials_service_role_backend_all")?.roles,"{public}");
+assert.match(doc,/Direct table grants and policy predicates/);
+assert.match(doc,/direct table grants are broader than necessary/i);
+assert.match(doc,/No live privileges, policies or functions were changed/i);
+
 console.log("Kingsmen staging security-advisor snapshot contract passed: 17 RLS tables, 6 SECURITY DEFINER RPCs, 16 policy overlaps and 282 index candidates captured; no live changes made.");
