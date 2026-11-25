@@ -26,7 +26,7 @@ The GitHub repository is accessible. The default branch at the start of this bat
 | Layer | Current evidence | Status | Remaining work |
 |---|---|---|---|
 | Public frontend | Next.js app in `apps/web`; public homepage, six pathway cards and candidate dashboard source exist | Source verified; runtime unverified | Run browser journeys and verify every link, route, mobile layout and form |
-| Free Destiny Map | Form and fields existed but the preview button had no submit handler | Interactive local-only preview implemented; Playwright browser E2E passed in workflow #17 | Keep preview local-only; design a separate safe, consented intake flow after privacy/backend prerequisites |
+| Free Destiny Map | Form and fields existed but the preview button had no submit handler | Interactive local-only preview implemented; clean install/build/browser E2E passed in focused workflow #24 | Keep preview local-only; design a separate safe, consented intake flow after privacy/backend prerequisites |
 | Candidate dashboard | Six pathways and five workspace links exist in `apps/web/src/app/candidate/dashboard/page.tsx` | Source verified; full user journey unverified | Verify authentication, data loading, navigation and persistence |
 | Backend API | HTTP server, command intake, workflow-result intake, policy evaluation and read-model code in `apps/api` | Source verified; runtime unverified | Build, start and smoke-test all required routes |
 | Database / Truth Vault | PostgreSQL repository implementation and persistence validator exist | Implemented, runtime unverified | Prove staging writes, reads, idempotency, audit, evidence, approvals, heartbeat and dead-letter queue |
@@ -39,7 +39,7 @@ The GitHub repository is accessible. The default branch at the start of this bat
 | Jarvis / AI | Command contracts, policy gate, tool registry and evidence-ledger foundations exist | Source verified; end-to-end capability unverified | Verify allowed SAFE_READ operations, backend authority, approvals and evidence recording |
 | Automation | Workflow APIs and worker/heartbeat/DLQ foundations exist | Runtime unverified | Prove worker runs, retries, idempotency and failure recovery |
 | Infrastructure / Netlify | A connected Netlify project named `kingsmen-jarvis-command-zungu` was found; its last listed ready production deploy is dated 8 July 2026 | Connection found; Kingsmen public-portal mapping unconfirmed | Confirm the intended production site, repository/build settings, current deployed commit and preview deployment |
-| CI / tests | Existing Kingsmen CI plus focused preview workflow | Root regression tests, API/web build, and browser E2E have passed; lockfile correction landed, and strict `npm ci` passed in the lock-repair run | Verify a fresh clean workflow run #23 completes the build and browser E2E; keep regression checks |
+| CI / tests | Existing Kingsmen CI plus focused preview workflow | Focused workflow #24 passed strict root/web `npm ci`, root regression suite, Chromium install, Next.js production build, and Free Destiny Map browser E2E; Kingsmen CI #647 also passed. Expanded dashboard/workspace route E2E is in workflow #25 | Confirm workflow #25 passes six dashboard pathway checks and five workspace routes; retain strict install/build/E2E gates |
 | Privacy, legal and launch controls | Launch-readiness document defines required evidence gates | Launch blocked | Complete legal review/publication and the required redacted staging evidence |
 
 ## Batch log
@@ -49,21 +49,22 @@ The GitHub repository is accessible. The default branch at the start of this bat
 **Branch:** `feat/free-destiny-map-interactive-preview-20261125`  
 **Pull request:** [#340](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/340)  
 **Base branch:** `main`  
-**Validated PR head:** `b9d5b3f4af1660c6bcf7b21fc3762dc4df97fd55`  
-**Focused workflow:** [Run #17 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45646132498)  
-**Kingsmen CI:** [Run #640 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45646133193)
+**Latest PR head:** `9d2cd9dfc7f8be4d3727cbf73016bd5c5cd06c2e`  
+**Focused workflow:** [Run #24 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45647547967)  
+**Kingsmen CI:** [Run #647 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45647548413)  
+**Expanded candidate-navigation workflow:** [Run #25 — pending at last check](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45649631829)
 
 Implemented in the branch:
 
 - `apps/web/src/app/free-destiny-map/page.tsx` — made the page a client component; wired form submission; required the core selections; added a result panel; supplied distinct next-step guidance for university, TVET, SETA/learnership, internship/apprenticeship, employment, funding and undecided routes.
 - `scripts/staging/test-free-destiny-map-local-preview.mjs` — added a source-level regression contract for required fields, handler wiring, accessible output, seven guidance branches and the no-send/no-persist boundary.
-- `scripts/staging/e2e-free-destiny-map-preview.mjs` — added a Playwright browser E2E that fills the form, generates university and funding previews, checks the visible result, verifies the local-only disclosure, and asserts that previewing does not issue app write requests or change browser storage.
+- `scripts/staging/e2e-free-destiny-map-preview.mjs` — Playwright browser E2E fills the form, generates university and funding previews, checks the visible result, verifies the local-only disclosure, and asserts that previewing does not issue app write requests or change browser storage. The latest change also smoke-tests the candidate dashboard's six pathway cards and checks that its five workspace destinations return HTTP 200.
 - `package.json` — registered `test:free-destiny-map-preview` and included the test in the root `npm test` command.
 - `.github/workflows/free-destiny-map-preview-check.yml` — added a GitHub Actions workflow to run the root regression suite, build Next.js, start the production build, and run Playwright browser E2E on relevant push and PR changes.
 
 **Data boundary:** This preview only reads the current form values in the page and renders recommendations. It makes no backend request and does not write to localStorage or sessionStorage. It does not create a candidate profile, save an application, or claim that a real opportunity is open.
 
-**Validation actually performed:** The source-level structural inspection passed 16/16 checks. The actual root `npm test` suite passed, including `test-free-destiny-map-local-preview.mjs`. Existing Kingsmen CI run #640 passed the focused repository tests, API build, web dependency install, and Next.js build. Focused preview workflow run #17 passed root regression, web dependency installation, Chromium setup, Next.js production build and Playwright browser E2E. The browser test loaded `/free-destiny-map/`, generated the university preview, changed the route to funding, generated funding-specific guidance, confirmed the local-only notice, and confirmed there were no app write requests or browser-storage changes. A follow-up found the strict clean-install mismatch: the lockfile lacked `@netlify/plugin-nextjs@5.16.9`. The lockfile has now been regenerated and committed in the PR branch (lockfile commit observed in workflow logs as `1c83ea2`), and workflow #21's `npm ci --prefix apps/web --no-audit --no-fund` step passed. Workflow #21 was cancelled during the subsequent web build as the branch was updated to remove temporary write permissions and auto-commit logic. The permanent read-only workflow now uses clean `npm ci`; fresh run #23 is pending/in progress and must pass the full build and browser E2E before this newest workflow revision is considered fully verified. Playwright is pinned to Ubuntu 24.04 because v1.60 does not support Ubuntu 26.04.
+**Validation actually performed:** The source-level structural inspection passed 16/16 checks. Root `npm test` passed, including the candidate dashboard contract and Free Destiny Map local-preview contract. Focused preview workflow #24 passed strict clean installs (`npm ci` at root and `npm ci --prefix apps/web`), Chromium setup, Next.js production build, and the production-preview browser E2E for the Free Destiny Map. Kingsmen CI #647 passed. The browser test verifies university and funding guidance, the local-only disclosure, no app write requests, and unchanged browser storage. The web lockfile was regenerated and committed in the PR branch to include the missing `@netlify/plugin-nextjs@5.16.9` entry; the workflow now uses read-only permissions and strict `npm ci`. The next E2E extension adds checks for all six candidate dashboard pathways and HTTP 200 responses for all five linked workspace routes. Workflow #25 was queued/in progress at the time of this update, so those additional checks are not yet reported as passed. Playwright is pinned to Ubuntu 24.04 because v1.60 does not support Ubuntu 26.04.
 
 ## Additional repository protection finding
 
@@ -90,9 +91,9 @@ The official launch gate remains the authoritative list; this status record does
 
 ## Next implementation sequence
 
-1. PR #340's local-preview feature passed tests/build/browser E2E; keep it unmerged until the normal repository review and merge requirements are satisfied.
+1. PR #340's local-preview feature passed strict install, regression tests, production build and browser E2E in workflow #24. The expanded dashboard route test in workflow #25 must also pass; keep the PR unmerged until normal review and merge requirements are satisfied.
 2. Resolve `main` branch protection: run #3467 could not verify active protection (HTTP 404/not found or not visible); inspect repository settings with admin authority, apply the checked-in script only after confirming its exact scope, and rerun the read-only evidence workflow.
-3. Finish verification with permanent read-only workflow run #23, confirming the synchronized web lockfile passes `npm ci`, the Next.js production build, and browser E2E.
+3. Review workflow #25's expanded dashboard navigation checks; investigate any missing or broken candidate workspace route revealed by the browser test.
 4. Confirm which Netlify site is the actual public candidate portal, and verify deployment repository/build settings and deployed commit.
 5. Complete privacy/legal publication and safe backend/database staging prerequisites before turning any candidate intake into a real data-collection flow, then continue through remaining P0 gates.
 
