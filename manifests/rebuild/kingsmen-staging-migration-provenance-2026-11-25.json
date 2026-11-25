@@ -1,0 +1,1448 @@
+{
+  "schema": "kingsmen.staging-migration-provenance-snapshot.v1",
+  "capturedOn": "2026-11-25",
+  "sourceRepository": "kingsmenportal-ctrl/kingsmen-platform",
+  "sourceBranch": "rebuild/kingsmen-one-foundation-2026-11-17",
+  "sourceTreeSha": "a5daeb6b11d250c2643819f051ccbb0763e2ac7a",
+  "database": {
+    "provider": "Supabase",
+    "projectName": "kingsmen-portal-staging",
+    "projectRef": "euhubhhnumtibbyufghm",
+    "status": "ACTIVE_HEALTHY",
+    "region": "eu-west-1",
+    "postgresVersion": "17.11.0.003"
+  },
+  "scope": {
+    "trackedMigrationDirectories": [
+      "db/migrations",
+      "database/migrations",
+      "supabase/migrations"
+    ],
+    "matchingRule": "A normalized exact name match moves a leading numeric file prefix to a trailing suffix. A core-only match ignores numeric sequence and is only a candidate for human review. Neither result authorizes replay.",
+    "excludesCandidateDataRows": true,
+    "readOnlyCapture": true
+  },
+  "summary": {
+    "liveLedgerRecords": 130,
+    "trackedSourceFiles": 41,
+    "normalizedExactMatches": 32,
+    "coreOnlyCandidateMatches": 2,
+    "liveLedgerRecordsWithoutNameMatch": 96,
+    "sourceFilesWithoutLedgerMatch": 7,
+    "duplicateLedgerNames": 2,
+    "extraDuplicateRecords": 2,
+    "possiblePendingSourceMigrations": [
+      "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+      "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+      "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+      "db/migrations/0110_n15_source_review_decision_atomicity.sql"
+    ]
+  },
+  "ledgerRecords": [
+    {
+      "version": "20261012155326",
+      "name": "n03_truth_vault_0001",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0001_n03_truth_vault.sql"
+      ]
+    },
+    {
+      "version": "20261012155332",
+      "name": "n04_candidate_core_0002",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0002_n04_candidate_core.sql"
+      ]
+    },
+    {
+      "version": "20261012155338",
+      "name": "n05_document_vault_0003",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0003_n05_document_vault.sql"
+      ]
+    },
+    {
+      "version": "20261012155345",
+      "name": "n06_route_universe_0004",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0004_n06_route_universe.sql"
+      ]
+    },
+    {
+      "version": "20261012155355",
+      "name": "n07_airtable_sync_0005",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0005_n07_airtable_sync.sql"
+      ]
+    },
+    {
+      "version": "20261012155403",
+      "name": "n08_control_plane_0006",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0006_n08_control_plane.sql"
+      ]
+    },
+    {
+      "version": "20261012155411",
+      "name": "n09_notifications_communications_0007",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0007_n09_notifications_communications.sql"
+      ]
+    },
+    {
+      "version": "20261012155417",
+      "name": "n10_finance_payfast_0008",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0008_n10_finance_payfast.sql"
+      ]
+    },
+    {
+      "version": "20261012155539",
+      "name": "n11_ai_decision_matching_0009",
+      "matchType": "CORE_ONLY_REVIEW_REQUIRED",
+      "sourcePaths": [
+        "db/migrations/0084_n11_ai_decision_matching.sql"
+      ]
+    },
+    {
+      "version": "20261012155549",
+      "name": "n12_governance_policy_0010",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0010_n12_governance_policy.sql"
+      ]
+    },
+    {
+      "version": "20261012155559",
+      "name": "n13_observability_reports_incidents_0011",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0011_n13_observability_reports_incidents.sql"
+      ]
+    },
+    {
+      "version": "20261012155618",
+      "name": "n14_integrations_workflow_connectors_0012",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0012_n14_integrations_workflow_connectors.sql"
+      ]
+    },
+    {
+      "version": "20261012155627",
+      "name": "n15_opportunity_engine_0013",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0013_n15_opportunity_engine.sql"
+      ]
+    },
+    {
+      "version": "20261012155636",
+      "name": "n16_orchestrator_execution_0014",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0014_n16_orchestrator_execution.sql"
+      ]
+    },
+    {
+      "version": "20261012155644",
+      "name": "n17_founder_command_ops_0015",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0015_n17_founder_command_ops.sql"
+      ]
+    },
+    {
+      "version": "20261012155655",
+      "name": "n18_public_website_0016",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0016_n18_public_website.sql"
+      ]
+    },
+    {
+      "version": "20261012155704",
+      "name": "n19_candidate_mobile_public_portal_0017",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0017_n19_candidate_mobile_public_portal.sql"
+      ]
+    },
+    {
+      "version": "20261012155713",
+      "name": "n20_final_assembly_system_lock_0018",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0018_n20_final_assembly_system_lock.sql"
+      ]
+    },
+    {
+      "version": "20261012155744",
+      "name": "rls_security_boundary_0019",
+      "matchType": "CORE_ONLY_REVIEW_REQUIRED",
+      "sourcePaths": [
+        "db/migrations/0009_rls_security_boundary.sql"
+      ]
+    },
+    {
+      "version": "20261012155914",
+      "name": "rls_helper_search_path_hardening_0020",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261012160432",
+      "name": "foreign_key_index_hardening_0021",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261012173518",
+      "name": "n10_commercial_schedule_v1_0022",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015151555",
+      "name": "candidate_auth_private_storage_0023",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015151630",
+      "name": "candidate_owned_application_document_reads_0024",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015152102",
+      "name": "explicit_candidate_identity_binding",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015152345",
+      "name": "require_verified_candidate_identity",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015152529",
+      "name": "candidate_portal_durable_state",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015152933",
+      "name": "harden_candidate_document_storage",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015153626",
+      "name": "revoke_anon_candidate_data_access_0029",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261015153651",
+      "name": "revoke_unneeded_candidate_mutations_0030",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017062557",
+      "name": "n11_payfast_provider_idempotency_0036",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017062602",
+      "name": "n11_payfast_retryable_rejected_itn_0037",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017062700",
+      "name": "candidate_sessions_0038_legacy_compatible",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017062706",
+      "name": "candidate_credentials_0039",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017062711",
+      "name": "candidate_auth_identity_link_0040",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017082458",
+      "name": "kingsmen_ecosystem_marketplace_0041",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017082554",
+      "name": "public_verified_opportunity_read_0042",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017082751",
+      "name": "marketplace_rls_performance_hardening_0043",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017083209",
+      "name": "candidate_saved_routes_0044",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017083300",
+      "name": "partner_pending_listing_intake_0045",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0045_partner_pending_listing_intake.sql"
+      ]
+    },
+    {
+      "version": "20261017083446",
+      "name": "candidate_saved_routes_fk_index_0046",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0046_candidate_saved_routes_fk_index.sql"
+      ]
+    },
+    {
+      "version": "20261017083509",
+      "name": "candidate_route_application_tracker_0047",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0047_candidate_route_application_tracker.sql"
+      ]
+    },
+    {
+      "version": "20261017083558",
+      "name": "candidate_route_application_unique_sources_0048",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0048_candidate_route_application_unique_sources.sql"
+      ]
+    },
+    {
+      "version": "20261017083615",
+      "name": "candidate_application_source_integrity_0049",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0049_candidate_application_source_integrity.sql"
+      ]
+    },
+    {
+      "version": "20261017083818",
+      "name": "marketplace_reviewer_queue_0050",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0050_marketplace_reviewer_queue.sql"
+      ]
+    },
+    {
+      "version": "20261017083832",
+      "name": "published_listing_organisation_guard_0051",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0051_published_listing_organisation_guard.sql"
+      ]
+    },
+    {
+      "version": "20261017083909",
+      "name": "marketplace_review_audit_fields_0052",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0052_marketplace_review_audit_fields.sql"
+      ]
+    },
+    {
+      "version": "20261017084005",
+      "name": "marketplace_select_policy_consolidation_0053",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0053_marketplace_select_policy_consolidation.sql"
+      ]
+    },
+    {
+      "version": "20261017084021",
+      "name": "marketplace_public_authenticated_select_split_0054",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0054_marketplace_public_authenticated_select_split.sql"
+      ]
+    },
+    {
+      "version": "20261017084048",
+      "name": "saved_partner_listings_verified_only_0055",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0055_saved_partner_listings_verified_only.sql"
+      ]
+    },
+    {
+      "version": "20261017084704",
+      "name": "marketplace_review_event_audit_0056",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017085001",
+      "name": "marketplace_https_url_constraints_0057",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017085438",
+      "name": "marketplace_public_dns_url_constraints_0058",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017155008",
+      "name": "0060_n06_application_pathway_runtime",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017155013",
+      "name": "0061_n07_provider_review_operations",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017155018",
+      "name": "0062_n08_outcomes_progression",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017155024",
+      "name": "0063_n09_communications_follow_up",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017155029",
+      "name": "0064_n10_packages_payments_refunds",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017155618",
+      "name": "n10_finance_privilege_hardening",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017160630",
+      "name": "n10_atomic_payfast_payment_confirmation",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017160636",
+      "name": "n10_payfast_refund_reconciliation",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017160641",
+      "name": "n10_atomic_finance_workflows",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017160751",
+      "name": "n10_finance_rpc_only_writes",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261017174940",
+      "name": "n03_truth_vault_0002_rls_hardening",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019065555",
+      "name": "staging_rls_search_path_hardening_0072",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0072_staging_rls_search_path_hardening.sql"
+      ]
+    },
+    {
+      "version": "20261019082917",
+      "name": "n06_application_privilege_hardening_0073",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019095926",
+      "name": "candidate_workspace_persistence_v1",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019101601",
+      "name": "candidate_identity_review_requests_v1",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112437",
+      "name": "candidate_identity_review_decision_workflow_0076",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112445",
+      "name": "candidate_application_tracker_0077",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112452",
+      "name": "candidate_application_preparation_readiness_0078",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112511",
+      "name": "candidate_application_preparation_readiness_0078",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112516",
+      "name": "candidate_private_document_vault_0079",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112521",
+      "name": "authorised_candidate_document_review_0080",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019112627",
+      "name": "candidate_document_preparation_detach_and_fk_indexes_0081",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261019122713",
+      "name": "fk_index_hardening_0082",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0082_fk_index_hardening.sql"
+      ]
+    },
+    {
+      "version": "20261020031028",
+      "name": "n12_candidate_private_document_review",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022030303",
+      "name": "reviewer_audit_tables_backend_only",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022031206",
+      "name": "move_candidate_identity_helper_to_private_schema",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022042942",
+      "name": "candidate_identity_review_submission_rpc",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022043212",
+      "name": "serialize_candidate_identity_review_submissions",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022183219",
+      "name": "revoke_client_candidate_identity_link_table_access",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022184513",
+      "name": "identity_review_server_side_submission_route",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022184626",
+      "name": "identity_review_submission_audit_schema_compat",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022194413",
+      "name": "expand_sa_official_source_catalog",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261022202953",
+      "name": "n09_communications_backend_only",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023040341",
+      "name": "cross_module_application_outcome_truth_guards",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023132336",
+      "name": "revoke_client_execute_application_outcome_guard_functions",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023133631",
+      "name": "20261023170000_application_linked_private_document_evidence",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023135605",
+      "name": "20261023180000_seed_verified_labour_vacancies",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023142155",
+      "name": "20261023190000_route_availability_expiry_guards",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023142549",
+      "name": "20261023200000_route_availability_sa_timezone",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023144551",
+      "name": "n15_current_verified_opportunity_feed",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023145002",
+      "name": "n15_public_safe_opportunity_feed",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023145908",
+      "name": "n05_document_application_owner_index",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023152823",
+      "name": "n11_ai_evidence_and_review_guards",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261023160910",
+      "name": "n15_source_authority_registry_bridge_0085",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0085_n15_source_authority_registry_bridge.sql"
+      ]
+    },
+    {
+      "version": "20261023161234",
+      "name": "n15_live_ingestion_candidate_feed_0086",
+      "matchType": "NORMALIZED_EXACT",
+      "sourcePaths": [
+        "db/migrations/0086_n15_live_ingestion_candidate_feed.sql"
+      ]
+    },
+    {
+      "version": "20261023164135",
+      "name": "0020_n07_durable_outbox_leases_retry",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025004936",
+      "name": "n16_durable_worker_recovery_202610250001",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025004943",
+      "name": "n16_worker_send_boundary_202610250002",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025004952",
+      "name": "n16_exhausted_lease_recovery_202610250003",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025090643",
+      "name": "n17_founder_brief_access_hardening",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025090832",
+      "name": "n17_founder_report_access_hardening",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025101411",
+      "name": "payfast_sandbox_atomic_settlement",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025105336",
+      "name": "identity_review_least_privilege_role",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025105411",
+      "name": "identity_review_role_code_constraint",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025105520",
+      "name": "identity_review_audit_actor_role",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025110908",
+      "name": "unified_candidate_master_application",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025110918",
+      "name": "unified_candidate_master_application_rpc",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025111050",
+      "name": "unified_master_application_source_confidence_guard",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025111404",
+      "name": "candidate_identity_review_private_evidence",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025112103",
+      "name": "candidate_identity_review_followup_status",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025112853",
+      "name": "master_target_to_application_lifecycle_bridge",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025113010",
+      "name": "master_target_pathway_consistency_guard",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025113119",
+      "name": "candidate_manual_portal_handoff",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025113510",
+      "name": "freeze_linked_master_application_targets",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025113726",
+      "name": "link_reviewed_documents_to_application_evidence",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025113938",
+      "name": "verified_submission_and_outcome_workflow",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261025114110",
+      "name": "lock_document_review_rpc_to_service_role",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029143144",
+      "name": "canonical_package_benefits_universal_accommodation_20261029",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029143414",
+      "name": "seed_canonical_public_package_cards_20261029",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029165245",
+      "name": "0088_covering_indexes_for_live_foreign_keys",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029174204",
+      "name": "candidate_private_document_vault_workflows_0089",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029180233",
+      "name": "atomic_payfast_checkout_bundle_0092",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029180243",
+      "name": "remove_duplicate_identity_review_open_request_index_0091",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029180632",
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029180642",
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029181155",
+      "name": "harden_payfast_checkout_identity_locks_0094",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    },
+    {
+      "version": "20261029193124",
+      "name": "candidate_self_service_profile_bootstrap_0095",
+      "matchType": "UNMAPPED_TO_TRACKED_SOURCE",
+      "sourcePaths": []
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "database/migrations/000004_jarvis_postgresql_truth_vault.sql",
+      "basename": "000004_jarvis_postgresql_truth_vault",
+      "gitBlobSha": "65c28efbf8a9022f504ff834cd34fc36c5773bd8",
+      "sizeBytes": 6366,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    },
+    {
+      "path": "db/migrations/0001_n03_truth_vault.sql",
+      "basename": "0001_n03_truth_vault",
+      "gitBlobSha": "2ee31de554c20dbcf522f5868af411d50d74173a",
+      "sizeBytes": 15387,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155326",
+          "name": "n03_truth_vault_0001",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0002_n04_candidate_core.sql",
+      "basename": "0002_n04_candidate_core",
+      "gitBlobSha": "ae02bbdd9ffce662506ed6e930786346a01e28e0",
+      "sizeBytes": 10072,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155332",
+          "name": "n04_candidate_core_0002",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0003_n05_document_vault.sql",
+      "basename": "0003_n05_document_vault",
+      "gitBlobSha": "2f6efa5d4c3f6686965952bbc774d4c701e9e922",
+      "sizeBytes": 11379,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155338",
+          "name": "n05_document_vault_0003",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0004_n06_route_universe.sql",
+      "basename": "0004_n06_route_universe",
+      "gitBlobSha": "17b3a4f2880094464590d619643353a12fa3b6de",
+      "sizeBytes": 17966,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155345",
+          "name": "n06_route_universe_0004",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0005_n07_airtable_sync.sql",
+      "basename": "0005_n07_airtable_sync",
+      "gitBlobSha": "689b8db53070390dfff0ce593314786325f33024",
+      "sizeBytes": 7191,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155355",
+          "name": "n07_airtable_sync_0005",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0006_n08_control_plane.sql",
+      "basename": "0006_n08_control_plane",
+      "gitBlobSha": "e58946ac23294b58d4a1092a3c1a02591cfff8b8",
+      "sizeBytes": 8301,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155403",
+          "name": "n08_control_plane_0006",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0007_n09_notifications_communications.sql",
+      "basename": "0007_n09_notifications_communications",
+      "gitBlobSha": "b782e056428db6c9049582d45e1cc78076857bc1",
+      "sizeBytes": 8835,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155411",
+          "name": "n09_notifications_communications_0007",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0008_n10_finance_payfast.sql",
+      "basename": "0008_n10_finance_payfast",
+      "gitBlobSha": "7f8f6cbe1a751a8e199b5571baaaa9e0a3d82142",
+      "sizeBytes": 10681,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155417",
+          "name": "n10_finance_payfast_0008",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0009_rls_security_boundary.sql",
+      "basename": "0009_rls_security_boundary",
+      "gitBlobSha": "1b74136123f1d37370c7cd62e941a8581f711704",
+      "sizeBytes": 8981,
+      "matchType": "CORE_ONLY_LEDGER_CANDIDATE",
+      "ledgerMatches": [
+        {
+          "version": "20261012155744",
+          "name": "rls_security_boundary_0019",
+          "matchType": "CORE_ONLY_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0010_n12_governance_policy.sql",
+      "basename": "0010_n12_governance_policy",
+      "gitBlobSha": "51f68ca9dd2c28b72d154ee5223dd605d42a8f8f",
+      "sizeBytes": 12725,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155549",
+          "name": "n12_governance_policy_0010",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0011_n13_observability_reports_incidents.sql",
+      "basename": "0011_n13_observability_reports_incidents",
+      "gitBlobSha": "63cddf2a97ef10e06fba814a23bf81eb43ea18c9",
+      "sizeBytes": 16541,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155559",
+          "name": "n13_observability_reports_incidents_0011",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0012_n14_integrations_workflow_connectors.sql",
+      "basename": "0012_n14_integrations_workflow_connectors",
+      "gitBlobSha": "064bd89116810efa96d2047c9055deae356bbd2b",
+      "sizeBytes": 10397,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155618",
+          "name": "n14_integrations_workflow_connectors_0012",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0013_n15_opportunity_engine.sql",
+      "basename": "0013_n15_opportunity_engine",
+      "gitBlobSha": "78f84d8c2e903a37ff737fdd3b630e99082e49a7",
+      "sizeBytes": 13373,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155627",
+          "name": "n15_opportunity_engine_0013",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0014_n16_orchestrator_execution.sql",
+      "basename": "0014_n16_orchestrator_execution",
+      "gitBlobSha": "7c4220c92adae2a8a098af7a5c95e00163b32501",
+      "sizeBytes": 14650,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155636",
+          "name": "n16_orchestrator_execution_0014",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0015_n17_founder_command_ops.sql",
+      "basename": "0015_n17_founder_command_ops",
+      "gitBlobSha": "b9757ca7b99a59b625eddbbbe608135d419e9e83",
+      "sizeBytes": 12833,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155644",
+          "name": "n17_founder_command_ops_0015",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0016_n18_public_website.sql",
+      "basename": "0016_n18_public_website",
+      "gitBlobSha": "ebf17142016d115afc35e993b20271b6d0b9cfca",
+      "sizeBytes": 12947,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155655",
+          "name": "n18_public_website_0016",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0017_n19_candidate_mobile_public_portal.sql",
+      "basename": "0017_n19_candidate_mobile_public_portal",
+      "gitBlobSha": "2ecfebfc94a1ffc5bc1e6d1e28d4222643f21a93",
+      "sizeBytes": 9948,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155704",
+          "name": "n19_candidate_mobile_public_portal_0017",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0018_n20_final_assembly_system_lock.sql",
+      "basename": "0018_n20_final_assembly_system_lock",
+      "gitBlobSha": "901af0bc08819e8561738254c1219dd6cc81a242",
+      "sizeBytes": 9070,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261012155713",
+          "name": "n20_final_assembly_system_lock_0018",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0045_partner_pending_listing_intake.sql",
+      "basename": "0045_partner_pending_listing_intake",
+      "gitBlobSha": "90515fe902e57e1d6363565fb8685d7d0914bfb4",
+      "sizeBytes": 662,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083300",
+          "name": "partner_pending_listing_intake_0045",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0046_candidate_saved_routes_fk_index.sql",
+      "basename": "0046_candidate_saved_routes_fk_index",
+      "gitBlobSha": "2ab802d988000c04b923dfbde849ee4e0d35c7a0",
+      "sizeBytes": 193,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083446",
+          "name": "candidate_saved_routes_fk_index_0046",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0047_candidate_route_application_tracker.sql",
+      "basename": "0047_candidate_route_application_tracker",
+      "gitBlobSha": "8f7b6d0ad1dd2fdacee936576a92de5a3b974006",
+      "sizeBytes": 4585,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083509",
+          "name": "candidate_route_application_tracker_0047",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0048_candidate_route_application_unique_sources.sql",
+      "basename": "0048_candidate_route_application_unique_sources",
+      "gitBlobSha": "d517f5558b02c35faab38418c8ce014c4eca9f3b",
+      "sizeBytes": 433,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083558",
+          "name": "candidate_route_application_unique_sources_0048",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0049_candidate_application_source_integrity.sql",
+      "basename": "0049_candidate_application_source_integrity",
+      "gitBlobSha": "2cc725966e563e2e221a3b1ea13a3adf35c78087",
+      "sizeBytes": 1466,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083615",
+          "name": "candidate_application_source_integrity_0049",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0050_marketplace_reviewer_queue.sql",
+      "basename": "0050_marketplace_reviewer_queue",
+      "gitBlobSha": "ee88f23d78451a774ac226ca79ab803cf89aea7a",
+      "sizeBytes": 1908,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083818",
+          "name": "marketplace_reviewer_queue_0050",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0051_published_listing_organisation_guard.sql",
+      "basename": "0051_published_listing_organisation_guard",
+      "gitBlobSha": "5a2b2aa8eb5b93ed33920a7e5ab59c0048d64c74",
+      "sizeBytes": 1155,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083832",
+          "name": "published_listing_organisation_guard_0051",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0052_marketplace_review_audit_fields.sql",
+      "basename": "0052_marketplace_review_audit_fields",
+      "gitBlobSha": "b8b33f8520b6570b59eb1bb4502a9d457f91139d",
+      "sizeBytes": 357,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017083909",
+          "name": "marketplace_review_audit_fields_0052",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0053_marketplace_select_policy_consolidation.sql",
+      "basename": "0053_marketplace_select_policy_consolidation",
+      "gitBlobSha": "df0cd18d60037f2da6107d0082dbaba349e73a6c",
+      "sizeBytes": 1055,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017084005",
+          "name": "marketplace_select_policy_consolidation_0053",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0054_marketplace_public_authenticated_select_split.sql",
+      "basename": "0054_marketplace_public_authenticated_select_split",
+      "gitBlobSha": "16ca893cbf3acf83166f9085fc3646ae239af705",
+      "sizeBytes": 872,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017084021",
+          "name": "marketplace_public_authenticated_select_split_0054",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0055_saved_partner_listings_verified_only.sql",
+      "basename": "0055_saved_partner_listings_verified_only",
+      "gitBlobSha": "a77a40791db0307e8a05115471dd4c9f21abd966",
+      "sizeBytes": 567,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261017084048",
+          "name": "saved_partner_listings_verified_only_0055",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0072_staging_rls_search_path_hardening.sql",
+      "basename": "0072_staging_rls_search_path_hardening",
+      "gitBlobSha": "f951457803823bdcbd6f5d2268d825574a2ba196",
+      "sizeBytes": 2079,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261019065555",
+          "name": "staging_rls_search_path_hardening_0072",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0082_fk_index_hardening.sql",
+      "basename": "0082_fk_index_hardening",
+      "gitBlobSha": "d773302e65339597d63c2642896af1c13a911f32",
+      "sizeBytes": 5333,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261019122713",
+          "name": "fk_index_hardening_0082",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0083_retire_legacy_accommodation_checkout.sql",
+      "basename": "0083_retire_legacy_accommodation_checkout",
+      "gitBlobSha": "05e7c7808f622829bcd91def330116f23d057e60",
+      "sizeBytes": 698,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    },
+    {
+      "path": "db/migrations/0084_n11_ai_decision_matching.sql",
+      "basename": "0084_n11_ai_decision_matching",
+      "gitBlobSha": "a9925c15cb6d10392eec2791b1d3bbd02ee61aeb",
+      "sizeBytes": 12697,
+      "matchType": "CORE_ONLY_LEDGER_CANDIDATE",
+      "ledgerMatches": [
+        {
+          "version": "20261012155539",
+          "name": "n11_ai_decision_matching_0009",
+          "matchType": "CORE_ONLY_REVIEW_REQUIRED"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0085_n15_source_authority_registry_bridge.sql",
+      "basename": "0085_n15_source_authority_registry_bridge",
+      "gitBlobSha": "ffe3ee8a761fd37e6ffb517a27a09f1f647ce39e",
+      "sizeBytes": 2451,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261023160910",
+          "name": "n15_source_authority_registry_bridge_0085",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0086_n15_live_ingestion_candidate_feed.sql",
+      "basename": "0086_n15_live_ingestion_candidate_feed",
+      "gitBlobSha": "efa81eab3fe945880906d4d86f7599b3f07ba6f3",
+      "sizeBytes": 1622,
+      "matchType": "NORMALIZED_LEDGER_MATCH",
+      "ledgerMatches": [
+        {
+          "version": "20261023161234",
+          "name": "n15_live_ingestion_candidate_feed_0086",
+          "matchType": "NORMALIZED_EXACT"
+        }
+      ]
+    },
+    {
+      "path": "db/migrations/0107_application_capacity_entitlements_20261101.sql",
+      "basename": "0107_application_capacity_entitlements_20261101",
+      "gitBlobSha": "25132f7b0b7da2981805a56331ec04fa41ef9226",
+      "sizeBytes": 28337,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    },
+    {
+      "path": "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
+      "basename": "0108_candidate_application_readiness_eligibility_deadline_gate_20261101",
+      "gitBlobSha": "530b8c8af9e519be442d445f8be267b17402af1d",
+      "sizeBytes": 19353,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    },
+    {
+      "path": "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
+      "basename": "0109_candidate_application_draft_persistence_20261101",
+      "gitBlobSha": "2a8d650acebbf5c4a5ca1e5681e7ec9476f950de",
+      "sizeBytes": 17818,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    },
+    {
+      "path": "db/migrations/0110_n15_source_review_decision_atomicity.sql",
+      "basename": "0110_n15_source_review_decision_atomicity",
+      "gitBlobSha": "a41ce80d794a618a59866a29aa981594fcd5618d",
+      "sizeBytes": 7438,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    },
+    {
+      "path": "supabase/migrations/20261016151400_payfast_finance_tx.sql",
+      "basename": "20261016151400_payfast_finance_tx",
+      "gitBlobSha": "0901a4e36d7bf128d451f0ed4a28e37b26d2550d",
+      "sizeBytes": 6601,
+      "matchType": "SOURCE_WITH_NO_LEDGER_MATCH",
+      "ledgerMatches": []
+    }
+  ],
+  "duplicateLedgerNames": [
+    {
+      "name": "candidate_application_preparation_readiness_0078",
+      "versions": [
+        "20261019112452",
+        "20261019112511"
+      ]
+    },
+    {
+      "name": "seed_verified_labour_vacancy_deadlines_0093",
+      "versions": [
+        "20261029180632",
+        "20261029180642"
+      ]
+    }
+  ],
+  "safety": {
+    "schemaChanged": false,
+    "dataChanged": false,
+    "migrationsApplied": false,
+    "releaseGateOpened": false
+  },
+  "nextAction": "Reconcile every unmapped live ledger record against deployment commits and any archived source. Review duplicate names and core-only matches; produce a reviewed alias/lineage map before future schema changes."
+}
