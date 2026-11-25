@@ -103,8 +103,25 @@ function configuration(env) {
     }
   }
 
-  if (env[ENV_KEYS.candidateAId] === env[ENV_KEYS.candidateBId]) {
-    return { ok: false, status: "BLOCKED_INVALID_FIXTURE_IDS", missing: [], reason: "CANDIDATE_IDS_MUST_DIFFER" };
+  const distinctFixtureGroups = [
+    [env[ENV_KEYS.candidateAId], env[ENV_KEYS.candidateBId]],
+    [env[ENV_KEYS.sessionAId], env[ENV_KEYS.sessionBId]],
+    [env[ENV_KEYS.evidenceSafeAId], env[ENV_KEYS.evidenceSafeBId], env[ENV_KEYS.evidenceProtectedAId], env[ENV_KEYS.evidenceProtectedBId]],
+    [env[ENV_KEYS.workflowAId], env[ENV_KEYS.workflowBId]],
+    [env[ENV_KEYS.routeSourceVerifiedId], env[ENV_KEYS.routeSourceUnverifiedId], env[ENV_KEYS.routeSourceLowConfidenceId]]
+  ];
+  if (distinctFixtureGroups.some((group) => new Set(group).size !== group.length)) {
+    return { ok: false, status: "BLOCKED_INVALID_FIXTURE_IDS", missing: [], reason: "FIXTURE_IDS_MUST_BE_DISTINCT_WITHIN_GROUP" };
+  }
+
+  const roleTokens = [
+    env[ENV_KEYS.candidateAJwt],
+    env[ENV_KEYS.candidateBJwt],
+    env[ENV_KEYS.operatorJwt],
+    env[ENV_KEYS.founderJwt]
+  ];
+  if (new Set(roleTokens).size !== roleTokens.length || roleTokens.includes(env[ENV_KEYS.anonKey])) {
+    return { ok: false, status: "BLOCKED_INVALID_ACTOR_TOKENS", missing: [], reason: "ACTOR_TOKENS_MUST_BE_DISTINCT" };
   }
 
   return {
