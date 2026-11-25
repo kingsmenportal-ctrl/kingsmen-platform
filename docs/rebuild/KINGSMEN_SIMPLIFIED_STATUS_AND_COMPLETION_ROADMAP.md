@@ -4,7 +4,7 @@
 **Canonical repository:** kingsmenportal-ctrl/kingsmen-platform  
 **Implementation branch:** rebuild/kingsmen-one-foundation-2026-11-17  
 **Overall state:** **REBUILD IN PROGRESS — PUBLIC LAUNCH BLOCKED**  
-**Active phase:** **Phase 1 — Repository and architecture consolidation (in progress)**
+**Active phase:** **Phase 1 governance + Phase 2 database/security audit (in progress; Phase 2 is the active diagnostic workstream)**
 
 This is the current, evidence-based project status register. It supersedes older summaries when current repository, staging or release-manifest evidence disagrees with an old chat or report. Read this file before beginning Kingsmen work and update it when a meaningful batch lands.
 
@@ -15,7 +15,7 @@ This is the current, evidence-based project status register. It supersedes older
 - **Rebuild CI validator repair merged:** PR [#330](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/330), merge commit `84978bb62981ef41997b1fd23aed47a3cce0de26`. [Its Kingsmen CI run](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249) passed focused tests, the status-register validator, migration-provenance validator, API build and Next.js web build. This was a wording/validator repair only; no staging schema or data changed.
 - **Verified pre-merge checks:** [PR #327 Kingsmen CI](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634438774) passed focused tests, status validation, API build and web build. [PR #326 application contract workflow](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651) passed PostgreSQL/UI contract coverage, the Free Destiny Map preview browser test and the N15 source-review browser test.
 - **Post-merge validation:** CI is running again on the latest consolidated rebuild commit (`90670e52b3af1786fa3cc315b2a09f98b22b60ed`). The separate main-branch-protection evidence job failed verification with HTTP 404 on that commit; branch protection remains a release blocker.
-- **Security advisor snapshot captured (read-only):** the live staging advisor lists 17 RLS-enabled tables with no policies, 6 SECURITY DEFINER RPC functions callable by authenticated users, 16 overlapping permissive-policy findings, leaked-password protection disabled and 282 unused-index suggestions. The full table/function/policy/index details are stored in the new audit artifacts. These are findings for triage; the 17 no-policy tables may be intentionally backend-only, and the 282 indexes must not be dropped by count alone. No security, auth or database settings were changed; the new snapshot validator has been added to CI.
+- **Security advisor snapshot captured and live privileges checked (read-only):** the live staging advisor lists 17 RLS-enabled tables with no policies, 6 SECURITY DEFINER RPC functions callable by authenticated users, 16 overlapping permissive-policy findings, leaked-password protection disabled and 282 unused-index suggestions. A live catalog query verified all six deployed function bodies match candidate historical source bodies after whitespace normalization; anon and PUBLIC cannot execute any of them, while authenticated execution is explicitly granted. A second query verified all 17 no-policy tables deny direct SELECT/INSERT/UPDATE/DELETE to both anon and authenticated. The function grants and backend-only tables still need role-level E2E/lineage review; leaked-password protection remains disabled; do not drop the 282 indexes by count alone. No database/security/Auth settings were changed. The full details and a validator are stored in the audit artifacts.
 - **Migration provenance snapshot expanded across history:** the current rebuild branch has 41 tracked SQL files. A sweep of eight rebuild/feature/release branch trees captured 414 branch-file entries, deduplicated to 86 path/hash entries across 83 paths. It found 40 ledger records with core+sequence candidates, 27 with core-only/sequence-different candidates and 63 with no source-name candidate in the branches searched. The current branch alone still has 96 ledger records without a name match; two live ledger names are duplicated. These are filename-derived candidates, not exact SQL-deployment proof. No staging data/schema was changed. Historical sequence reuse in the 0087–0096 range makes blind restore/replay unsafe. The provenance validator passed in PR #330's CI run alongside status-register validation and API/web builds. CI is running again against the latest consolidated rebuild commit.
 
 ## 1. Executive status
@@ -37,12 +37,22 @@ The rebuild strategy remains: preserve the repository and its history; consolida
 | Migration history | 130 staging ledger records; 41 current-branch SQL files; 8-branch sweep: 40 core+sequence candidates, 27 core-only candidates, 63 no source-name candidate; 2 duplicate ledger names | A historical candidate map now exists, but exact applied SQL-body provenance is not proved; sequence reuse across branches requires a reviewed lineage map before any schema change |
 | Staging contents | Supabase table inventory reported zero rows for every public table | Inventory signal, not proof that every test flow or storage object is empty; verify with controlled read-only checks |
 | Edge Functions | 23 functions reported ACTIVE; 22 have JWT verification enabled, while payfast-sandbox has verify_jwt=false for external callback compatibility | Deployed code exists; compare hashes to source and prove each critical runtime path |
-| Security advisor | 6 authenticated-callable SECURITY DEFINER functions; 17 RLS-enabled tables without policies; 16 multiple-permissive-policy findings; leaked-password-protection warning | Must be reviewed and closed or explicitly justified before release |
+| Security advisor | 17 RLS/no-policy tables, 6 authenticated-callable SECURITY DEFINER functions, 16 policy-overlap findings, leaked-password protection disabled, 282 unused-index suggestions | Live checks show no anon/PUBLIC EXECUTE on the six functions, all six bodies match historical candidates, and no anon/authenticated direct grants on the 17 no-policy tables; role-level E2E tests and Auth setting remain open |
 | Hosting | Netlify project exists and last recorded ready production deploy is dated 8 July 2026 | A ready deploy exists; it does not prove the current rebuild branch is deployed |
 | Git governance | Current branch-protection evidence returned HTTP 404 and recorded protection as inactive/not verified | P0 release blocker |
 | Launch gates | 13 canonical gates remain incomplete or proof-pending | Public launch blocked |
 
 Inventory counts were observed from the selected rebuild branch's GitHub tree and connected Supabase project on 25 November 2026. Code counts are not a percentage of product completion.
+
+### Frontend / backend / integration status — 25 November 2026
+
+| Surface | What is built / verified | What is still missing | Status |
+|---|---|---|---|
+| **Frontend — Next.js / React** | `apps/web` contains 78 route pages on the last inventory snapshot; candidate/dashboard, profile, identity, workbench, tracker, documents, finance, outcomes, messages and mobile route families exist. PR #326's browser-local Free Destiny Map readiness preview is merged; its browser test passed and verified preview does not submit or persist. The Next.js build passed in PR #330 CI. | A single full authenticated candidate journey has not passed end-to-end on staging; design/source coverage is not proof that all pages are connected or production-ready. Latest build after the new security-audit-only changes is awaiting current CI. | **Source built; targeted preview test passed; full journey pending.** |
+| **Backend — API / workers** | Separate `apps/api` package and typed command/state-machine and persistence foundations exist. API build passed in PR #330 CI. `apps/workers` exists. | Prove real staging command persistence, idempotency/retry, worker lease recovery, queue/DLQ behaviour and service-role boundaries. | **Build passed on PR #330; runtime acceptance pending.** |
+| **Backend — Supabase / PostgreSQL** | Staging is `ACTIVE_HEALTHY`, PostgreSQL 17.11, 230 public tables, RLS enabled across the public inventory, and 23 Edge Functions reported active. Live security advisor and function/table-privilege checks are snapshotted. | Exact applied migration lineage remains unresolved (130 live records; historical branch naming candidates only). Candidate A/B, operator/founder and RPC negative-access tests are pending. Leaked-password protection still requires a reviewed Auth change. | **Available; read-only diagnostics done; release security gates open.** |
+| **Integration / deployment** | Rebuild-branch CI now runs status, migration-provenance and security snapshot validators. Jarvis Live Runtime workflow has recently passed. | Current post-change CI must pass; branch protection is still not verified; the last recorded Netlify ready deployment was 8 July 2026 on `main`, not this rebuild branch. API/web/staging full journey proof and production release are pending. | **CI improving; intended rebuild is not yet proven deployed.** |
+
 
 ## 2. What Kingsmen is supposed to deliver
 
@@ -178,7 +188,7 @@ The schedule is expressed as engineering effort plus explicit gates, not as a cl
 | **6. Founder operations, Jarvis and mobile** | 1–2 working days | Founder/operator controls, release evidence/incident views, voice/status proof and responsive mobile integration | Role-protected control paths and key operations are tested |
 | **7. Staging release and private beta** | 2–3 working days | Backup/restore, observability/incident drills, legal/privacy publication, staging pack and final assembly bundle | All 13 gates pass and founder approves a small private beta |
 
-**Working estimate:** 12–21 engineering days assuming code reuse and prompt decisions. External provider accounts, runtime credentials, security remediation, legal review and retesting may add roughly 3–10 working days. A realistic planning window is therefore **about 3–6 calendar weeks**, revisited after Phase 2 and the first full candidate journey. Every phase still has an explicit pass/fail exit condition.
+**Working estimate:** 12–21 engineering days assuming code reuse and prompt decisions. External provider accounts, runtime credentials, security remediation, legal review and retesting may add roughly 3–10 working days. A realistic planning window is therefore **about 3–6 calendar weeks**. From 25 November 2026, the tentative planning window for a small private beta is **16 December 2026–6 January 2027**, conditional on the phase exit criteria and provider/legal dependencies; this is not a guarantee date. Re-estimate after Phase 2 and the first full candidate journey. Every phase has an explicit pass/fail exit condition.
 
 ### What “complete” means
 
@@ -214,15 +224,17 @@ No new production database should be created. Do not modify staging data, migrat
 
 ## 8. Required status format for every Kingsmen work chat
 
-Every Kingsmen reply must start with a compact status line that names:
+Every response concerning Kingsmen must start with a dated status report, even when the user's request is a follow-up or just says “next”:
 
-1. overall status and active phase;
-2. implementation branch and current PR/commit;
-3. what was actually built and which tests actually passed;
-4. the highest-priority open blocker;
-5. the next deliverable and its acceptance test.
+1. **Overall status:** active phase, launch state and current completion estimate.
+2. **Frontend status:** source/pages changed, what is visible/connected, tests/build that passed, and what remains.
+3. **Backend/data status:** API/database/migrations/RLS/auth/Edge Functions/workers changed, tests/runtime proof, and what remains.
+4. **Integration/deployment status:** branch/PR/commit, staging state, current CI and whether the current rebuild commit is actually deployed.
+5. **This batch:** changed files and whether each change is FRONTEND, BACKEND/DATABASE, INTEGRATION/CI, or DOCUMENTATION/GOVERNANCE.
+6. **Evidence:** exact passed/failed/pending test or workflow links. Do not claim a test passed based on source presence or an older commit without saying so.
+7. **Blocker and next milestone:** named blocker, next deliverable, acceptance test and engineering estimate/target window.
 
-Then perform work in small, verifiable batches. At the end of a batch, update this file and the manifest when the project's state has actually changed. Never say “complete” without evidence. Do not propose a fresh architecture unless the current architecture is demonstrably wrong and the change is recorded.
+After that opening report, explain what was built in the batch and what remains. Distinguish source exists, builds, tests pass, works in staging, and deployed to the intended environment. Do not end a Kingsmen batch while a known CI failure is unreported; fix it or explicitly record a concrete failing step. Update this status document, JSON manifest and validators after meaningful work. Never say “complete” without evidence. Do not propose a fresh architecture unless the current architecture is demonstrably wrong and the change is recorded.
 
 ## 9. Commands and links
 
