@@ -108,3 +108,19 @@ export function evaluateMainBranchProtection(protection) {
   }
   return evaluateClassicProtection(protection);
 }
+
+
+/**
+ * Derive an active-protection signal from the verified protection object.
+ * An HTTP 200 response from a listing endpoint does not itself prove that a
+ * ruleset applies to the target branch.
+ */
+export function protectionActiveFromEvidence(checks, httpStatus, verificationEndpoint) {
+  if (verificationEndpoint === 'repository_rulesets') {
+    return checks?.rulesetActiveForMain === true;
+  }
+  if (verificationEndpoint === 'classic_branch_protection') {
+    return httpStatus === 200 && checks?.protectionSource === 'classic_branch_protection';
+  }
+  return false;
+}
