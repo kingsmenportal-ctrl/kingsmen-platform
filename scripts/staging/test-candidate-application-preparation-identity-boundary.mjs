@@ -22,7 +22,7 @@ assert.match(identityBlock, /not\("verified_at","is",null\)/);
 assert.match(identityBlock, /not\("verified_by","is",null\)/);
 assert.match(identityBlock, /lte\("verified_at",identityCheckedAt\)/,
   "A future-dated verification must not authorise candidate access.");
-assert.match(identityBlock, /order\("id",\{ascending:true\}\)\.limit\(2\)/,
+assert.match(identityBlock, /\.order\("id",\{ascending:true\}\)\s*\.limit\(2\)/,
   "The service must fetch up to two links so duplicate verified identities are detected.");
 assert.match(identityBlock, /identityLinks\.length!==1/,
   "Zero or multiple valid verified links must fail closed.");
