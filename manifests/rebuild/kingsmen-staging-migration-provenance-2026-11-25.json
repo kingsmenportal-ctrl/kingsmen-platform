@@ -49,8 +49,13 @@
       "duplicateLedgerNames": 2,
       "candidateSourceRecords": 67,
       "ledgerWithoutAnyHistoricalSourceNameCandidate": 63,
-      "exactSqlBodyProvenanceMatches": 0,
-      "replayAuthorized": false
+      "exactSqlBodyProvenanceMatches": 30,
+      "replayAuthorized": false,
+      "exactSqlBodyProvenanceDistinctBodies": 29,
+      "ledgerRecordsWithoutExactSqlBodyMatch": 100,
+      "filenameCandidateButDifferentBody": 37,
+      "noFilenameOrBodyCandidateInSearchedBranches": 63,
+      "bodyProvenanceEvidencePath": "manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json"
     }
   },
   "ledgerRecords": [
