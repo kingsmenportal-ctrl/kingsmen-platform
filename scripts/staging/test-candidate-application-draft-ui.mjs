@@ -93,6 +93,13 @@ try {
 
   const page = await context.newPage();
   page.setDefaultTimeout(10_000);
+  await page.addInitScript(() => {
+    window.__kingsmenConfirmMessages = [];
+    window.confirm = message => {
+      window.__kingsmenConfirmMessages.push(String(message));
+      return false;
+    };
+  });
   page.setDefaultNavigationTimeout(15_000);
   await page.route("**/functions/v1/**", async route => {
     providerRequests.push(route.request().url());
@@ -172,6 +179,16 @@ try {
   assert.equal(await motivation.inputValue(), "Saved motivation");
 
   await motivation.fill("Updated motivation through the Kingsmen draft editor");
+  assert.equal(await page.getByTestId("draft-save-state").textContent(),
+    "Unsaved changes. Save your draft before leaving this page.");
+  await page.getByRole("button", { name: "Reload saved draft" }).click();
+  const confirmMessages = await page.evaluate(() => window.__kingsmenConfirmMessages);
+  assert.deepEqual(confirmMessages, [
+    "You have unsaved changes. Reloading will discard them. Continue?"
+  ], "Reload must ask before discarding unsaved application answers.");
+  assert.equal(await motivation.inputValue(), "Updated motivation through the Kingsmen draft editor",
+    "Dismissing the discard confirmation must preserve the edited answer.");
+
   await page.getByRole("button", { name: "Save application draft" }).click();
   await page.getByRole("status").filter({ hasText: "Fixture draft saved; no provider submission occurred." }).waitFor();
   assert.equal(savedRequests.length, 1);
@@ -181,6 +198,7 @@ try {
   assert.equal(savedRequests[0].answer_data.motivation_statement, "Updated motivation through the Kingsmen draft editor");
   assert.equal(await page.getByText("Draft version 2", { exact: true }).count(), 1);
   assert.equal(await page.getByText("Draft", { exact: true }).count(), 1);
+  assert.equal(await page.getByTestId("draft-save-state").textContent(), "All changes saved.");
   assert.equal(states.get(appA).application.status, "READY_TO_SUBMIT",
     "saving answers must not rewrite the backend workflow state");
 
