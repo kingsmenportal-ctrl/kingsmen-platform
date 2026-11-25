@@ -318,7 +318,8 @@
           "Live security checks confirm all six flagged SECURITY DEFINER function bodies match candidate historical source bodies; anon/PUBLIC execution is denied.",
           "All 17 RLS/no-policy tables deny direct anon/authenticated SELECT/INSERT/UPDATE/DELETE; authenticated Candidate A/B/operator/founder role-level E2E tests remain open.",
           "No staging schema, data, policies, function privileges, Auth settings or indexes were modified.",
-          "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies."
+          "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies.",
+          "Live policy/grant review captured 33 policies and seven JWT-bound helper definitions across eight sensitive tables; five tables grant all direct CRUD to anon and authenticated, so P0 negative API tests are required before least-privilege changes."
         ]
       },
       {
@@ -498,7 +499,7 @@
       "replayAuthorized": false
     },
     "securityAdvisorAudit": {
-      "status": "live_acl_and_body_checks_captured_validator_passed",
+      "status": "live_policy_grant_review_captured_validator_pending",
       "ciRunId": 45639316939,
       "securityAdvisorAuditPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
       "counts": {
@@ -512,7 +513,17 @@
       },
       "functionBodiesMatched": 6,
       "anonOrPublicCanExecuteFlaggedFunction": 0,
-      "noPolicyTablesWithDirectAnonOrAuthenticatedGrant": 0
+      "noPolicyTablesWithDirectAnonOrAuthenticatedGrant": 0,
+      "tablesWithAnonAndAuthenticatedAllCrudGrants": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "policyDefinitionsCaptured": 33,
+      "helperFunctionsCaptured": 7,
+      "liveApiNegativeRoleTestsRun": 0
     },
     "releaseProtectionCheck": {
       "runId": 45639317054,
@@ -559,7 +570,7 @@
     "validatorPath": "scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
     "validatorCommand": "npm run kingsmen:security-advisor:validate",
     "captureType": "read_only",
-    "status": "LIVE_BODY_AND_PRIVILEGE_CHECKS_CAPTURED_VALIDATOR_PASSED",
+    "status": "LIVE_BODY_GRANTS_POLICIES_CAPTURED_VALIDATOR_PENDING",
     "summary": {
       "publicTables": 230,
       "publicTablesWithRlsEnabled": 230,
@@ -571,9 +582,19 @@
       "liveFunctionBodiesMatchedHistoricalSource": 6,
       "flaggedFunctionsExecutableByAnonOrPublic": 0,
       "noPolicyTablesWithDirectAnonOrAuthenticatedGrants": 0,
-      "noPolicyTablesPrivilegedChecked": 17
+      "noPolicyTablesPrivilegedChecked": 17,
+      "tablesWithAnonAndAuthenticatedAllCrudGrants": [
+        "candidate_credentials",
+        "candidate_sessions",
+        "evidence_ledger",
+        "route_sources",
+        "workflow_runs"
+      ],
+      "policyDefinitionsCaptured": 33,
+      "helperFunctionsCaptured": 7,
+      "liveApiNegativeRoleTestsRun": 0
     },
-    "nextAction": "Inspect the six function bodies/grants and test candidate A/B/operator/founder isolation before proposing any role, policy, or Auth change."
+    "nextAction": "Run PostgREST/API negative tests for anonymous and cross-candidate access on candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs before proposing least-privilege grant changes."
   },
   "surfaceStatus": {
     "frontend": {
@@ -624,7 +645,8 @@
         "Reconcile exact migration body/version/commit provenance for the 130 live ledger records; historical filename candidate map is not deployment proof.",
         "Run real Candidate A/B, operator and founder negative/positive authorization tests across API/RPC/table boundaries.",
         "Review 16 policy-overlap findings and enable/verify leaked-password protection through a separate reviewed Auth change.",
-        "Prove durable state, retries, idempotency, worker lease recovery, backup/restore and payment/communication sandbox paths."
+        "Prove durable state, retries, idempotency, worker lease recovery, backup/restore and payment/communication sandbox paths.",
+        "Test anon/Candidate A/Candidate B/operator/founder direct REST/RPC access to candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs; grants are broad at table layer and current RLS predicates need runtime negative proof."
       ],
       "evidence": {
         "migrationAudit": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
