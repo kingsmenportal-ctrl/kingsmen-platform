@@ -9,6 +9,10 @@ const trackerPath = "apps/web/src/app/candidate/tracker/page.tsx";
 const tracker = fs.readFileSync(path.join(root, trackerPath), "utf8");
 const trackerComponentPath = "apps/web/src/components/candidate/CandidateApplicationTracker.tsx";
 const trackerComponent = fs.readFileSync(path.join(root, trackerComponentPath), "utf8");
+const workbenchPath = "apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx";
+const workbench = fs.readFileSync(path.join(root, workbenchPath), "utf8");
+const statusPath = "apps/web/src/lib/candidate-application-status.ts";
+const status = fs.readFileSync(path.join(root, statusPath), "utf8");
 const sessionPath = "apps/web/src/lib/candidate-session.ts";
 const session = fs.readFileSync(path.join(root, sessionPath), "utf8");
 const dashboardPath = "apps/web/src/app/candidate/dashboard/page.tsx";
@@ -24,6 +28,12 @@ assert.match(session, /export function getCandidateSessionState\(\)/,
   "Candidate application screens must share one session-reading boundary.");
 assert.match(session, /session\.expires_at[\s\S]*Date\.now\(\)/,
   "Expired candidate sessions must be rejected before application data requests.");
+assert.match(status, /"Draft"[\s\S]*"Submitted to Kingsmen"[\s\S]*"Under review"[\s\S]*"Action required"[\s\S]*"Prepared for provider"[\s\S]*"Provider receipt confirmed"[\s\S]*"Decision recorded"/,
+  "The canonical candidate-facing status vocabulary must contain the seven approved labels.");
+assert.match(workbench, /canResumeCandidateApplicationDraft/,
+  "Workbench draft links must respect candidate-facing status and internal pre-submission state.");
+assert.doesNotMatch(workbench, /Application state:\s*\{parent\.status\}/,
+  "Internal application workflow status must not be shown as the candidate lifecycle label.");
 assert.match(trackerComponent, /getCandidateSessionState/,
   "The application tracker must use the shared candidate session helper.");
 assert.doesNotMatch(trackerComponent, /window\.localStorage|JSON\.parse\(raw\)/,
