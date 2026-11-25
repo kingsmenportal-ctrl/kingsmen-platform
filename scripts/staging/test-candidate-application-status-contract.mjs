@@ -82,6 +82,10 @@ const service = read("supabase/functions/candidate-application-preparation/index
 assert.match(tracker, /candidateFacingApplicationStatusLabel\(application\.kingsmen_status\)/);
 assert.doesNotMatch(tracker, /<span[^>]*>\{label\(application\.status\)\}<\/span>/);
 assert.match(workbench, /candidateFacingApplicationStatusLabel\(parent\.kingsmen_status\)/);
+assert.match(workbench, /candidateApplicationStatusGuidance\(parent\.kingsmen_status\)/,
+  "Workbench cards must provide candidate-facing next-step guidance when the canonical status is known.");
+assert.match(workbench, /Next step unavailable/,
+  "Workbench must explain why no next step is rendered when candidate-facing status is missing.");
 assert.doesNotMatch(workbench, /Application state:\s*\{parent\.status\}/);
 assert.match(page, /body\.is_editable === true/);
 assert.match(page, /isCandidateEditableApplicationStatus\(application\.kingsmen_status\)/);
