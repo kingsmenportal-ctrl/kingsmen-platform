@@ -102,7 +102,8 @@
     "n15:ingestion:check": "npm run n15:ingestion:test",
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs",
     "kingsmen:status:validate": "node scripts/validators/validate-kingsmen-simplified-status.mjs",
-    "kingsmen:migrations:provenance:validate": "node scripts/validators/validate-kingsmen-migration-provenance.mjs"
+    "kingsmen:migrations:provenance:validate": "node scripts/validators/validate-kingsmen-migration-provenance.mjs",
+    "kingsmen:security-advisor:validate": "node scripts/validators/validate-kingsmen-staging-security-advisor.mjs"
   },
   "repository": {
     "type": "git",
