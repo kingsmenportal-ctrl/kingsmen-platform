@@ -151,6 +151,9 @@ export default function CandidateApplicationDraftPage() {
 
   function update<K extends keyof AnswerData>(key: K, value: AnswerData[K]) {
     setAnswers(old => ({ ...old, [key]: value }));
+    // An idempotency key belongs to one exact payload. If the candidate edits
+    // after a failed/ambiguous save, the changed payload must get a new key.
+    setSaveIdempotencyKey("");
     setNotice("");
   }
 
@@ -159,6 +162,8 @@ export default function CandidateApplicationDraftPage() {
       ...old,
       additional_answers: old.additional_answers.map((item, i) => i === index ? { ...item, [key]: value } : item)
     }));
+    // Keep retries idempotent only while the request payload remains unchanged.
+    setSaveIdempotencyKey("");
     setNotice("");
   }
 
