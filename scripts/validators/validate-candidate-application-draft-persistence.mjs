@@ -11,6 +11,7 @@ const page = read("apps/web/src/app/candidate/applications/[applicationId]/page.
 const tracker = read("apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
 const workbench = read("apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
 const statusContract = read("apps/web/src/lib/candidate-application-status.ts");
+const statusProposal = read("docs/rebuild/proposals/candidate-application-status-contract.proposal.sql");
 const workbenchBrowserTest = read("scripts/staging/test-candidate-workbench-ui.mjs");
 const webManifest = JSON.parse(read("apps/web/package.json"));
 const webLock = JSON.parse(read("apps/web/package-lock.json"));
@@ -68,6 +69,7 @@ const checks = [
   ["provider submission remains explicitly false throughout draft save", migration.includes(String.fromCharCode(39) + "provider_submission_sent" + String.fromCharCode(39) + ", false") && /does not submit to a provider/.test(page)],
   ["application tracker links owned parent records to the resumable editor", /candidate\/applications\/\$\{application\.id\}/.test(tracker) && /Open \/ resume application draft/.test(tracker)],
   ["candidate-facing status uses the seven-label shared contract", ["Draft","Submitted to Kingsmen","Under review","Action required","Prepared for provider","Provider receipt confirmed","Decision recorded"].every(status => statusContract.includes("\"" + status + "\"")) && statusContract.includes("Status not available")],
+  ["candidate-facing status SQL proposal is fail-closed and does not rewrite internal state", statusProposal.includes("APPLICATION_KINGSMEN_STATUS_MAPPING_REQUIRED") && statusProposal.includes("SET readiness_status") && !statusProposal.includes("SET status =")],
   ["tracker never exposes internal workflow status as the candidate lifecycle label", /candidateFacingApplicationStatusLabel\(application\.kingsmen_status\)/.test(tracker) && !/label\(application\.status\)/.test(tracker)],
   ["workbench links only candidate-editable pre-submission parent applications to the same draft editor", /candidate\/applications\/\$\{parent\.id\}/.test(workbench) && /Open \/ resume application draft/.test(workbench) && /canResumeCandidateApplicationDraft\(parent\.kingsmen_status, parent\.status\)/.test(workbench) && /PRE_SUBMISSION_INTERNAL_STATES/.test(statusContract)],
   ["workbench browser contract verifies preparation, resume link and no provider submission", /prepare_master_application/.test(workbenchBrowserTest) && /Open \/ resume application draft/.test(workbenchBrowserTest) && /provider submission endpoint/.test(workbenchBrowserTest) && /test-candidate-workbench-ui\.mjs/.test(workflow)],
