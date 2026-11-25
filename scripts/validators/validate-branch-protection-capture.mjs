@@ -54,7 +54,9 @@ const policyRequirements = [
   'requiredApprovingReviewCount'
 ];
 const testRequirements = [
-  'complete protection configuration should pass',
+  'complete classic protection configuration should pass',
+  'complete active repository ruleset should pass',
+  'observed active but incomplete ruleset detected',
   'strict_status_checks',
   'stale_review_dismissal',
   'conversation_resolution',
