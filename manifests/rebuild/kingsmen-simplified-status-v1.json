@@ -317,7 +317,8 @@
           "Eight-branch migration provenance snapshot captured: 67/130 ledger rows have filename-based candidates; 63 have none among branches searched; exact SQL deployment lineage is not yet proven.",
           "Live security advisor details captured and validated: all six flagged function bodies match candidate historical source; no anon/PUBLIC execute; all 17 RLS/no-policy tables deny direct anon/authenticated table grants.",
           "No live staging schema/data/policies/function privileges/Auth settings/indexes were changed.",
-          "Candidate A/B/operator/founder end-to-end isolation tests remain open."
+          "Candidate A/B/operator/founder end-to-end isolation tests remain open.",
+          "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies."
         ]
       },
       {
@@ -456,6 +457,12 @@
       "ciRunId": 45637295249,
       "ciResult": "success",
       "notes": "Repaired status-register and migration-provenance wording contracts. Root tests, status validator, provenance validator, API build and web build passed. No database mutation."
+    },
+    {
+      "id": "security-advisor-overlap-detail-reconciliation",
+      "state": "prepared_for_review",
+      "ciResult": "pending",
+      "notes": "Read-only Supabase performance advisor and pg_policies requery populated role/action/policy names for all 16 overlap combinations; validator now rejects unknown placeholders. No schema, policy, privilege, auth setting, data or release gate was changed."
     }
   ],
   "latestVerification": {
