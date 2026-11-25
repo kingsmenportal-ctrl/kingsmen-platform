@@ -10,6 +10,8 @@ const api = read("apps/web/src/app/api/candidate/application-draft/route.ts");
 const page = read("apps/web/src/app/candidate/applications/[applicationId]/page.tsx");
 const tracker = read("apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
 const workbench = read("apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
+const statusContract = read("apps/web/src/lib/candidate-application-status.ts");
+const statusProposal = read("docs/rebuild/proposals/candidate-application-status-contract.proposal.sql");
 const workbenchBrowserTest = read("scripts/staging/test-candidate-workbench-ui.mjs");
 const webManifest = JSON.parse(read("apps/web/package.json"));
 const webLock = JSON.parse(read("apps/web/package-lock.json"));
@@ -58,7 +60,7 @@ const checks = [
   ["application read/write RPCs are executable by authenticated only", /GRANT EXECUTE ON FUNCTION public\.get_candidate_application_draft/.test(migration) && /GRANT EXECUTE ON FUNCTION public\.save_candidate_application_draft/.test(migration) && /FROM PUBLIC, anon/.test(migration)],
   ["API forwards candidate bearer with public anon key and never uses service role", /Authorization: authorization/.test(api) && /apikey: config\.anonKey/.test(api) && !/SERVICE_ROLE/.test(api)],
   ["API validates application UUID, expected version and idempotency key", /UUID\.test/.test(api) && /Number\.isInteger\(incoming\.expected_version\)/.test(api) && /idempotency_key/.test(api)],
-  ["candidate draft page loads persisted application data from the API", /\/api\/candidate\/application-draft\?application_id=/.test(page) && /setAnswers\(normalizeAnswers\(body\.draft\)\)/.test(page)],
+  ["candidate draft page loads persisted data and uses server-confirmed candidate editability", /\/api\/candidate\/application-draft\?application_id=/.test(page) && /setAnswers\(normalizeAnswers\(body\.draft\)\)/.test(page) && /body\.is_editable === true/.test(page) && /isCandidateEditableApplicationStatus\(application\.kingsmen_status\)/.test(page)],
   ["candidate can explicitly reload and resume the latest saved version", /Reload saved draft/.test(page) && /draft_version/.test(page) && /setVersion\(/.test(page)],
   ["candidate draft page saves with stable idempotency key across retries", /saveIdempotencyKey/.test(page) && /const requestKey = saveIdempotencyKey \|\|/.test(page) && /idempotency_key: requestKey/.test(page)],
   ["candidate UI preserves all six pathway labels", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"].every(x => page.includes(x))],
@@ -66,7 +68,10 @@ const checks = [
   ["CAO programme choices stay under one parent application", page.includes("CAO programme choices remain child records under one Kingsmen parent application") && readinessMigration.includes("CAO")],
   ["provider submission remains explicitly false throughout draft save", migration.includes(String.fromCharCode(39) + "provider_submission_sent" + String.fromCharCode(39) + ", false") && /does not submit to a provider/.test(page)],
   ["application tracker links owned parent records to the resumable editor", /candidate\/applications\/\$\{application\.id\}/.test(tracker) && /Open \/ resume application draft/.test(tracker)],
-  ["workbench links editable prepared parent applications to the same draft editor", /candidate\/applications\/\$\{parent\.id\}/.test(workbench) && /Open \/ resume application draft/.test(workbench) && /READY_TO_SUBMIT/.test(workbench)],
+  ["candidate-facing status uses the seven-label shared contract", ["Draft","Submitted to Kingsmen","Under review","Action required","Prepared for provider","Provider receipt confirmed","Decision recorded"].every(status => statusContract.includes("\"" + status + "\"")) && statusContract.includes("Status not available")],
+  ["candidate-facing status SQL proposal is fail-closed and does not rewrite internal state", statusProposal.includes("APPLICATION_KINGSMEN_STATUS_MAPPING_REQUIRED") && statusProposal.includes("SET readiness_status") && !statusProposal.includes("SET status =")],
+  ["tracker never exposes internal workflow status as the candidate lifecycle label", /candidateFacingApplicationStatusLabel\(application\.kingsmen_status\)/.test(tracker) && !/label\(application\.status\)/.test(tracker)],
+  ["workbench links only candidate-editable pre-submission parent applications to the same draft editor", /candidate\/applications\/\$\{parent\.id\}/.test(workbench) && /Open \/ resume application draft/.test(workbench) && /canResumeCandidateApplicationDraft\(parent\.kingsmen_status, parent\.status\)/.test(workbench) && /PRE_SUBMISSION_INTERNAL_STATES/.test(statusContract)],
   ["workbench browser contract verifies preparation, resume link and no provider submission", /prepare_master_application/.test(workbenchBrowserTest) && /Open \/ resume application draft/.test(workbenchBrowserTest) && /provider submission endpoint/.test(workbenchBrowserTest) && /test-candidate-workbench-ui\.mjs/.test(workflow)],
   ["web manifest and lock pin patched Next.js 15.5.29 across its runtime and SWC packages", webManifest.dependencies?.next === "15.5.29" && webPackages["node_modules/next"]?.version === "15.5.29" && webPackages["node_modules/@next/env"]?.version === "15.5.29" && Object.entries(webPackages).filter(([name]) => name.startsWith("node_modules/@next/swc-")).length > 0 && Object.entries(webPackages).filter(([name]) => name.startsWith("node_modules/@next/swc-")).every(([, item]) => item.version === "15.5.29")],
   ["image optimization and PostCSS dependencies use patched Sharp 0.35.5 and PostCSS 8.5.33", webPackages["node_modules/sharp"]?.version === "0.35.5" && webManifest.overrides?.postcss === "8.5.33" && webPackages["node_modules/postcss"]?.version === "8.5.33"],
