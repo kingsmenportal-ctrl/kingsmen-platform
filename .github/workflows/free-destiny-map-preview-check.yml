@@ -27,7 +27,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: free-destiny-map-preview-${{ github.ref }}
@@ -57,28 +57,7 @@ jobs:
       - name: Run Kingsmen regression suite
         run: npm test
 
-      - name: Regenerate web lockfile for this feature PR
-        if: github.event_name == 'pull_request' && github.head_ref == 'feat/free-destiny-map-interactive-preview-20261125'
-        run: npm install --prefix apps/web --package-lock-only --no-audit --no-fund
-
-      - name: Commit corrected web lockfile to the feature PR
-        if: github.event_name == 'pull_request' && github.head_ref == 'feat/free-destiny-map-interactive-preview-20261125'
-        run: |
-          set -euo pipefail
-          if git diff --quiet -- apps/web/package-lock.json; then
-            echo "Web dependency lockfile is already synchronized."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/package-lock.json
-          git commit -m "fix(deps): synchronize web package lockfile"
-          git stash push --include-untracked -m "CI-generated files before lockfile push"
-          git fetch origin "${GITHUB_HEAD_REF}"
-          git rebase "origin/${GITHUB_HEAD_REF}"
-          git push origin "HEAD:${GITHUB_HEAD_REF}"
-
-      - name: Verify clean web dependency installation
+      - name: Install web dependencies
         run: npm ci --prefix apps/web --no-audit --no-fund
 
       - name: Install Chromium for browser test
