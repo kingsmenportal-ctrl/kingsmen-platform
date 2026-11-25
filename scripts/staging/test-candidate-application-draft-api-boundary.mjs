@@ -61,6 +61,15 @@ try {
   assert.equal(missingAuthPost.status, 401, "POST must require a bearer token before RPC invocation.");
   assert.equal((await missingAuthPost.json()).code, "AUTHENTICATION_REQUIRED");
 
+  const unauthenticatedMalformedJson = await fetch(baseUrl + "/api/candidate/application-draft", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{not-json"
+  });
+  assert.equal(unauthenticatedMalformedJson.status, 401,
+    "POST must reject unauthenticated requests before attempting to parse an untrusted body.");
+  assert.equal((await unauthenticatedMalformedJson.json()).code, "AUTHENTICATION_REQUIRED");
+
   const wrongContentType = await fetch(baseUrl + "/api/candidate/application-draft", {
     method: "POST",
     headers: { Authorization: "Bearer ci-test-token", "Content-Type": "text/plain" },
@@ -98,7 +107,7 @@ try {
   assert.equal(missingFields.status, 400, "POST must validate version and idempotency fields.");
   assert.equal((await missingFields.json()).code, "APPLICATION_DRAFT_INPUT_INVALID");
 
-  for (const response of [invalidId, missingAuthGet, missingAuthPost, wrongContentType, invalidJson, oversizedPayload, missingFields]) {
+  for (const response of [invalidId, missingAuthGet, missingAuthPost, unauthenticatedMalformedJson, wrongContentType, invalidJson, oversizedPayload, missingFields]) {
     assert.match(response.headers.get("cache-control") || "", /no-store/i,
       "Candidate draft responses must not be cacheable.");
     assert.match(response.headers.get("vary") || "", /authorization/i,
