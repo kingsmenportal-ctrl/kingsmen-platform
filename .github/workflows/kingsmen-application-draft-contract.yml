@@ -25,6 +25,7 @@ on:
       - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
       - scripts/staging/test-n15-source-review-postgres.sql
       - scripts/staging/test-n15-source-review-ui.mjs
+      - scripts/staging/test-free-destiny-map-preview-ui.mjs
       - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
       - scripts/validators/validate-free-destiny-map-preview.mjs
       - package.json
@@ -61,6 +62,7 @@ on:
       - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
       - scripts/staging/test-n15-source-review-postgres.sql
       - scripts/staging/test-n15-source-review-ui.mjs
+      - scripts/staging/test-free-destiny-map-preview-ui.mjs
       - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
       - scripts/validators/validate-free-destiny-map-preview.mjs
       - package.json
@@ -165,6 +167,9 @@ jobs:
       - name: Test saved target to parent application workbench journey
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-workbench-ui.mjs
+      - name: Test Free Destiny Map local readiness preview
+        timeout-minutes: 3
+        run: node scripts/staging/test-free-destiny-map-preview-ui.mjs
       - name: Test N15 source-review queue and decisions
         timeout-minutes: 3
         run: node scripts/staging/test-n15-source-review-ui.mjs
