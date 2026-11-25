@@ -17,6 +17,8 @@ on:
       - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
+      - scripts/staging/test-candidate-application-status-contract.mjs
+      - apps/web/src/lib/candidate-application-status.ts
       - apps/web/src/lib/read-limited-json.ts
       - apps/web/package.json
       - apps/web/package-lock.json
@@ -58,6 +60,8 @@ on:
       - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
+      - scripts/staging/test-candidate-application-status-contract.mjs
+      - apps/web/src/lib/candidate-application-status.ts
       - apps/web/src/lib/read-limited-json.ts
       - apps/web/package.json
       - apps/web/package-lock.json
@@ -122,6 +126,8 @@ jobs:
         run: npm ci --prefix apps/web
       - name: Validate candidate application draft contract
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - name: Test canonical candidate application status contract
+        run: node scripts/staging/test-candidate-application-status-contract.mjs
       - name: Test canonical candidate applications entry route
         run: node scripts/staging/test-candidate-applications-entry-route.mjs
       - name: Validate N15 source-review security contract
