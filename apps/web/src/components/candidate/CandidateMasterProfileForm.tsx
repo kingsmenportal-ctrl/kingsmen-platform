@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 const PATHWAYS = [
@@ -64,37 +65,24 @@ const blankProfile: ProfileFields = {
   preferredLocation: ""
 };
 
-function config() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  let storageKey = "sb-euhubhhnumtibbyufghm-auth-token";
-  try {
-    if (url) {
-      const ref = new URL(url).hostname.split(".")[0];
-      if (ref) storageKey = `sb-${ref}-auth-token`;
-    }
-  } catch {}
-  return { url, anonKey, storageKey };
-}
-
 function readToken() {
-  const settings = config();
-  if (!settings.url || !settings.anonKey) throw new Error("Candidate profile is not configured for this deployment.");
-  let raw: string | null = null;
-  try { raw = window.localStorage.getItem(settings.storageKey); } catch {}
-  if (!raw) throw new Error("Sign in before opening your candidate profile.");
-  try {
-    const session = JSON.parse(raw) as { access_token?: string; expires_at?: number };
-    if (!session.access_token) throw new Error("Sign in before opening your candidate profile.");
-    if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
-      throw new Error("Your session has expired. Sign in again to continue.");
-    }
-    return { ...settings, token: session.access_token };
-  } catch (error) {
-    if (error instanceof Error && error.message.startsWith("Sign in")) throw error;
-    if (error instanceof Error && error.message.startsWith("Your session")) throw error;
+  const state = getCandidateSessionState();
+  if (state.status === "not_configured") {
+    throw new Error("Candidate profile is not configured for this deployment.");
+  }
+  if (state.status === "missing") {
+    throw new Error("Sign in before opening your candidate profile.");
+  }
+  if (state.status === "expired") {
+    throw new Error("Your session has expired. Sign in again to continue.");
+  }
+  if (state.status === "unreadable") {
     throw new Error("Your browser session could not be read. Sign in again.");
   }
+  if (state.status !== "ready") {
+    throw new Error("Sign in before opening your candidate profile.");
+  }
+  return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 
 async function callProfile(payload: Record<string, unknown>): Promise<ApiState> {
