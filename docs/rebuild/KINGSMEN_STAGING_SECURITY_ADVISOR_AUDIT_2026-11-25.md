@@ -66,26 +66,28 @@ Several are founder-command or identity/document-review audit tables. A delibera
 
 ## 3. Overlapping permissive policies
 
-The advisor reports 16 overlapping permissive-policy combinations. These are not all independent tables; multiple combinations can arise from the same table for different roles. The full policy names, role and action are recorded in the JSON snapshot.
+The live advisor was re-queried read-only on 25 November 2026 at 2026-11-25T14:55:32.378Z. A read-only `pg_policies` query also confirmed the active roles, commands and predicate expressions for the listed policies. The table below replaces the earlier unknown role/action placeholders with the actual advisor role/action and policy names.
+
+The 16 findings are role/action overlap combinations, not 16 proven authorization exploits or 16 independent tables. In particular, the `candidate_credentials` and `candidate_sessions` entries repeat the same `public`-scoped helper-gated policies across several database roles. Their helper predicates and real Candidate A/B, operator and founder boundaries still require runtime tests; no live policy changes were made.
 
 | Table | Role | Action | Policies |
 |---|---|---|---|
-| applications | unknown | unknown |  |
-| candidate_credentials | unknown | unknown |  |
-| candidate_credentials | unknown | unknown |  |
-| candidate_credentials | unknown | unknown |  |
-| candidate_credentials | unknown | unknown |  |
-| candidate_credentials | unknown | unknown |  |
-| candidate_profiles | unknown | unknown |  |
-| candidate_sessions | unknown | unknown |  |
-| candidate_sessions | unknown | unknown |  |
-| candidate_sessions | unknown | unknown |  |
-| candidate_sessions | unknown | unknown |  |
-| candidate_sessions | unknown | unknown |  |
-| candidates | unknown | unknown |  |
-| evidence_ledger | unknown | unknown |  |
-| route_sources | unknown | unknown |  |
-| workflow_runs | unknown | unknown |  |
+| `applications` | `authenticated` | `SELECT` | `applications_authenticated_own_account_read`, `applications_candidate_read_own`, `applications_founder_operator_read` |
+| `candidate_credentials` | `anon` | `SELECT` | `candidate_credentials_founder_operator_read`, `candidate_credentials_service_role_backend_all` |
+| `candidate_credentials` | `authenticated` | `SELECT` | `candidate_credentials_founder_operator_read`, `candidate_credentials_service_role_backend_all` |
+| `candidate_credentials` | `authenticator` | `SELECT` | `candidate_credentials_founder_operator_read`, `candidate_credentials_service_role_backend_all` |
+| `candidate_credentials` | `dashboard_user` | `SELECT` | `candidate_credentials_founder_operator_read`, `candidate_credentials_service_role_backend_all` |
+| `candidate_credentials` | `supabase_privileged_role` | `SELECT` | `candidate_credentials_founder_operator_read`, `candidate_credentials_service_role_backend_all` |
+| `candidate_profiles` | `authenticated` | `SELECT` | `candidate_profiles_authenticated_own_account_read`, `candidate_profiles_candidate_read_own`, `candidate_profiles_founder_operator_read` |
+| `candidate_sessions` | `anon` | `SELECT` | `candidate_sessions_candidate_read_own`, `candidate_sessions_founder_operator_read`, `candidate_sessions_service_role_backend_all` |
+| `candidate_sessions` | `authenticated` | `SELECT` | `candidate_sessions_candidate_read_own`, `candidate_sessions_founder_operator_read`, `candidate_sessions_service_role_backend_all` |
+| `candidate_sessions` | `authenticator` | `SELECT` | `candidate_sessions_candidate_read_own`, `candidate_sessions_founder_operator_read`, `candidate_sessions_service_role_backend_all` |
+| `candidate_sessions` | `dashboard_user` | `SELECT` | `candidate_sessions_candidate_read_own`, `candidate_sessions_founder_operator_read`, `candidate_sessions_service_role_backend_all` |
+| `candidate_sessions` | `supabase_privileged_role` | `SELECT` | `candidate_sessions_candidate_read_own`, `candidate_sessions_founder_operator_read`, `candidate_sessions_service_role_backend_all` |
+| `candidates` | `authenticated` | `SELECT` | `candidates_authenticated_own_account_read`, `candidates_candidate_read_own`, `candidates_founder_operator_read` |
+| `evidence_ledger` | `authenticated` | `SELECT` | `evidence_ledger_candidate_read_own_safe`, `evidence_ledger_founder_operator_read` |
+| `route_sources` | `authenticated` | `SELECT` | `route_sources_founder_operator_read`, `route_sources_public_verified_read` |
+| `workflow_runs` | `authenticated` | `SELECT` | `workflow_runs_candidate_read_own`, `workflow_runs_founder_operator_read` |
 
 First review priorities are candidate data and session tables, where overlapping candidate, founder/operator and backend policies must not be interpreted as granting a candidate cross-account access. Validate candidate A/B isolation with actual authenticated requests. Consolidation should preserve the same access semantics and must be tested before any policy change is applied.
 
