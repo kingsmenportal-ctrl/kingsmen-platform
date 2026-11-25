@@ -172,11 +172,11 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < scripts/staging/test-n15-source-review-postgres.sql
       - name: Build Next.js application with CI-only Supabase config
         run: npm --prefix apps/web run build
+      - name: Install Chromium for browser smoke tests
+        run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test application tracker and saved draft resume journey
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-application-tracker-ui.mjs
-      - name: Install Chromium for browser smoke tests
-        run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test candidate draft browser save and resume
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-application-draft-ui.mjs
