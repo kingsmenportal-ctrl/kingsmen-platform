@@ -1,5 +1,7 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
+import { canResumeCandidateApplicationDraft, candidateFacingApplicationStatusLabel, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Session = { url: string; anonKey: string; token: string };
@@ -22,6 +24,7 @@ type ParentApplication = {
   application_ref?: string | null;
   pathway_type: string;
   status: string;
+  kingsmen_status?: CandidateFacingApplicationStatus | string | null;
   readiness_status?: string | null;
   readiness_snapshot?: Record<string, unknown> | null;
   created_at?: string;
@@ -83,22 +86,23 @@ const PATHWAY_LABELS: Record<string, string> = {
 };
 
 function readSession(): Session {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) throw new Error("Candidate application services are not configured for this deployment.");
-  const ref = new URL(url).hostname.split(".")[0];
-  const storageKey = "sb-" + ref + "-auth-token";
-  let raw: string | null = null;
-  try { raw = window.localStorage.getItem(storageKey); } catch {}
-  if (!raw) throw new Error("Sign in to load your saved application records.");
-  let session: { access_token?: string; expires_at?: number };
-  try { session = JSON.parse(raw) as { access_token?: string; expires_at?: number }; }
-  catch { throw new Error("Your browser session could not be read. Sign in again."); }
-  if (!session.access_token) throw new Error("Sign in to load your saved application records.");
-  if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
+  const state = getCandidateSessionState();
+  if (state.status === "not_configured") {
+    throw new Error("Candidate application services are not configured for this deployment.");
+  }
+  if (state.status === "missing") {
+    throw new Error("Sign in to load your saved application records.");
+  }
+  if (state.status === "expired") {
     throw new Error("Your session has expired. Sign in again.");
   }
-  return { url, anonKey, token: session.access_token };
+  if (state.status === "unreadable") {
+    throw new Error("Your browser session could not be read. Sign in again.");
+  }
+  if (state.status !== "ready") {
+    throw new Error("Sign in to load your saved application records.");
+  }
+  return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 
 async function callPreparation(payload: Record<string, unknown>): Promise<ApiResult> {
@@ -263,8 +267,8 @@ export function CandidateApplicationWorkbench() {
                         {target.provider_application_url && /^https:\/\//i.test(target.provider_application_url) ? <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800">Open official destination ↗</a> : null}
                         {parent ? (
                           <>
-                            <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || parent.status}</span>
-                            {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(parent.status) ? (
+                            <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || "Kingsmen application"}</span>
+                            {canResumeCandidateApplicationDraft(parent.kingsmen_status, parent.status) ? (
                               <a
                                 href={`/candidate/applications/${parent.id}`}
                                 className="inline-flex min-h-10 items-center rounded-lg bg-amber-300 px-3 py-2 text-xs font-extrabold text-slate-950 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -280,7 +284,7 @@ export function CandidateApplicationWorkbench() {
                           </button>
                         )}
                       </div>
-                      {parent ? <p className="mt-2 text-xs leading-5 text-slate-500">Application state: {parent.status} · Readiness: {parent.readiness_status || "Not assessed"}. This is a Kingsmen preparation record, not provider receipt.</p> : null}
+                      {parent ? <p className="mt-2 text-xs leading-5 text-slate-500">Kingsmen status: {candidateFacingApplicationStatusLabel(parent.kingsmen_status)} · Readiness: {parent.readiness_status || "Not assessed"}. This is a Kingsmen preparation record, not provider receipt.</p> : null}
                     </article>
                   );
                 })}
