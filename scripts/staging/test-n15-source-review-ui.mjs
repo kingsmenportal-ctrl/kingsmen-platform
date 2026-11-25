@@ -90,6 +90,8 @@ function queuePayload() {
 }
 
 const server = spawn("npm", ["run", "start"], {
+  // Start a process group so CI cleanup can terminate npm and its Next.js child.
+  detached: process.platform !== "win32",
   cwd: webDirectory,
   env: {
     ...process.env,
@@ -291,7 +293,12 @@ try {
       delay(5000)
     ]);
   }
-  server.kill("SIGTERM");
+  // npm run start launches Next.js as a child. Killing only npm can leave
+  // next-server orphaned and keep the CI step alive after every assertion passes.
+  try {
+    if (process.platform !== "win32" && server.pid) process.kill(-server.pid, "SIGTERM");
+    else server.kill("SIGTERM");
+  } catch {}
   if (server.exitCode === null) {
     await Promise.race([
       new Promise(resolve => server.once("exit", resolve)),
