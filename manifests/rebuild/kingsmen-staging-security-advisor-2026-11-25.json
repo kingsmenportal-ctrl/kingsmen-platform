@@ -1,0 +1,1722 @@
+{
+  "schema": "kingsmen.staging-security-advisor-snapshot.v1",
+  "capturedOn": "2026-11-25",
+  "source": "Supabase database advisor API, read-only",
+  "database": {
+    "provider": "Supabase",
+    "projectName": "kingsmen-portal-staging",
+    "projectRef": "euhubhhnumtibbyufghm",
+    "status": "ACTIVE_HEALTHY",
+    "region": "eu-west-1",
+    "postgresVersion": "17.11.0.003"
+  },
+  "tableInventory": {
+    "publicTables": 230,
+    "publicTablesWithRlsEnabled": 230,
+    "publicTablesRlsDisabled": [],
+    "estimatedRowCountsWereReportedZeroForAllPublicTables": true
+  },
+  "findings": {
+    "rlsEnabledNoPolicy": {
+      "level": "INFO",
+      "count": 17,
+      "description": "Detects cases where row level security (RLS) has been enabled on a table but no RLS policies have been created.",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "tables": [
+        {
+          "table": "candidate_identity_review_audit",
+          "detail": "Table \\`public.candidate_identity_review_audit\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "candidate_identity_review_evidence",
+          "detail": "Table \\`public.candidate_identity_review_evidence\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "candidate_identity_review_requests",
+          "detail": "Table \\`public.candidate_identity_review_requests\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "candidate_private_document_reviews",
+          "detail": "Table \\`public.candidate_private_document_reviews\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_command_catalog",
+          "detail": "Table \\`public.founder_command_catalog\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_command_requests",
+          "detail": "Table \\`public.founder_command_requests\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_command_results",
+          "detail": "Table \\`public.founder_command_results\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_daily_briefs",
+          "detail": "Table \\`public.founder_daily_briefs\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_decision_log",
+          "detail": "Table \\`public.founder_decision_log\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_escalation_threads",
+          "detail": "Table \\`public.founder_escalation_threads\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_mobile_cards",
+          "detail": "Table \\`public.founder_mobile_cards\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_operator_profiles",
+          "detail": "Table \\`public.founder_operator_profiles\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_ops_audit_events",
+          "detail": "Table \\`public.founder_ops_audit_events\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_report_sections",
+          "detail": "Table \\`public.founder_report_sections\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_reports",
+          "detail": "Table \\`public.founder_reports\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_runtime_config",
+          "detail": "Table \\`public.founder_runtime_config\\` has RLS enabled, but no policies exist"
+        },
+        {
+          "table": "founder_watchlist_items",
+          "detail": "Table \\`public.founder_watchlist_items\\` has RLS enabled, but no policies exist"
+        }
+      ]
+    },
+    "authenticatedSecurityDefinerFunctionExecutable": {
+      "level": "WARN",
+      "count": 6,
+      "description": "Detects `SECURITY DEFINER` functions that are callable by signed-in users. Revoke `EXECUTE`, switch the function to `SECURITY INVOKER`, or move it out of your exposed API schema if signed-in users should not call it.",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "functions": [
+        {
+          "name": "get_candidate_cao_choices",
+          "schema": "public",
+          "arguments": "p_application_id uuid",
+          "language": "plpgsql",
+          "securityDefiner": true,
+          "detail": "Function `public.get_candidate_cao_choices(p_application_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/get_candidate_cao_choices`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+        },
+        {
+          "name": "list_candidate_cao_parents",
+          "schema": "public",
+          "arguments": "",
+          "language": "plpgsql",
+          "securityDefiner": true,
+          "detail": "Function `public.list_candidate_cao_parents()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/list_candidate_cao_parents`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+        },
+        {
+          "name": "prepare_candidate_application_from_master_target",
+          "schema": "public",
+          "arguments": "p_target_key text",
+          "language": "plpgsql",
+          "securityDefiner": true,
+          "detail": "Function `public.prepare_candidate_application_from_master_target(p_target_key text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/prepare_candidate_application_from_master_target`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+        },
+        {
+          "name": "prepare_candidate_manual_portal_submission",
+          "schema": "public",
+          "arguments": "p_application_id uuid",
+          "language": "plpgsql",
+          "securityDefiner": true,
+          "detail": "Function `public.prepare_candidate_manual_portal_submission(p_application_id uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/prepare_candidate_manual_portal_submission`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+        },
+        {
+          "name": "record_candidate_application_outcome",
+          "schema": "public",
+          "arguments": "p_application_id uuid, p_evidence_ref text, p_outcome_type text, p_provider_reference text, p_summary text, p_next_step text",
+          "language": "plpgsql",
+          "securityDefiner": true,
+          "detail": "Function `public.record_candidate_application_outcome(p_application_id uuid, p_evidence_ref text, p_outcome_type text, p_provider_reference text, p_summary text, p_next_step text)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/record_candidate_application_outcome`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+        },
+        {
+          "name": "save_candidate_cao_choices",
+          "schema": "public",
+          "arguments": "p_application_id uuid, p_choices jsonb",
+          "language": "plpgsql",
+          "securityDefiner": true,
+          "detail": "Function `public.save_candidate_cao_choices(p_application_id uuid, p_choices jsonb)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/save_candidate_cao_choices`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+        }
+      ]
+    },
+    "leakedPasswordProtection": {
+      "level": "WARN",
+      "count": 1,
+      "description": "Leaked password protection is currently disabled.",
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+      "findings": [
+        {
+          "detail": "Supabase Auth prevents the use of compromised passwords by checking against HaveIBeenPwned.org. Enable this feature to enhance security.",
+          "metadata": {
+            "type": "auth",
+            "entity": "Auth"
+          }
+        }
+      ]
+    },
+    "multiplePermissivePolicies": {
+      "level": "WARN",
+      "count": 16,
+      "description": "Detects if multiple permissive row level security policies are present on a table for the same \\`role\\` and \\`action\\` (e.g. insert). Multiple permissive policies are suboptimal for performance as each policy must be executed for every relevant query.",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0006_multiple_permissive_policies",
+      "policies": [
+        {
+          "table": "applications",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.applications\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{applications_authenticated_own_account_read,applications_candidate_read_own,applications_founder_operator_read}\\`"
+        },
+        {
+          "table": "candidate_credentials",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`anon\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_credentials",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_credentials",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`authenticator\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_credentials",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`dashboard_user\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_credentials",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_credentials\\` has multiple permissive policies for role \\`supabase_privileged_role\\` for action \\`SELECT\\`. Policies include \\`{candidate_credentials_founder_operator_read,candidate_credentials_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_profiles",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_profiles\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_profiles_authenticated_own_account_read,candidate_profiles_candidate_read_own,candidate_profiles_founder_operator_read}\\`"
+        },
+        {
+          "table": "candidate_sessions",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`anon\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_sessions",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_sessions",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`authenticator\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_sessions",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`dashboard_user\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidate_sessions",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidate_sessions\\` has multiple permissive policies for role \\`supabase_privileged_role\\` for action \\`SELECT\\`. Policies include \\`{candidate_sessions_candidate_read_own,candidate_sessions_founder_operator_read,candidate_sessions_service_role_backend_all}\\`"
+        },
+        {
+          "table": "candidates",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.candidates\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{candidates_authenticated_own_account_read,candidates_candidate_read_own,candidates_founder_operator_read}\\`"
+        },
+        {
+          "table": "evidence_ledger",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.evidence_ledger\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{evidence_ledger_candidate_read_own_safe,evidence_ledger_founder_operator_read}\\`"
+        },
+        {
+          "table": "route_sources",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.route_sources\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{route_sources_founder_operator_read,route_sources_public_verified_read}\\`"
+        },
+        {
+          "table": "workflow_runs",
+          "role": null,
+          "action": null,
+          "policies": [],
+          "detail": "Table \\`public.workflow_runs\\` has multiple permissive policies for role \\`authenticated\\` for action \\`SELECT\\`. Policies include \\`{workflow_runs_candidate_read_own,workflow_runs_founder_operator_read}\\`"
+        }
+      ]
+    },
+    "unusedIndexes": {
+      "level": "INFO",
+      "count": 282,
+      "description": "Detects if an index has never been used and may be a candidate for removal.",
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index",
+      "indexes": [
+        {
+          "index": null,
+          "table": "cao_choice_items",
+          "detail": "Index \\`cao_choice_items_candidate_parent_idx\\` on table \\`public.cao_choice_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_dispatch_queue",
+          "detail": "Index \\`orchestrator_dispatch_due_idx\\` on table \\`public.orchestrator_dispatch_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_dispatch_queue",
+          "detail": "Index \\`orchestrator_dispatch_expired_lock_idx\\` on table \\`public.orchestrator_dispatch_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_master_application_targets",
+          "detail": "Index \\`candidate_master_targets_application_idx\\` on table \\`public.candidate_master_application_targets\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_opportunities",
+          "detail": "Index \\`idx_n06_opportunities_discovery\\` on table \\`public.candidate_opportunities\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_saved_opportunities",
+          "detail": "Index \\`idx_n06_saved_candidate\\` on table \\`public.candidate_saved_opportunities\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_applications",
+          "detail": "Index \\`idx_n06_applications_candidate\\` on table \\`public.candidate_applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_applications",
+          "detail": "Index \\`idx_n06_applications_status\\` on table \\`public.candidate_applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_events",
+          "detail": "Index \\`idx_n06_application_events_application\\` on table \\`public.candidate_application_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_tracker_events",
+          "detail": "Index \\`candidate_application_tracker_events_owner_time_idx\\` on table \\`public.candidate_application_tracker_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_tracker",
+          "detail": "Index \\`candidate_application_tracker_owner_updated_idx\\` on table \\`public.candidate_application_tracker\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "system_health_snapshots",
+          "detail": "Index \\`idx_system_health_snapshots_captured\\` on table \\`public.system_health_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "service_health_checks",
+          "detail": "Index \\`idx_service_health_checks_service\\` on table \\`public.service_health_checks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "metric_samples",
+          "detail": "Index \\`idx_metric_samples_name\\` on table \\`public.metric_samples\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "incident_events",
+          "detail": "Index \\`idx_incident_events_status\\` on table \\`public.incident_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "incident_timeline_entries",
+          "detail": "Index \\`idx_incident_timeline_incident\\` on table \\`public.incident_timeline_entries\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "incident_actions",
+          "detail": "Index \\`idx_incident_actions_status\\` on table \\`public.incident_actions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_reports",
+          "detail": "Index \\`idx_founder_reports_type\\` on table \\`public.founder_reports\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_report_sections",
+          "detail": "Index \\`idx_founder_report_sections_report\\` on table \\`public.founder_report_sections\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_pipeline_snapshots",
+          "detail": "Index \\`idx_candidate_pipeline_snapshots_captured\\` on table \\`public.candidate_pipeline_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "workflow_run_observations",
+          "detail": "Index \\`idx_workflow_observations_code\\` on table \\`public.workflow_run_observations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "oracle_lite_capacity_snapshots",
+          "detail": "Index \\`idx_oracle_capacity_captured\\` on table \\`public.oracle_lite_capacity_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "system_alerts",
+          "detail": "Index \\`idx_system_alerts_status\\` on table \\`public.system_alerts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "report_delivery_log",
+          "detail": "Index \\`idx_report_delivery_log_report\\` on table \\`public.report_delivery_log\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_evidence",
+          "detail": "Index \\`idx_n07_evidence_application\\` on table \\`public.candidate_application_evidence\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_evidence",
+          "detail": "Index \\`idx_n07_evidence_status\\` on table \\`public.candidate_application_evidence\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_submission_jobs",
+          "detail": "Index \\`idx_n07_submission_queue\\` on table \\`public.candidate_application_submission_jobs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_submission_jobs",
+          "detail": "Index \\`idx_n07_submission_candidate\\` on table \\`public.candidate_application_submission_jobs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_decision_signals",
+          "detail": "Index \\`idx_candidate_decision_signals_candidate\\` on table \\`public.candidate_decision_signals\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "eligibility_screen_results",
+          "detail": "Index \\`idx_eligibility_screen_candidate\\` on table \\`public.eligibility_screen_results\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_match_candidates",
+          "detail": "Index \\`idx_route_match_candidate\\` on table \\`public.route_match_candidates\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "placement_scores",
+          "detail": "Index \\`idx_placement_scores_candidate\\` on table \\`public.placement_scores\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_recommendations",
+          "detail": "Index \\`idx_route_recommendations_candidate\\` on table \\`public.route_recommendations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "destiny_maps",
+          "detail": "Index \\`idx_destiny_maps_candidate\\` on table \\`public.destiny_maps\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "phoenix_fallback_plans",
+          "detail": "Index \\`idx_phoenix_candidate\\` on table \\`public.phoenix_fallback_plans\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidates",
+          "detail": "Index \\`idx_candidates_email\\` on table \\`public.candidates\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidates",
+          "detail": "Index \\`idx_candidates_state\\` on table \\`public.candidates\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "applications",
+          "detail": "Index \\`idx_applications_candidate\\` on table \\`public.applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "applications",
+          "detail": "Index \\`idx_applications_state\\` on table \\`public.applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "applications",
+          "detail": "Index \\`idx_applications_route_type\\` on table \\`public.applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "command_log",
+          "detail": "Index \\`idx_command_log_idempotency\\` on table \\`public.command_log\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "command_log",
+          "detail": "Index \\`idx_command_log_correlation\\` on table \\`public.command_log\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "workflow_runs",
+          "detail": "Index \\`idx_workflow_runs_correlation\\` on table \\`public.workflow_runs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "evidence_ledger",
+          "detail": "Index \\`idx_evidence_candidate\\` on table \\`public.evidence_ledger\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "evidence_ledger",
+          "detail": "Index \\`idx_evidence_application\\` on table \\`public.evidence_ledger\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "audit_events",
+          "detail": "Index \\`idx_audit_correlation\\` on table \\`public.audit_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_sources",
+          "detail": "Index \\`idx_route_sources_route_type\\` on table \\`public.route_sources\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "worker_heartbeats",
+          "detail": "Index \\`idx_worker_heartbeats_worker\\` on table \\`public.worker_heartbeats\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "dead_letter_queue",
+          "detail": "Index \\`idx_dlq_status\\` on table \\`public.dead_letter_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "approval_requests",
+          "detail": "Index \\`idx_approval_status\\` on table \\`public.approval_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "ai_decision_events",
+          "detail": "Index \\`idx_ai_decision_events_candidate\\` on table \\`public.ai_decision_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "ai_learning_signals",
+          "detail": "Index \\`idx_ai_learning_signals_type\\` on table \\`public.ai_learning_signals\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_accounts",
+          "detail": "Index \\`idx_candidate_accounts_email\\` on table \\`public.candidate_accounts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_sessions",
+          "detail": "Index \\`idx_candidate_sessions_candidate\\` on table \\`public.candidate_sessions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_profile_field_sources",
+          "detail": "Index \\`idx_candidate_field_sources_candidate\\` on table \\`public.candidate_profile_field_sources\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_profile_change_requests",
+          "detail": "Index \\`idx_candidate_change_requests_candidate\\` on table \\`public.candidate_profile_change_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_messages",
+          "detail": "Index \\`idx_candidate_messages_candidate\\` on table \\`public.candidate_messages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_support_tickets",
+          "detail": "Index \\`idx_candidate_support_candidate\\` on table \\`public.candidate_support_tickets\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_financial_items",
+          "detail": "Index \\`idx_candidate_financial_candidate\\` on table \\`public.candidate_financial_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_success_events",
+          "detail": "Index \\`idx_candidate_success_candidate\\` on table \\`public.candidate_success_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcomes",
+          "detail": "Index \\`idx_n08_outcomes_candidate\\` on table \\`public.candidate_outcomes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcomes",
+          "detail": "Index \\`idx_n08_outcomes_application\\` on table \\`public.candidate_outcomes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcomes",
+          "detail": "Index \\`idx_n08_outcomes_status\\` on table \\`public.candidate_outcomes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcome_correction_requests",
+          "detail": "Index \\`idx_n08_correction_candidate\\` on table \\`public.candidate_outcome_correction_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcome_correction_requests",
+          "detail": "Index \\`idx_n08_correction_queue\\` on table \\`public.candidate_outcome_correction_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_files",
+          "detail": "Index \\`idx_document_files_candidate\\` on table \\`public.document_files\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_files",
+          "detail": "Index \\`idx_document_files_application\\` on table \\`public.document_files\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_files",
+          "detail": "Index \\`idx_document_files_type\\` on table \\`public.document_files\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_files",
+          "detail": "Index \\`idx_document_files_status\\` on table \\`public.document_files\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_requests",
+          "detail": "Index \\`idx_document_requests_candidate\\` on table \\`public.document_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_requests",
+          "detail": "Index \\`idx_document_requests_application\\` on table \\`public.document_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_analysis",
+          "detail": "Index \\`idx_document_analysis_document\\` on table \\`public.document_analysis\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_verifications",
+          "detail": "Index \\`idx_document_verifications_document\\` on table \\`public.document_verifications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_fraud_flags",
+          "detail": "Index \\`idx_document_fraud_flags_document\\` on table \\`public.document_fraud_flags\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_storage_events",
+          "detail": "Index \\`idx_document_storage_events_document\\` on table \\`public.document_storage_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_readiness_snapshots",
+          "detail": "Index \\`idx_document_readiness_candidate\\` on table \\`public.document_readiness_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "governance_policies",
+          "detail": "Index \\`idx_governance_policies_domain\\` on table \\`public.governance_policies\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "policy_gate_evaluations",
+          "detail": "Index \\`idx_policy_gate_candidate\\` on table \\`public.policy_gate_evaluations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "policy_gate_evaluations",
+          "detail": "Index \\`idx_policy_gate_status\\` on table \\`public.policy_gate_evaluations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "governance_decisions",
+          "detail": "Index \\`idx_governance_decisions_status\\` on table \\`public.governance_decisions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "human_override_requests",
+          "detail": "Index \\`idx_human_override_status\\` on table \\`public.human_override_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "privacy_consent_records",
+          "detail": "Index \\`idx_privacy_consent_candidate\\` on table \\`public.privacy_consent_records\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "source_confidence_reviews",
+          "detail": "Index \\`idx_source_confidence_reviews_source\\` on table \\`public.source_confidence_reviews\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "growth_cap_reviews",
+          "detail": "Index \\`idx_growth_cap_reviews_status\\` on table \\`public.growth_cap_reviews\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "policy_exception_register",
+          "detail": "Index \\`idx_policy_exception_status\\` on table \\`public.policy_exception_register\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "governance_audit_events",
+          "detail": "Index \\`idx_governance_audit_events_candidate\\` on table \\`public.governance_audit_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_categories",
+          "detail": "Index \\`idx_route_categories_code\\` on table \\`public.route_categories\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_providers",
+          "detail": "Index \\`idx_route_providers_type\\` on table \\`public.route_providers\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_requirements",
+          "detail": "Index \\`idx_route_requirements_programme\\` on table \\`public.route_requirements\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_deadlines",
+          "detail": "Index \\`idx_route_deadlines_programme\\` on table \\`public.route_deadlines\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_fees",
+          "detail": "Index \\`idx_route_fees_programme\\` on table \\`public.route_fees\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "portal_dna",
+          "detail": "Index \\`idx_portal_dna_provider\\` on table \\`public.portal_dna\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "portal_health_checks",
+          "detail": "Index \\`idx_portal_health_portal\\` on table \\`public.portal_health_checks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "application_workbench_items",
+          "detail": "Index \\`idx_workbench_candidate\\` on table \\`public.application_workbench_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "application_workbench_items",
+          "detail": "Index \\`idx_workbench_application\\` on table \\`public.application_workbench_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_readiness_snapshots",
+          "detail": "Index \\`idx_route_readiness_candidate\\` on table \\`public.route_readiness_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "cao_choice_items",
+          "detail": "Index \\`idx_cao_choice_application\\` on table \\`public.cao_choice_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "nsfas_support_cases",
+          "detail": "Index \\`idx_nsfas_support_candidate\\` on table \\`public.nsfas_support_cases\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "map_manual_packages",
+          "detail": "Index \\`idx_map_manual_candidate\\` on table \\`public.map_manual_packages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_sync_outbox",
+          "detail": "Index \\`idx_airtable_sync_outbox_status_next\\` on table \\`public.airtable_sync_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_sync_runs",
+          "detail": "Index \\`idx_airtable_sync_runs_target_started\\` on table \\`public.airtable_sync_runs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_webhook_receipts",
+          "detail": "Index \\`idx_airtable_webhook_receipts_base_created\\` on table \\`public.airtable_webhook_receipts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_communications",
+          "detail": "Index \\`idx_n09_communications_candidate\\` on table \\`public.candidate_communications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_communications",
+          "detail": "Index \\`idx_n09_communications_queue\\` on table \\`public.candidate_communications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_communications",
+          "detail": "Index \\`idx_n09_communications_application\\` on table \\`public.candidate_communications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "control_plane_command_requests",
+          "detail": "Index \\`idx_cp_commands_status\\` on table \\`public.control_plane_command_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "control_plane_approval_queue",
+          "detail": "Index \\`idx_cp_approvals_decision\\` on table \\`public.control_plane_approval_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "control_plane_queue_snapshots",
+          "detail": "Index \\`idx_cp_queue_snapshots\\` on table \\`public.control_plane_queue_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "control_plane_worker_health",
+          "detail": "Index \\`idx_cp_worker_health\\` on table \\`public.control_plane_worker_health\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "control_plane_operator_audit",
+          "detail": "Index \\`idx_cp_operator_audit\\` on table \\`public.control_plane_operator_audit\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_communication_attempts",
+          "detail": "Index \\`idx_n09_attempts_communication\\` on table \\`public.candidate_communication_attempts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_preparation_items",
+          "detail": "Index \\`candidate_application_preparation_owner_tracker_idx\\` on table \\`public.candidate_application_preparation_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "notification_outbox",
+          "detail": "Index \\`idx_notification_outbox_status\\` on table \\`public.notification_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "notification_outbox",
+          "detail": "Index \\`idx_notification_outbox_candidate\\` on table \\`public.notification_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "notification_delivery_attempts",
+          "detail": "Index \\`idx_delivery_attempts_notification\\` on table \\`public.notification_delivery_attempts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "inbound_messages",
+          "detail": "Index \\`idx_inbound_messages_status\\` on table \\`public.inbound_messages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_portal_messages",
+          "detail": "Index \\`idx_portal_messages_candidate\\` on table \\`public.candidate_portal_messages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_follow_up_tasks",
+          "detail": "Index \\`idx_n09_tasks_candidate\\` on table \\`public.candidate_follow_up_tasks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_follow_up_tasks",
+          "detail": "Index \\`idx_n09_tasks_queue\\` on table \\`public.candidate_follow_up_tasks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "urgent_whatsapp_escalations",
+          "detail": "Index \\`idx_whatsapp_escalations_status\\` on table \\`public.urgent_whatsapp_escalations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "message_evidence_ledger",
+          "detail": "Index \\`idx_message_evidence_source\\` on table \\`public.message_evidence_ledger\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_preparation_events",
+          "detail": "Index \\`candidate_application_preparation_events_owner_time_idx\\` on table \\`public.candidate_application_preparation_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_orders",
+          "detail": "Index \\`idx_finance_orders_candidate\\` on table \\`public.finance_orders\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_invoices",
+          "detail": "Index \\`idx_finance_invoices_candidate\\` on table \\`public.finance_invoices\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "payfast_payment_intents",
+          "detail": "Index \\`idx_payfast_intents_status\\` on table \\`public.payfast_payment_intents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_payments",
+          "detail": "Index \\`idx_finance_payments_candidate\\` on table \\`public.finance_payments\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "payfast_itn_receipts",
+          "detail": "Index \\`idx_itn_receipts_merchant\\` on table \\`public.payfast_itn_receipts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_refund_requests",
+          "detail": "Index \\`idx_refund_requests_status\\` on table \\`public.finance_refund_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_ledger_entries",
+          "detail": "Index \\`idx_finance_ledger_candidate\\` on table \\`public.finance_ledger_entries\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "payment_evidence_ledger",
+          "detail": "Index \\`idx_payment_evidence_source\\` on table \\`public.payment_evidence_ledger\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "integration_outbox",
+          "detail": "Index \\`idx_integration_outbox_status\\` on table \\`public.integration_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "integration_inbox",
+          "detail": "Index \\`idx_integration_inbox_idempotency\\` on table \\`public.integration_inbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "workflow_result_events",
+          "detail": "Index \\`idx_workflow_result_events_code\\` on table \\`public.workflow_result_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "integration_dead_letter_queue",
+          "detail": "Index \\`idx_integration_dlq_status\\` on table \\`public.integration_dead_letter_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_service_orders",
+          "detail": "Index \\`idx_n10_orders_candidate\\` on table \\`public.candidate_service_orders\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_service_orders",
+          "detail": "Index \\`idx_n10_orders_status\\` on table \\`public.candidate_service_orders\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_payment_events",
+          "detail": "Index \\`idx_n10_payment_events_order\\` on table \\`public.candidate_payment_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_payment_events",
+          "detail": "Index \\`idx_n10_payment_events_candidate\\` on table \\`public.candidate_payment_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "opportunity_source_authorities",
+          "detail": "Index \\`idx_opportunity_source_authorities_type\\` on table \\`public.opportunity_source_authorities\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "external_source_observations",
+          "detail": "Index \\`idx_external_source_observations_status\\` on table \\`public.external_source_observations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "opportunity_providers",
+          "detail": "Index \\`idx_opportunity_providers_sector\\` on table \\`public.opportunity_providers\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "opportunity_programmes",
+          "detail": "Index \\`idx_opportunity_programmes_provider\\` on table \\`public.opportunity_programmes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "opportunity_deadlines",
+          "detail": "Index \\`idx_opportunity_deadlines_status\\` on table \\`public.opportunity_deadlines\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "opportunity_signal_queue",
+          "detail": "Index \\`idx_opportunity_signal_queue_status\\` on table \\`public.opportunity_signal_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_opportunity_matches",
+          "detail": "Index \\`idx_candidate_opportunity_matches_candidate\\` on table \\`public.candidate_opportunity_matches\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "opportunity_alerts",
+          "detail": "Index \\`idx_opportunity_alerts_status\\` on table \\`public.opportunity_alerts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_refund_requests",
+          "detail": "Index \\`idx_n10_refunds_queue\\` on table \\`public.candidate_refund_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_refund_requests",
+          "detail": "Index \\`idx_n10_refunds_candidate\\` on table \\`public.candidate_refund_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_audit_events",
+          "detail": "Index \\`idx_n10_finance_audit_entity\\` on table \\`public.finance_audit_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_documents",
+          "detail": "Index \\`candidate_private_documents_application_id_idx\\` on table \\`public.candidate_private_documents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_execution_plans",
+          "detail": "Index \\`idx_orchestrator_plans_status\\` on table \\`public.orchestrator_execution_plans\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_runs",
+          "detail": "Index \\`idx_orchestrator_runs_status\\` on table \\`public.orchestrator_runs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_steps",
+          "detail": "Index \\`idx_orchestrator_steps_run\\` on table \\`public.orchestrator_steps\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_dispatch_queue",
+          "detail": "Index \\`idx_orchestrator_dispatch_ready\\` on table \\`public.orchestrator_dispatch_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_worker_results",
+          "detail": "Index \\`idx_orchestrator_results_worker\\` on table \\`public.orchestrator_worker_results\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_manual_handoffs",
+          "detail": "Index \\`idx_orchestrator_handoffs_status\\` on table \\`public.orchestrator_manual_handoffs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "orchestrator_execution_events",
+          "detail": "Index \\`idx_orchestrator_events_run\\` on table \\`public.orchestrator_execution_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_master_profiles",
+          "detail": "Index \\`candidate_master_profiles_updated_idx\\` on table \\`public.candidate_master_profiles\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_documents",
+          "detail": "Index \\`candidate_private_documents_owner_time_idx\\` on table \\`public.candidate_private_documents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_document_events",
+          "detail": "Index \\`candidate_private_document_events_owner_time_idx\\` on table \\`public.candidate_private_document_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_command_requests",
+          "detail": "Index \\`idx_founder_commands_status\\` on table \\`public.founder_command_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_command_results",
+          "detail": "Index \\`idx_founder_results_command\\` on table \\`public.founder_command_results\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_daily_briefs",
+          "detail": "Index \\`idx_founder_briefs_date\\` on table \\`public.founder_daily_briefs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_watchlist_items",
+          "detail": "Index \\`idx_founder_watch_status\\` on table \\`public.founder_watchlist_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_escalation_threads",
+          "detail": "Index \\`idx_founder_escalations_status\\` on table \\`public.founder_escalation_threads\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_decision_log",
+          "detail": "Index \\`idx_founder_decisions_command\\` on table \\`public.founder_decision_log\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_ops_audit_events",
+          "detail": "Index \\`idx_founder_audit_actor\\` on table \\`public.founder_ops_audit_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_master_application_targets",
+          "detail": "Index \\`candidate_master_targets_candidate_updated_idx\\` on table \\`public.candidate_master_application_targets\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_documents",
+          "detail": "Index \\`candidate_private_documents_application_owner_idx\\` on table \\`public.candidate_private_documents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_master_application_targets",
+          "detail": "Index \\`candidate_master_targets_idempotency_idx\\` on table \\`public.candidate_master_application_targets\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_evidence",
+          "detail": "Index \\`candidate_identity_review_evidence_reviewed_by_idx\\` on table \\`public.candidate_identity_review_evidence\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_evidence",
+          "detail": "Index \\`candidate_identity_review_evidence_supabase_user_id_idx\\` on table \\`public.candidate_identity_review_evidence\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_master_application_targets",
+          "detail": "Index \\`candidate_master_targets_application_owner_idx\\` on table \\`public.candidate_master_application_targets\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_master_application_events",
+          "detail": "Index \\`candidate_master_events_candidate_created_idx\\` on table \\`public.candidate_master_application_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_website_pages",
+          "detail": "Index \\`idx_public_website_pages_status\\` on table \\`public.public_website_pages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_website_sections",
+          "detail": "Index \\`idx_public_website_sections_page\\` on table \\`public.public_website_sections\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_website_leads",
+          "detail": "Index \\`idx_public_website_leads_status\\` on table \\`public.public_website_leads\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_destiny_map_requests",
+          "detail": "Index \\`idx_public_destiny_map_lead\\` on table \\`public.public_destiny_map_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_website_conversion_events",
+          "detail": "Index \\`idx_public_conversion_events_type\\` on table \\`public.public_website_conversion_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_website_content_versions",
+          "detail": "Index \\`idx_public_content_versions_page\\` on table \\`public.public_website_content_versions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_document_reviews",
+          "detail": "Index \\`candidate_private_document_reviews_document_time_idx\\` on table \\`public.candidate_private_document_reviews\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "external_source_observations",
+          "detail": "Index \\`external_source_observations_authority_freshness_idx\\` on table \\`public.external_source_observations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "external_source_observations",
+          "detail": "Index \\`external_source_observations_url_idx\\` on table \\`public.external_source_observations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_opportunity_matches",
+          "detail": "Index \\`candidate_opportunity_matches_candidate_status_idx\\` on table \\`public.candidate_opportunity_matches\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_mobile_devices",
+          "detail": "Index \\`idx_candidate_mobile_devices_candidate\\` on table \\`public.candidate_mobile_devices\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_mobile_sessions",
+          "detail": "Index \\`idx_candidate_mobile_sessions_candidate\\` on table \\`public.candidate_mobile_sessions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "public_to_portal_claims",
+          "detail": "Index \\`idx_public_to_portal_claims_status\\` on table \\`public.public_to_portal_claims\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_onboarding_checklist",
+          "detail": "Index \\`idx_candidate_onboarding_candidate\\` on table \\`public.candidate_onboarding_checklist\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_mobile_status_cards",
+          "detail": "Index \\`idx_mobile_status_cards_candidate\\` on table \\`public.candidate_mobile_status_cards\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_mobile_activity_events",
+          "detail": "Index \\`idx_mobile_activity_candidate\\` on table \\`public.candidate_mobile_activity_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_documents",
+          "detail": "Index \\`candidate_private_documents_preparation_owner_idx\\` on table \\`public.candidate_private_documents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_workspace_saved_opportunities",
+          "detail": "Index \\`candidate_workspace_saved_opportunities_owner_created_idx\\` on table \\`public.candidate_workspace_saved_opportunities\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_document_events",
+          "detail": "Index \\`candidate_private_document_events_document_idx\\` on table \\`public.candidate_private_document_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_tracker",
+          "detail": "Index \\`candidate_application_tracker_saved_owner_idx\\` on table \\`public.candidate_application_tracker\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_tracker_events",
+          "detail": "Index \\`candidate_application_tracker_events_tracker_owner_idx\\` on table \\`public.candidate_application_tracker_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_preparation_items",
+          "detail": "Index \\`candidate_application_preparation_items_tracker_owner_idx\\` on table \\`public.candidate_application_preparation_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_preparation_events",
+          "detail": "Index \\`candidate_application_preparation_events_item_idx\\` on table \\`public.candidate_application_preparation_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_preparation_events",
+          "detail": "Index \\`candidate_application_preparation_events_tracker_owner_idx\\` on table \\`public.candidate_application_preparation_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_audit",
+          "detail": "Index \\`candidate_identity_review_audit_candidate_idx\\` on table \\`public.candidate_identity_review_audit\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_private_document_reviews",
+          "detail": "Index \\`candidate_private_document_reviews_candidate_idx\\` on table \\`public.candidate_private_document_reviews\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_support_tickets",
+          "detail": "Index \\`idx_fk_candidate_support_tickets_application_id\\` on table \\`public.candidate_support_tickets\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "release_module_registry",
+          "detail": "Index \\`idx_release_module_registry_order\\` on table \\`public.release_module_registry\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "production_readiness_checks",
+          "detail": "Index \\`idx_production_readiness_group\\` on table \\`public.production_readiness_checks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "launch_gate_decisions",
+          "detail": "Index \\`idx_launch_gate_status\\` on table \\`public.launch_gate_decisions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "release_artifact_evidence",
+          "detail": "Index \\`idx_release_artifact_phase\\` on table \\`public.release_artifact_evidence\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "operational_runbooks",
+          "detail": "Index \\`idx_runbook_severity\\` on table \\`public.operational_runbooks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "cao_choice_items",
+          "detail": "Index \\`idx_fk_cao_choice_items_candidate_id\\` on table \\`public.cao_choice_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "command_log",
+          "detail": "Index \\`idx_fk_command_log_application_id\\` on table \\`public.command_log\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_field_mappings",
+          "detail": "Index \\`idx_fk_airtable_field_mappings_sync_target_id\\` on table \\`public.airtable_field_mappings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_sync_outbox",
+          "detail": "Index \\`idx_fk_airtable_sync_outbox_sync_target_id\\` on table \\`public.airtable_sync_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "application_workbench_items",
+          "detail": "Index \\`idx_fk_application_workbench_items_programme_id\\` on table \\`public.application_workbench_items\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "approval_requests",
+          "detail": "Index \\`idx_fk_approval_requests_application_id\\` on table \\`public.approval_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "approval_requests",
+          "detail": "Index \\`idx_fk_approval_requests_candidate_id\\` on table \\`public.approval_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "audit_events",
+          "detail": "Index \\`idx_fk_audit_events_application_id\\` on table \\`public.audit_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "audit_events",
+          "detail": "Index \\`idx_fk_audit_events_candidate_id\\` on table \\`public.audit_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_messages",
+          "detail": "Index \\`idx_fk_candidate_messages_application_id\\` on table \\`public.candidate_messages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_mobile_sessions",
+          "detail": "Index \\`idx_fk_candidate_mobile_sessions_device_id\\` on table \\`public.candidate_mobile_sessions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_success_events",
+          "detail": "Index \\`idx_fk_candidate_success_events_application_id\\` on table \\`public.candidate_success_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "command_log",
+          "detail": "Index \\`idx_fk_command_log_candidate_id\\` on table \\`public.command_log\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "dead_letter_queue",
+          "detail": "Index \\`idx_fk_dead_letter_queue_application_id\\` on table \\`public.dead_letter_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "dead_letter_queue",
+          "detail": "Index \\`idx_fk_dead_letter_queue_candidate_id\\` on table \\`public.dead_letter_queue\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_readiness_snapshots",
+          "detail": "Index \\`idx_fk_document_readiness_snapshots_application_id\\` on table \\`public.document_readiness_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "document_requests",
+          "detail": "Index \\`idx_fk_document_requests_fulfilled_by_document_id\\` on table \\`public.document_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_invoices",
+          "detail": "Index \\`idx_fk_finance_invoices_order_ref\\` on table \\`public.finance_invoices\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_orders",
+          "detail": "Index \\`idx_fk_finance_orders_plan_code\\` on table \\`public.finance_orders\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_payments",
+          "detail": "Index \\`idx_fk_finance_payments_invoice_ref\\` on table \\`public.finance_payments\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_payments",
+          "detail": "Index \\`idx_fk_finance_payments_order_ref\\` on table \\`public.finance_payments\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_refund_requests",
+          "detail": "Index \\`idx_fk_finance_refund_requests_order_ref\\` on table \\`public.finance_refund_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "finance_refund_requests",
+          "detail": "Index \\`idx_fk_finance_refund_requests_payment_ref\\` on table \\`public.finance_refund_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "founder_command_requests",
+          "detail": "Index \\`idx_fk_founder_command_requests_command_key\\` on table \\`public.founder_command_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "map_manual_packages",
+          "detail": "Index \\`idx_fk_map_manual_packages_application_id\\` on table \\`public.map_manual_packages\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "nsfas_support_cases",
+          "detail": "Index \\`idx_fk_nsfas_support_cases_application_id\\` on table \\`public.nsfas_support_cases\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "payfast_payment_intents",
+          "detail": "Index \\`idx_fk_payfast_payment_intents_invoice_ref\\` on table \\`public.payfast_payment_intents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "payfast_payment_intents",
+          "detail": "Index \\`idx_fk_payfast_payment_intents_order_ref\\` on table \\`public.payfast_payment_intents\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_programmes",
+          "detail": "Index \\`idx_fk_route_programmes_provider_id\\` on table \\`public.route_programmes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_providers",
+          "detail": "Index \\`idx_fk_route_providers_source_authority_id\\` on table \\`public.route_providers\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_readiness_snapshots",
+          "detail": "Index \\`idx_fk_route_readiness_snapshots_application_id\\` on table \\`public.route_readiness_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_readiness_snapshots",
+          "detail": "Index \\`idx_fk_route_readiness_snapshots_programme_id\\` on table \\`public.route_readiness_snapshots\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "route_sources",
+          "detail": "Index \\`idx_fk_route_sources_source_authority_id\\` on table \\`public.route_sources\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "workflow_runs",
+          "detail": "Index \\`idx_fk_workflow_runs_application_id\\` on table \\`public.workflow_runs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "workflow_runs",
+          "detail": "Index \\`idx_fk_workflow_runs_candidate_id\\` on table \\`public.workflow_runs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_accounts",
+          "detail": "Index \\`candidate_accounts_auth_user_id_idx\\` on table \\`public.candidate_accounts\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_events",
+          "detail": "Index \\`candidate_application_events_candidate_id_idx\\` on table \\`public.candidate_application_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_evidence",
+          "detail": "Index \\`candidate_application_evidence_candidate_id_idx\\` on table \\`public.candidate_application_evidence\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_sessions",
+          "detail": "Index \\`idx_candidate_sessions_candidate_active\\` on table \\`public.candidate_sessions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_sessions",
+          "detail": "Index \\`idx_candidate_sessions_expiry\\` on table \\`public.candidate_sessions\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_application_submission_jobs",
+          "detail": "Index \\`candidate_application_submission_jobs_opportunity_id_idx\\` on table \\`public.candidate_application_submission_jobs\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_applications",
+          "detail": "Index \\`candidate_applications_opportunity_id_idx\\` on table \\`public.candidate_applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_credentials",
+          "detail": "Index \\`idx_candidate_credentials_status\\` on table \\`public.candidate_credentials\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_follow_up_tasks",
+          "detail": "Index \\`candidate_follow_up_tasks_communication_id_idx\\` on table \\`public.candidate_follow_up_tasks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_follow_up_tasks",
+          "detail": "Index \\`candidate_follow_up_tasks_outcome_id_idx\\` on table \\`public.candidate_follow_up_tasks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_requests",
+          "detail": "Index \\`candidate_identity_review_queue_idx\\` on table \\`public.candidate_identity_review_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisations",
+          "detail": "Index \\`organisations_status_type_idx\\` on table \\`public.organisations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_requests",
+          "detail": "Index \\`candidate_identity_review_requests_reviewed_by_idx\\` on table \\`public.candidate_identity_review_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcomes",
+          "detail": "Index \\`candidate_outcomes_evidence_id_idx\\` on table \\`public.candidate_outcomes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_outcomes",
+          "detail": "Index \\`candidate_outcomes_opportunity_id_idx\\` on table \\`public.candidate_outcomes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_refund_requests",
+          "detail": "Index \\`candidate_refund_requests_order_id_idx\\` on table \\`public.candidate_refund_requests\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisation_listings",
+          "detail": "Index \\`organisation_listings_public_idx\\` on table \\`public.organisation_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisation_listings",
+          "detail": "Index \\`organisation_listings_org_idx\\` on table \\`public.organisation_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_saved_opportunities",
+          "detail": "Index \\`candidate_saved_opportunities_opportunity_id_idx\\` on table \\`public.candidate_saved_opportunities\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_saved_listings",
+          "detail": "Index \\`candidate_saved_listings_user_idx\\` on table \\`public.candidate_saved_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_communications",
+          "detail": "Index \\`candidate_communications_outcome_id_idx\\` on table \\`public.candidate_communications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_follow_up_tasks",
+          "detail": "Index \\`candidate_follow_up_tasks_application_id_idx\\` on table \\`public.candidate_follow_up_tasks\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_service_orders",
+          "detail": "Index \\`candidate_service_orders_package_id_idx\\` on table \\`public.candidate_service_orders\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_sync_outbox",
+          "detail": "Index \\`idx_airtable_outbox_claimable\\` on table \\`public.airtable_sync_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_sync_outbox",
+          "detail": "Index \\`idx_airtable_outbox_expired_lease\\` on table \\`public.airtable_sync_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "airtable_sync_outbox",
+          "detail": "Index \\`idx_airtable_outbox_target_status\\` on table \\`public.airtable_sync_outbox\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_saved_listings",
+          "detail": "Index \\`candidate_saved_listings_listing_idx\\` on table \\`public.candidate_saved_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisation_listings",
+          "detail": "Index \\`organisation_listings_created_by_idx\\` on table \\`public.organisation_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisation_listings",
+          "detail": "Index \\`organisation_listings_source_verified_by_idx\\` on table \\`public.organisation_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisations",
+          "detail": "Index \\`organisations_created_by_idx\\` on table \\`public.organisations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisations",
+          "detail": "Index \\`organisations_reviewed_by_idx\\` on table \\`public.organisations\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_route_applications",
+          "detail": "Index \\`candidate_route_applications_user_updated_idx\\` on table \\`public.candidate_route_applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_route_applications",
+          "detail": "Index \\`candidate_route_applications_route_idx\\` on table \\`public.candidate_route_applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_route_applications",
+          "detail": "Index \\`candidate_route_applications_listing_idx\\` on table \\`public.candidate_route_applications\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_saved_routes",
+          "detail": "Index \\`candidate_saved_routes_user_idx\\` on table \\`public.candidate_saved_routes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_saved_routes",
+          "detail": "Index \\`candidate_saved_routes_programme_idx\\` on table \\`public.candidate_saved_routes\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "organisation_listings",
+          "detail": "Index \\`organisation_listings_reviewed_by_idx\\` on table \\`public.organisation_listings\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "marketplace_review_events",
+          "detail": "Index \\`marketplace_review_events_occurred_idx\\` on table \\`public.marketplace_review_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "marketplace_review_events",
+          "detail": "Index \\`marketplace_review_events_entity_idx\\` on table \\`public.marketplace_review_events\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_audit",
+          "detail": "Index \\`candidate_identity_review_audit_request_idx\\` on table \\`public.candidate_identity_review_audit\\` has not been used"
+        },
+        {
+          "index": null,
+          "table": "candidate_identity_review_evidence",
+          "detail": "Index \\`candidate_identity_review_evidence_request_idx\\` on table \\`public.candidate_identity_review_evidence\\` has not been used"
+        }
+      ]
+    }
+  },
+  "safety": {
+    "readOnly": true,
+    "schemaChanged": false,
+    "dataChanged": false,
+    "policiesChanged": false,
+    "functionsChanged": false,
+    "authSettingsChanged": false,
+    "releaseGateOpened": false
+  },
+  "recommendedOrder": [
+    "Inspect the six SECURITY DEFINER functions' bodies, search_path, candidate ownership checks, argument validation and EXECUTE grants. Do not revoke/alter until callers and intended backend-only functions are mapped.",
+    "Classify all 17 RLS-enabled/no-policy tables as backend-only or missing-policy. For backend-only tables prove client roles cannot access them and service-role access remains constrained by server policy/audit.",
+    "Review all 16 multiple-permissive-policy findings, especially roles with multiple broad policies on candidate_credentials and candidate_sessions.",
+    "Enable and verify Supabase leaked-password protection in a planned auth configuration change after review.",
+    "Do not drop the 282 unused-index candidates automatically; measure representative workload and preserve indexes used for foreign keys, rare paths or future launches."
+  ]
+}
