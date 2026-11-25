@@ -330,12 +330,13 @@
           "minimum": 2,
           "maximum": 4
         },
-        "status": "in_progress_source_and_ci",
+        "status": "in_progress_source_ci_passed_runtime_blocked",
         "exit": "Authenticated candidate journey passes browser/API/database tests.",
         "currentProgress": [
-          "Candidate application entry/status/session/document journey has been ported to a schema-compatible branch under PR #344.",
-          "Staging edge-function query omits the uninstalled kingsmen_status column and UI fails closed for missing status.",
-          "Authenticated staging journey remains blocked by missing draft table/RPC/helper/event type and absent approved actor/fixture records."
+          "Candidate entry/status/session/document journey merged in PR #344 after all four PR-head workflows passed.",
+          "Schema guard confirms the live candidate-preparation query does not request the uninstalled kingsmen_status column.",
+          "Seven candidate/browser regression paths and disposable PostgreSQL lifecycle contracts passed in CI.",
+          "Live staging candidate journey remains blocked by missing draft table/RPC/helper/event type and absent approved fixture actors."
         ]
       },
       {
@@ -452,20 +453,20 @@
     {
       "number": 342,
       "title": "Add canonical candidate applications entry route",
-      "state": "open",
+      "state": "closed",
       "draft": true,
       "base": "rebuild/kingsmen-one-foundation-2026-11-17",
-      "role": "stale predecessor draft; its current head is three commits behind/diverged from the canonical rebuild; superseded by schema-compatible PR #344 and should be closed after PR #344 CI is verified"
+      "role": "closed as superseded by schema-compatible candidate journey PR #344; the older branch diverged and contained a live query for an uninstalled status column"
     },
     {
       "number": 344,
       "title": "Reconcile candidate application journey with current staging schema",
-      "state": "open",
-      "draft": true,
+      "state": "merged",
+      "draft": false,
       "base": "rebuild/kingsmen-one-foundation-2026-11-17",
-      "headBranch": "feat/candidate-journey-schema-compatible-20261125",
-      "headSha": "a7c922b0534ba4a485e3e95c0d258951d2498d16",
-      "role": "candidate application and document frontend journey with shared session handling; edge query is compatible with current staging schema; status/draft SQL remains a CI-only proposal; PR CI pending"
+      "head": "994df9c4d58858a3f096a6979a2031100462e8df",
+      "mergeCommitSha": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "role": "candidate applications entry, tracker/workbench, status labels, shared session and document UI; schema-compatible edge query; all four PR CI workflows passed; live staging draft runtime still blocked"
     }
   ],
   "updateRules": [
@@ -515,9 +516,17 @@
     {
       "id": "candidate-journey-schema-compatibility",
       "pr": 344,
-      "state": "open-ci-pending",
+      "state": "merged",
       "branch": "feat/candidate-journey-schema-compatible-20261125",
-      "notes": "Ported candidate applications/dashboard/tracker/workbench/document/session UI and CI-only status proposal; removed missing kingsmen_status column from live edge SELECT; added schema compatibility regression guard. No staging/production mutation."
+      "notes": "Schema-compatible candidate application/session/document journey merged; all PR CI, disposable PostgreSQL and browser regression checks passed. No staging/production mutation.",
+      "mergeCommitSha": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "ciResult": "success",
+      "ciRunIds": [
+        45695029317,
+        45695029373,
+        45695029370,
+        45695029333
+      ]
     }
   ],
   "latestVerification": {
@@ -684,44 +693,95 @@
       }
     },
     "candidateApplicationJourneyPR": {
-      "status": "schema_compatible_candidate_journey_pr_ci_pending_not_deployed",
+      "status": "merged_ci_passed_staging_runtime_prerequisites_missing",
       "pullRequest": 344,
-      "branch": "feat/candidate-journey-schema-compatible-20261125",
-      "headSha": "a7c922b0534ba4a485e3e95c0d258951d2498d16",
-      "route": "/candidate/applications",
-      "schemaCompatibilityGuard": "scripts/staging/test-candidate-preparation-schema-compat.mjs",
-      "liveEdgeFunctionQuery": "excludes kingsmen_status until approved migration exists",
-      "sqlStatusContract": "proposal_only_disposable_postgresql_ci",
-      "deploymentAuthorized": false,
-      "stagingMutations": [],
-      "knownRuntimeBlockers": [
-        "candidate_application_draft_answers table missing",
-        "get_candidate_application_draft and save_candidate_application_draft RPCs missing",
-        "kingsmen_security.current_verified_kingsmen_candidate_id helper missing",
-        "APPLICATION_DRAFT_SAVED event type not allowed",
-        "no approved candidate actor/fixture records",
-        "kingsmen_status column absent and historical migration provenance unresolved"
-      ]
+      "validatedHead": "994df9c4d58858a3f096a6979a2031100462e8df",
+      "mergeCommit": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "workflows": [
+        {
+          "name": "Kingsmen CI",
+          "runId": 45695029317,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029317"
+        },
+        {
+          "name": "Kingsmen application draft contract",
+          "runId": 45695029373,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029373"
+        },
+        {
+          "name": "Kingsmen staging RLS API boundary",
+          "runId": 45695029370,
+          "result": "success_offline_live_probe_skipped",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029370"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45695029333,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45695029333"
+        }
+      ],
+      "statusContractAndSchemaGuard": "passed_on_validated_head",
+      "browserChecks": "passed_on_validated_head",
+      "liveStagingResult": "BLOCKED_RUNTIME_PREREQUISITES_MISSING",
+      "stagingOrProductionMutation": false
     },
     "candidateJourneySchemaCompatibility": {
-      "status": "implementation_committed_ci_pending",
+      "status": "merged_ci_passed_live_staging_pending",
       "pullRequest": 344,
       "branch": "feat/candidate-journey-schema-compatible-20261125",
-      "files": [
-        "scripts/staging/test-candidate-preparation-schema-compat.mjs",
-        "supabase/functions/candidate-application-preparation/index.ts",
-        "apps/web/src/lib/candidate-application-status.ts",
-        "apps/web/src/components/candidate/CandidateApplicationTracker.tsx",
-        "apps/web/src/app/candidate/applications/[applicationId]/page.tsx"
+      "validatedHead": "994df9c4d58858a3f096a6979a2031100462e8df",
+      "mergeCommit": "aebd079f8072de96d13f675e065c891d2b0bae88",
+      "tests": {
+        "rootFocusedRepositoryTests": "passed",
+        "candidateStatusContract": "passed",
+        "schemaCompatibilityGuard": "passed",
+        "candidateDocumentSessionContract": "passed",
+        "candidateEntryRouteContract": "passed",
+        "draftSaveResumeIdempotencyConsentIsolation": "passed_in_disposable_postgresql",
+        "statusContractSqlProposal": "passed_in_disposable_postgresql_only",
+        "candidateTrackerDraftResumeBrowser": "passed",
+        "privateDocumentUploadFinalizeDownloadBrowser": "passed",
+        "candidateDraftBrowserSaveResume": "passed",
+        "profileSaveReloadConsentBrowser": "passed",
+        "targetToWorkbenchBrowser": "passed",
+        "freeDestinyMapBrowser": "passed",
+        "n15SourceReviewBrowser": "passed",
+        "apiBuild": "passed",
+        "nextProductionBuild": "passed"
+      },
+      "postMergeWorkflows": [
+        {
+          "name": "Kingsmen CI",
+          "runId": 45695427282,
+          "status": "in_progress"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45695427264,
+          "status": "in_progress"
+        },
+        {
+          "name": "Kingsmen Main Branch Protection Evidence",
+          "runId": 45695427225,
+          "status": "in_progress"
+        }
       ],
-      "checks": [
-        "edge-function query selects only current staging columns",
-        "unknown/missing candidate-facing status remains Status not available",
-        "tracker does not offer draft resume for absent/unknown Kingsmen status",
-        "editor remains read-only unless serverEditable and candidate-facing status both permit editing"
-      ],
-      "liveStagingMutation": false,
-      "migrationPromotionAuthorized": false
+      "liveStaging": {
+        "result": "not_tested",
+        "blockers": [
+          "candidate_application_draft_answers missing",
+          "draft read/save RPCs missing",
+          "verified candidate security helper missing",
+          "APPLICATION_DRAFT_SAVED event type not allowed",
+          "kingsmen_status column absent",
+          "approved actor tokens and fixture records absent",
+          "migration provenance and restore/change-control gates unresolved"
+        ],
+        "schemaOrDataChanges": false
+      }
     }
   },
   "migrationProvenance": {
@@ -790,7 +850,7 @@
   "surfaceStatus": {
     "frontend": {
       "surface": "apps/web — Next.js App Router / React",
-      "status": "CANDIDATE_JOURNEY_SCHEMA_COMPAT_PORTED_CI_PENDING_STAGING_JOURNEY_BLOCKED",
+      "status": "CANDIDATE_JOURNEY_SOURCE_CI_PASSED_STAGING_RUNTIME_BLOCKED",
       "inventory": {
         "routePages": 78,
         "sourceFiles": 332,
@@ -803,13 +863,15 @@
         "PR #326 Free Destiny Map browser-local readiness preview merged; preview does not save or submit selections.",
         "Free Destiny Map readiness-preview browser test passed in application draft contract workflow.",
         "Next.js web build passed in PR #330 CI run 45637295249.",
-        "PR #344 ports candidate application navigation, tracker/workbench/editor, session expiry and document workflow; schema-compatibility guard added, CI pending."
+        "PR #344 ports candidate application navigation, tracker/workbench/editor, session expiry and document workflow; schema-compatibility guard added, CI pending.",
+        "PR #344 merged the schema-compatible candidate application and document journey; all PR CI and browser acceptance tests passed on the validated head."
       ],
       "remaining": [
         "Run current post-security-audit Next.js build to completion.",
         "Prove one full authenticated candidate browser/API/database journey on staging.",
         "Verify route-to-route connectivity and mobile/accessibility acceptance for the critical journey.",
-        "Complete current CI for PR #344 and close stale predecessor PR #342; live application resume/edit remains blocked until approved status/draft schema and runtime security prerequisites are installed."
+        "Complete current CI for PR #344 and close stale predecessor PR #342; live application resume/edit remains blocked until approved status/draft schema and runtime security prerequisites are installed.",
+        "Complete the authorized staging runtime prerequisites and authenticated candidate application end-to-end proof; source/UI tests do not prove live backend functionality."
       ],
       "evidence": {
         "readinessPreviewCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651",
@@ -841,7 +903,8 @@
         "Prove durable state, retries, idempotency, worker lease recovery, backup/restore and payment/communication sandbox paths.",
         "Test anon/Candidate A/Candidate B/operator/founder direct REST/RPC access to candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs; grants are broad at table layer and current RLS predicates need runtime negative proof.",
         "Complete approved staging actor/fixture setup and run the new GET-only RLS API boundary probe; retain release block until live proof passes.",
-        "Keep live candidate-preparation query compatible with the current schema; complete migration provenance, restore rehearsal, identity-helper review and authorized fixture design before any status/draft persistence migration."
+        "Keep live candidate-preparation query compatible with the current schema; complete migration provenance, restore rehearsal, identity-helper review and authorized fixture design before any status/draft persistence migration.",
+        "Complete candidate status/draft persistence only after migration provenance, restore rehearsal, security review and change approval; then provision approved test actors/fixtures and prove the runtime journey."
       ],
       "evidence": {
         "migrationAudit": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
@@ -914,12 +977,14 @@
         "apps/web contains 78 route pages in the recorded inventory",
         "Free Destiny Map browser-local readiness preview merged in PR #326; targeted browser test passed",
         "Next.js production build passed in PR #335 CI run 45640042482",
-        "PR #344 ports the candidate application entry, tracker/workbench, shared session, document and seven-label status UI; schema-aware unavailable status fails closed pending an approved migration. PR checks pending."
+        "PR #344 ports the candidate application entry, tracker/workbench, shared session, document and seven-label status UI; schema-aware unavailable status fails closed pending an approved migration. PR checks pending.",
+        "PR #344 merged candidate application entry/status/tracker/workbench/session/document journey after API + Next production builds, contract tests, disposable PostgreSQL checks and seven browser journeys passed."
       ],
       "missing": [
         "Full authenticated candidate journey through account/profile/documents/application tracker has not passed staging end-to-end",
         "Current rebuild branch is not the recorded Netlify production deployment",
-        "Validate PR #344 candidate UI/status/session changes on current branch CI, then prove end-to-end behavior only after missing staging runtime prerequisites are resolved."
+        "Validate PR #344 candidate UI/status/session changes on current branch CI, then prove end-to-end behavior only after missing staging runtime prerequisites are resolved.",
+        "Staging candidate application resume/edit journey remains blocked until reviewed status/draft schema and runtime security prerequisites are installed and tested."
       ]
     },
     "backendApi": {
@@ -929,12 +994,14 @@
       "currentEvidence": [
         "Separate apps/api package, typed command/state-machine and PostgreSQL Truth Vault foundation exist",
         "API build passed in PR #335 CI run 45640042482",
-        "PR #344 removes absent kingsmen_status from the live candidate-preparation SELECT and adds a schema-compatibility regression guard; the status SQL remains proposal-only."
+        "PR #344 removes absent kingsmen_status from the live candidate-preparation SELECT and adds a schema-compatibility regression guard; the status SQL remains proposal-only.",
+        "PR #344 removes the uninstalled kingsmen_status column from the live candidate-preparation query and adds a passing schema-compatibility guard; status/draft SQL remains proposal-only."
       ],
       "missing": [
         "Prove real PostgreSQL persistence and idempotency on staging",
         "Prove retry/worker lease/DLQ recovery, authorization boundaries and API/UI end-to-end",
-        "Staging draft persistence remains blocked by missing table/RPC/security helper/event type and unavailable approved fixtures; do not promote migrations until provenance/restore/security/change control pass."
+        "Staging draft persistence remains blocked by missing table/RPC/security helper/event type and unavailable approved fixtures; do not promote migrations until provenance/restore/security/change control pass.",
+        "Candidate draft runtime still lacks the draft-answer table, get/save RPCs, verified-candidate security helper and allowed APPLICATION_DRAFT_SAVED event; no approved actor/fixture dataset."
       ]
     },
     "databaseSecurity": {
@@ -946,7 +1013,8 @@
         "Read-only migration lineage audit: 130 migration ledger records; 63 lack source-name candidates across eight branches; exact applied SQL body/deployment lineage remains unresolved",
         "Six SECURITY DEFINER bodies match selected historical source candidates; anon/PUBLIC execution denied; 17 no-policy tables deny direct anon/authenticated privileges",
         "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed",
-        "PR #343 merged at 4adb15d963363202cdc6e81715f25dcc3f163857; the GET-only staging RLS API probe, 65-check offline contract, Kingsmen CI, candidate application/PostgreSQL browser contract and Jarvis Live Runtime all passed on PR head 194bc01f442fdc18114314078c6e2f3d19f39bb5. This is source/CI proof only, not live staging role-isolation evidence."
+        "PR #343 merged at 4adb15d963363202cdc6e81715f25dcc3f163857; the GET-only staging RLS API probe, 65-check offline contract, Kingsmen CI, candidate application/PostgreSQL browser contract and Jarvis Live Runtime all passed on PR head 194bc01f442fdc18114314078c6e2f3d19f39bb5. This is source/CI proof only, not live staging role-isolation evidence.",
+        "PR #344 merged at aebd079f8072de96d13f675e065c891d2b0bae88 after all four PR-head CI workflows passed; status-contract, schema-compat guard, isolated PostgreSQL and seven browser checks passed. These are source/CI proofs only; live candidate runtime and RLS actor isolation remain untested."
       ],
       "missing": [
         "Authenticated Candidate A/B, operator and founder runtime isolation tests",
