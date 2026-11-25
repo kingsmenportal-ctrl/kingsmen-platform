@@ -146,6 +146,8 @@ try {
   await page.goto(baseUrl + "/candidate/applications", { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Application tracker" }).waitFor();
   await page.getByText("CI-APPLICATION-001", { exact: false }).waitFor();
+  await page.getByRole("heading", { name: "Next step: continue your draft" }).waitFor();
+  await page.getByText("Draft editing is available only when the server confirms that this record is editable.", { exact: false }).waitFor();
   assert.ok(fixtureRequests.some(item =>
     item.url.endsWith("/functions/v1/candidate-application-preparation")
       && item.method === "POST" && item.body.action === "load"),
