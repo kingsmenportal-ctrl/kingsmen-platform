@@ -25,6 +25,12 @@ on:
       - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
       - scripts/staging/test-n15-source-review-postgres.sql
       - scripts/staging/test-n15-source-review-ui.mjs
+      - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+      - scripts/validators/validate-free-destiny-map-preview.mjs
+      - package.json
+      - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+      - scripts/validators/validate-free-destiny-map-preview.mjs
+      - package.json
       - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-profile-ui.mjs
       - scripts/staging/test-candidate-workbench-ui.mjs
@@ -75,6 +81,8 @@ jobs:
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
       - name: Validate N15 source-review security contract
         run: node scripts/validators/validate-n15-source-review-decision.mjs
+      - name: Validate Free Destiny Map browser-local readiness preview
+        run: node scripts/validators/validate-free-destiny-map-preview.mjs
       - name: Locate disposable PostgreSQL service container
         shell: bash
         run: |
