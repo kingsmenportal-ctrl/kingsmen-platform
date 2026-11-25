@@ -23,8 +23,8 @@
       "database/migrations",
       "supabase/migrations"
     ],
-    "inventoryTreeSha": "58306af161766d597f5cf90dbcd0cad30b6c9759",
-    "inventoryCapturedOn": "2026-11-25"
+    "inventoryCapturedOn": "2026-11-25",
+    "inventoryCapturedAtCommit": "58306af161766d597f5cf90dbcd0cad30b6c9759"
   },
   "infrastructure": {
     "stagingProvider": "Supabase",
@@ -299,9 +299,9 @@
         "status": "in_progress",
         "exit": "Clean CI on the intended rebuild branch and release branch protection confirmed.",
         "currentProgress": [
-          "Status and completion register, README reference, mandatory reporting contract and validators are merged into the rebuild lane.",
-          "Free Destiny Map readiness preview is merged and its focused browser test passed.",
-          "Read-only GitHub ruleset inspection confirmed an active main-branch ruleset, but found gaps versus the stricter project protection manifest; governance gate remains partial."
+          "Status register and mandatory frontend/backend reporting contract are implemented in README/CLAUDE and checked in CI.",
+          "Free Destiny Map readiness preview is merged; its targeted browser test passed.",
+          "An active main branch ruleset is verified; strict protection policy still has documented gaps vs the project's approved protection manifest."
         ]
       },
       {
@@ -314,10 +314,10 @@
         "status": "in_progress_read_only_audit",
         "exit": "Migration map approved and RLS/authenticated role tests pass.",
         "currentProgress": [
-          "Eight-branch migration provenance snapshot captured: 67/130 ledger rows have filename-based candidates; 63 have none among branches searched; exact SQL deployment lineage is not yet proven.",
-          "Live security advisor details captured and validated: all six flagged function bodies match candidate historical source; no anon/PUBLIC execute; all 17 RLS/no-policy tables deny direct anon/authenticated table grants.",
-          "No live staging schema/data/policies/function privileges/Auth settings/indexes were changed.",
-          "Candidate A/B/operator/founder end-to-end isolation tests remain open."
+          "Eight-branch migration provenance snapshot captured; 67/130 ledger rows have filename candidates, 63 do not; exact SQL body/deployment lineage is not proven.",
+          "Live security checks confirm all six flagged SECURITY DEFINER function bodies match candidate historical source bodies; anon/PUBLIC execution is denied.",
+          "All 17 RLS/no-policy tables deny direct anon/authenticated SELECT/INSERT/UPDATE/DELETE; authenticated Candidate A/B/operator/founder role-level E2E tests remain open.",
+          "No staging schema, data, policies, function privileges, Auth settings or indexes were modified."
         ]
       },
       {
@@ -460,34 +460,29 @@
   ],
   "latestVerification": {
     "statusDate": "2026-11-25",
+    "lastKnownPassingIntegratedCi": {
+      "runId": 45639316939,
+      "result": "success",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45639316939",
+      "commit": "af25ba4ecf94fde40739332d7c15a24092874974",
+      "checksPassed": [
+        "focused repository tests",
+        "Kingsmen status-register contract",
+        "migration-provenance contract",
+        "security-advisor contract",
+        "API build",
+        "Next.js web build"
+      ]
+    },
     "statusRegisterCi": {
-      "runId": 45634438774,
+      "runId": 45639316939,
       "result": "success",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634438774"
-    },
-    "readinessPreviewCi": {
-      "runId": 45634488651,
-      "result": "success",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651"
-    },
-    "postMergeBuild": {
-      "runId": 45635347893,
-      "status": "queued",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45635347893"
-    },
-    "releaseProtectionCheck": {
-      "runId": 45638646955,
-      "workflowResult": "failure",
-      "classicEndpointHttpStatus": 404,
-      "observedRulesetId": 26323884,
-      "observedRulesetName": "main-branch-protection",
-      "observedRulesetEnforcement": "active",
-      "result": "partial_ruleset_active_spec_gaps",
-      "reason": "Protection is implemented via an active repository ruleset, but the classic endpoint verifier reports 404. The observed ruleset does not yet satisfy all stricter controls listed in the repo's protection manifest."
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45639316939",
+      "commit": "af25ba4ecf94fde40739332d7c15a24092874974"
     },
     "migrationProvenance": {
       "status": "historical_sweep_captured_validator_passed",
-      "ciRunId": 45638646994,
+      "ciRunId": 45639316939,
       "currentBranchTrackedSourceFiles": 41,
       "historicalBranchesScanned": 8,
       "historicalNameCandidates": 67,
@@ -497,7 +492,7 @@
     },
     "securityAdvisorAudit": {
       "status": "live_acl_and_body_checks_captured_validator_passed",
-      "ciRunId": 45638646994,
+      "ciRunId": 45639316939,
       "securityAdvisorAuditPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
       "counts": {
         "publicTables": 230,
@@ -512,23 +507,12 @@
       "anonOrPublicCanExecuteFlaggedFunction": 0,
       "noPolicyTablesWithDirectAnonOrAuthenticatedGrant": 0
     },
-    "lastKnownPassingIntegratedCi": {
-      "runId": 45637295249,
-      "result": "success",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249",
-      "commit": "84978bb62981ef41997b1fd23aed47a3cce0de26"
-    },
-    "latestPostAuditCi": {
-      "runId": 45638710300,
-      "status": "pending",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638710300",
-      "commit": "58306af161766d597f5cf90dbcd0cad30b6c9759"
-    },
-    "latestSecurityValidatorRun": {
-      "runId": 45638646994,
-      "result": "passed",
-      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638646994",
-      "commit": "f410c11daac91cc74af7babe2619b0f6460d3228"
+    "releaseProtectionCheck": {
+      "runId": 45639317054,
+      "workflowResult": "failure_classic_endpoint_returns_404",
+      "rulesetId": 26323884,
+      "result": "partial_ruleset_active_spec_gaps",
+      "reason": "Active ruleset is verified through the rulesets API; the project manifest asks for additional status checks and review/history requirements not yet present in the observed ruleset."
     }
   },
   "migrationProvenance": {
