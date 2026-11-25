@@ -68,7 +68,7 @@ assert.match(page, /isCandidateEditableApplicationStatus\(application\.kingsmen_
 assert.doesNotMatch(page, /status:\s*"DRAFT"/,
   "A draft save in the client must not rewrite the internal workflow state.");
 const applicationSelect = service.match(
-  /admin\\.from\\(["']candidate_applications["']\\)\\s*\\.select\\(["']([^"']+)["']\\)/
+  /admin\.from\(["']candidate_applications["']\)\s*\.select\(["']([^"']+)["']\)/
 );
 assert.ok(applicationSelect, "Candidate preparation must keep an explicit application column list.");
 const selectedApplicationColumns = applicationSelect[1].split(",").map(column => column.trim());
