@@ -68,9 +68,9 @@ function makeCases(ids) {
     row("workflow_runs:candidate_a_run", "workflow_runs", "id", ids.workflowAId, candidateSessionsAllowed("candidateA")),
     row("workflow_runs:candidate_b_run", "workflow_runs", "id", ids.workflowBId, candidateSessionsAllowed("candidateB")),
 
-    row("route_sources:verified_a_band", "route_sources", "id", ids.routeSourceVerifiedId, ACTOR_NAMES),
-    row("route_sources:unverified_hidden", "route_sources", "id", ids.routeSourceUnverifiedId, operatorAndFounder),
-    row("route_sources:low_confidence_hidden", "route_sources", "id", ids.routeSourceLowConfidenceId, operatorAndFounder)
+    row("route_sources:verified_a_band", "route_sources", "id", ids.routeSourceVerifiedId, ACTOR_NAMES, { status: "eq.VERIFIED", confidence_band: "eq.A" }),
+    row("route_sources:unverified_hidden", "route_sources", "id", ids.routeSourceUnverifiedId, operatorAndFounder, { status: "eq.DRAFT", confidence_band: "eq.A" }),
+    row("route_sources:low_confidence_hidden", "route_sources", "id", ids.routeSourceLowConfidenceId, operatorAndFounder, { status: "eq.VERIFIED", confidence_band: "eq.C" })
   ];
 }
 
