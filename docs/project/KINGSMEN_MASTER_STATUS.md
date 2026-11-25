@@ -49,7 +49,7 @@ The GitHub repository is accessible. The default branch at the start of this bat
 **Branch:** `feat/free-destiny-map-interactive-preview-20261125`  
 **Pull request:** [#340](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/340)  
 **Base branch:** `main`  
-**Current branch head when recorded:** `d7d6423256aea5ad664213529549fb8cff486bf1`
+**Workflow commit:** `d7d6423256aea5ad664213529549fb8cff486bf1`
 
 Implemented in the branch:
 
