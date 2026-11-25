@@ -57,7 +57,30 @@ try {
   assert.deepEqual(storageAfter, storageBefore, "Preview must not persist data in localStorage or sessionStorage.");
   assert.deepEqual(nonGetAppRequests, [], "Preview must not submit selections to an application endpoint.");
 
-  console.log("Free Destiny Map browser E2E passed: page loaded, university and funding previews rendered, selections reflected, data not transmitted, and browser storage unchanged.");
+  // Smoke-test candidate navigation so visible dashboard links do not point to broken routes.
+  const origin = new URL(baseUrl).origin;
+  const dashboardResponse = await page.goto(new URL("/candidate/dashboard", origin).toString(), { waitUntil: "networkidle" });
+  assert.equal(dashboardResponse?.status(), 200, "Candidate dashboard should return HTTP 200.");
+  assert.equal(await page.getByRole("heading", { name: "Your opportunity command centre" }).count(), 1);
+  for (const pathway of ["Higher Education", "TVET", "SETA programmes & learnerships", "Internships", "Apprenticeships", "Employment"]) {
+    const card = page.locator("article[data-gate]").filter({ has: page.getByRole("heading", { name: pathway }) });
+    assert.equal(await card.count(), 1, "Candidate dashboard should display the " + pathway + " pathway.");
+  }
+
+  const workspaceRoutes = [
+    "/candidate/workbench",
+    "/candidate/opportunity-matches",
+    "/candidate/saved-opportunities",
+    "/candidate/documents",
+    "/personal-job-desk/application-tracker"
+  ];
+  for (const route of workspaceRoutes) {
+    assert.equal(await page.locator("a[href=\"" + route + "\"]").count(), 1, "Dashboard should expose one navigation link to " + route + ".");
+    const response = await page.request.get(new URL(route, origin).toString());
+    assert.equal(response.status(), 200, "Dashboard destination " + route + " should return HTTP 200.");
+  }
+
+  console.log("Kingsmen browser E2E passed: local-only previews, unchanged storage/no writes, six dashboard pathways, and five workspace destinations returning HTTP 200.");
 } finally {
   await browser.close();
 }
