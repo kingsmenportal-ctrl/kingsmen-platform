@@ -17,6 +17,10 @@ on:
       - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
+      - apps/web/src/components/candidate/CandidateAuthForm.tsx
+      - apps/web/src/components/candidate/CandidateSessionControl.tsx
+      - apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx
+      - apps/web/src/components/candidate/CandidateMasterProfileForm.tsx
       - scripts/staging/test-candidate-document-session-contract.mjs
       - apps/web/src/app/candidate/documents/page.tsx
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
@@ -66,6 +70,10 @@ on:
       - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
+      - apps/web/src/components/candidate/CandidateAuthForm.tsx
+      - apps/web/src/components/candidate/CandidateSessionControl.tsx
+      - apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx
+      - apps/web/src/components/candidate/CandidateMasterProfileForm.tsx
       - scripts/staging/test-candidate-document-session-contract.mjs
       - apps/web/src/app/candidate/documents/page.tsx
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
