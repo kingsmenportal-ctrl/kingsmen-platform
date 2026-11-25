@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evaluateMainBranchProtection } from './main-branch-protection-policy.mjs';
+import { evaluateMainBranchProtection, protectionActiveFromEvidence } from './main-branch-protection-policy.mjs';
 
 function completeProtection() {
   return {
@@ -162,6 +162,18 @@ assert.equal(observed.checks.conversationResolutionRequired, false);
 assert.equal(observed.checks.linearHistoryRequired, false);
 assert.equal(observed.checks.adminEnforcementEnabled, false);
 
+
+assert.equal(protectionActiveFromEvidence(complete.checks, 200, 'classic_branch_protection'), true,
+  'verified classic protection object should be considered active');
+assert.equal(protectionActiveFromEvidence(completeRulesetResult.checks, 200, 'repository_rulesets'), true,
+  'active ruleset applying to main should be considered active');
+assert.equal(protectionActiveFromEvidence(observed.checks, 200, 'repository_rulesets'), true,
+  'an active but incomplete ruleset is active but does not pass the policy gate');
+assert.equal(protectionActiveFromEvidence({ failure: 'no visible ruleset' }, 200, 'repository_rulesets'), false,
+  'HTTP 200 from an empty ruleset list must not imply active protection');
+assert.equal(protectionActiveFromEvidence({ rulesetActiveForMain: false }, 200, 'repository_rulesets'), false);
+assert.equal(protectionActiveFromEvidence(complete.checks, 404, 'classic_branch_protection'), false);
+
 const unavailable = evaluateMainBranchProtection(null);
 assert.equal(unavailable.passed, false, 'missing protection response must block');
 console.log(JSON.stringify({
@@ -171,5 +183,6 @@ console.log(JSON.stringify({
   rulesetConfigurationPassed: true,
   rulesetNegativeCases: rulesetFailures.length,
   observedActiveButIncompleteRulesetDetected: true,
+  protectionActiveEvidenceCasesPassed: true,
   unavailableResponseBlocked: true
 }, null, 2));
