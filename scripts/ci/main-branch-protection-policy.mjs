@@ -108,3 +108,18 @@ export function evaluateMainBranchProtection(protection) {
   }
   return evaluateClassicProtection(protection);
 }
+
+
+/**
+ * Derive active protection only from an observed protection object.
+ * A successful ruleset-list request alone is not proof a ruleset applies to main.
+ */
+export function protectionActiveFromEvidence(checks, httpStatus, verificationEndpoint) {
+  if (verificationEndpoint === 'repository_rulesets' || verificationEndpoint === 'repository_ruleset') {
+    return checks?.rulesetActiveForMain === true;
+  }
+  if (verificationEndpoint === 'classic_branch_protection') {
+    return httpStatus === 200 && checks?.protectionSource === 'classic_branch_protection';
+  }
+  return false;
+}
