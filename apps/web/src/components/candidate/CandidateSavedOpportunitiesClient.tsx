@@ -134,7 +134,7 @@ export default function CandidateSavedOpportunitiesClient() {
       <div className="public-notice"><span aria-hidden="true" /> SAVED OPPORTUNITIES · Authenticated records with row-level security</div>
       <header className="public-header"><div className="public-container public-header-inner">
         <a className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></a>
-        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/profile/">Profile</a><a href="/candidate/opportunity-matches/">Opportunities ↗</a><a href="/candidate/workbench/">Workbench</a></nav>
+        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/applications">Applications</a><a href="/candidate/profile/">Profile</a><a href="/candidate/opportunity-matches/">Opportunities ↗</a><a href="/candidate/workbench/">Workbench</a></nav>
       </div></header>
       <div className="public-container candidate-page-body">
         <header className="candidate-page-heading"><div><div className="public-eyebrow"><span /> YOUR SHORTLIST</div><h1>Saved opportunities <em>and next steps.</em></h1><p>Saved records belong to the authenticated candidate workspace. Saving a verified match prepares a parent application draft; it does not submit an application to the provider.</p></div><span className="candidate-preview-chip">{loading ? "LOADING" : identityStatus === "VERIFIED" ? "IDENTITY VERIFIED" : "REVIEW REQUIRED"}</span></header>
