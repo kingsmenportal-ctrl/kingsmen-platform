@@ -24,7 +24,11 @@ async function finish(status, checks, httpStatus = null, extra = {}) {
     repository: repository ?? null,
     branch,
     checkedAt,
-    protectionActive: checks?.rulesetActiveForMain === true || httpStatus === 200,
+    protectionActive: checks?.protectionSource === 'repository_ruleset' || typeof checks?.rulesetActiveForMain === 'boolean'
+      ? checks?.rulesetActiveForMain === true
+      : (extra.verificationEndpoint === 'repository_rulesets' || extra.verificationEndpoint === 'repository_rulesets_detail')
+        ? false
+        : httpStatus === 200,
     httpStatus,
     verificationEndpoint: extra.verificationEndpoint ?? null,
     checks,
@@ -138,8 +142,14 @@ if (classicResponse.ok) {
   }
 
   const rulesets = await rulesetsResponse.json();
-  const candidates = Array.isArray(rulesets) ? rulesets.filter(rulesetAppliesToMain) : [];
-  const preferred = candidates.find((ruleset) => ruleset.name === 'main-branch-protection') ?? candidates[0];
+  const listedRulesets = Array.isArray(rulesets) ? rulesets : [];
+  // The list endpoint may omit conditions and rule definitions, so locate the known
+  // ruleset by name here and verify its target/enforcement using the detail endpoint below.
+  const namedCandidates = listedRulesets.filter((ruleset) => ruleset?.name === 'main-branch-protection');
+  const candidates = listedRulesets.filter(rulesetAppliesToMain);
+  const preferred = namedCandidates.find((ruleset) => ruleset?.target === 'branch' && ruleset?.enforcement !== 'disabled')
+    ?? namedCandidates[0]
+    ?? candidates[0];
 
   if (!preferred) {
     const report = await finish(
@@ -186,6 +196,22 @@ if (classicResponse.ok) {
   }
 
   const detailedRuleset = await detailResponse.json();
+  if (!rulesetAppliesToMain(detailedRuleset)) {
+    const report = await finish(
+      'BLOCKED_RULESET_NOT_FOUND_OR_NOT_VISIBLE',
+      { ...blockedChecks('The selected ruleset detail does not confirm active enforcement on refs/heads/main.'), rulesetActiveForMain: false },
+      detailResponse.status,
+      {
+        verificationEndpoint: 'repository_rulesets_detail',
+        classicEndpointStatus: classicResponse.status,
+        rulesetId: detailedRuleset.id ?? preferred.id ?? null,
+        rulesetName: detailedRuleset.name ?? preferred.name ?? null,
+        applicableActiveRulesetCount: candidates.length
+      }
+    );
+    console.log(JSON.stringify(report, null, 2));
+    process.exit(1);
+  }
   const evaluation = evaluateMainBranchProtection(detailedRuleset);
   const report = await finish(
     evaluation.passed ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE' : 'BLOCKED_PROTECTION_INCOMPLETE',
