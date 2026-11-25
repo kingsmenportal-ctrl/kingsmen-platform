@@ -28,6 +28,7 @@ on:
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
       - scripts/staging/test-candidate-draft-runtime-preflight.mjs
+      - scripts/staging/test-candidate-application-draft-api-boundary.mjs
       - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
       - supabase/functions/candidate-application-preparation/index.ts
       - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
@@ -86,6 +87,7 @@ on:
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
       - scripts/staging/test-candidate-draft-runtime-preflight.mjs
+      - scripts/staging/test-candidate-application-draft-api-boundary.mjs
       - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
       - supabase/functions/candidate-application-preparation/index.ts
       - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
@@ -220,6 +222,9 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < scripts/staging/test-n15-source-review-postgres.sql
       - name: Build Next.js application with CI-only Supabase config
         run: npm --prefix apps/web run build
+      - name: Test candidate draft API authentication and input boundary
+        timeout-minutes: 3
+        run: npm run candidate:draft:api:test
       - name: Install Chromium for browser smoke tests
         run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test application tracker and saved draft resume journey

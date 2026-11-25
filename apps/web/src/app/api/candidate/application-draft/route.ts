@@ -98,6 +98,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (!/^Bearer\s+\S+$/i.test(request.headers.get("authorization") ?? "")) {
+    return respond({ ready: false, code: "AUTHENTICATION_REQUIRED", error: "Sign in to open or save an application draft." }, 401);
+  }
+
   let incoming: Record<string, unknown>;
   try {
     incoming = await readLimitedJson(request, BODY_LIMIT) as Record<string, unknown>;
