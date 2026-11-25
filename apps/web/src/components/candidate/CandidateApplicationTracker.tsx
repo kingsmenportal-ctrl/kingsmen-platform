@@ -244,7 +244,13 @@ export default function CandidateApplicationTracker() {
                           Saves application-specific answers separately from your reusable profile. Opening this draft does not submit it to a provider.
                         </p>
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3" role="status">
+                        <p className="text-sm font-semibold text-amber-950">Draft editing is not available for this record yet.</p>
+                        <p className="mt-1 text-sm leading-6 text-amber-900">Kingsmen only enables draft actions when the server confirms an approved, editable application status. A missing or unrecognised status will not be guessed from internal workflow codes.</p>
+                        <Link href="/candidate/workbench" className="mt-2 inline-flex min-h-9 items-center rounded-md border border-amber-300 px-3 py-1.5 text-sm font-semibold text-amber-950 hover:bg-amber-100">Continue in workbench</Link>
+                      </div>
+                    )}
                     <div className="mt-5 border-t border-slate-100 pt-4">
                       <h4 className="text-sm font-bold">Recorded application events</h4>
                       {events.length ? (
