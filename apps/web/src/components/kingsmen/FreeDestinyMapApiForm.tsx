@@ -34,6 +34,7 @@ type LocalReadinessPreview = {
   title: string;
   summary: string;
   region: string;
+  routes: string[];
   steps: string[];
 };
 
@@ -176,12 +177,17 @@ function buildLocalReadinessPreview(form: HTMLFormElement): LocalReadinessPrevie
     .filter((step, index, all) => all.indexOf(step) === index)
     .slice(0, 6);
   const first = guidance[0];
+  const displayedRoutes = [...selected];
+  if (needsFunding && !displayedRoutes.includes("nsfas_bursary")) displayedRoutes.push("nsfas_bursary");
+  if (needsCv && !displayedRoutes.includes("cv_revamp")) displayedRoutes.push("cv_revamp");
+  if (needsAccommodation && !displayedRoutes.includes("accommodation")) displayedRoutes.push("accommodation");
   return {
     title: selected.length > 1 ? "Your combined readiness path" : first.title,
     summary: selected.length > 1
       ? "Use these route-specific checks as a starting point. Verify each opportunity with its official provider."
       : first.summary,
     region: String(values.get("province") ?? "").trim(),
+    routes: Array.from(new Set(displayedRoutes)).map((route) => localReadinessGuidance[route].title),
     steps
   };
 }
@@ -366,6 +372,11 @@ export function FreeDestinyMapApiForm() {
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800">Local preview · not a verified live match</p>
               <h3 id="kingsmen-readiness-preview-title" className="mt-2 text-xl font-extrabold text-slate-950">{preview.title}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-700">{preview.summary}</p>
+              <div data-kingsmen-readiness-preview-routes="true" className="mt-3 flex flex-wrap gap-2">
+                {preview.routes.map((route) => (
+                  <span key={route} className="rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-bold text-slate-700">{route}</span>
+                ))}
+              </div>
               {preview.region ? <p className="mt-2 text-xs font-semibold text-slate-600">Province selected: {preview.region}</p> : null}
             </div>
             <ol data-kingsmen-readiness-preview-steps="true" className="grid list-decimal gap-2.5 pl-5 text-sm leading-6 text-slate-800">
