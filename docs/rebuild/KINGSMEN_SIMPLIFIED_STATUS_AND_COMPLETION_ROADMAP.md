@@ -3,9 +3,17 @@
 **Status date:** 25 November 2026  
 **Canonical repository:** kingsmenportal-ctrl/kingsmen-platform  
 **Implementation branch:** rebuild/kingsmen-one-foundation-2026-11-17  
-**Overall state:** **REBUILD IN PROGRESS — PUBLIC LAUNCH BLOCKED**
+**Overall state:** **REBUILD IN PROGRESS — PUBLIC LAUNCH BLOCKED**  
+**Active phase:** **Phase 1 — Repository and architecture consolidation (in progress)**
 
 This is the current, evidence-based project status register. It supersedes older summaries when current repository, staging or release-manifest evidence disagrees with an old chat or report. Read this file before beginning Kingsmen work and update it when a meaningful batch lands.
+
+### Latest completed work
+
+- **Status and roadmap register merged:** PR [#327](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/327), merge commit `fbd8420d14ba6ee87174c77de7de58d213254f8c`. The status validator, top-of-README reference, mandatory CLAUDE handoff instructions, and CI status-check step are now on the rebuild branch.
+- **Free Destiny Map readiness preview merged:** PR [#326](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/326), merge commit `189b61a74a8c8bf2dace85203954fd5969e66629`. The preview is browser-local, separate from the existing consent-gated submit action, and tested not to call the intake API or save selections.
+- **Verified pre-merge checks:** [PR #327 Kingsmen CI](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634438774) passed focused tests, status validation, API build and web build. [PR #326 application contract workflow](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651) passed PostgreSQL/UI contract coverage, the Free Destiny Map preview browser test and the N15 source-review browser test.
+- **Post-merge validation:** rebuild-branch CI is running again after the two merges. The separate main-branch-protection evidence job continues to fail to verify protection (HTTP 404); this remains a release blocker.
 
 ## 1. Executive status
 
@@ -77,9 +85,11 @@ The live site is a preview of a previous deployment; it must not be mistaken for
 
 ### Existing pull-request position
 
-- **PR #326 — Add browser-local readiness preview to Free Destiny Map intake:** open, draft, and correctly targets the rebuild branch. It is an isolated UI improvement; it does not make the full platform production-ready.
-- **PR #324 — Canonical candidate application status contract:** open, draft, targets the rebuild branch.
-- **PR #323 — Read-only staging preflight for candidate application runtime:** open, draft, targets the rebuild branch.
+- **PR #327 — Authoritative status and completion roadmap:** merged into the rebuild branch.
+- **PR #326 — Browser-local Free Destiny Map readiness preview:** merged into the rebuild branch after its browser/PostgreSQL contract workflow passed.
+- **PR #324 — Canonical candidate application status contract:** still open and draft, targets the rebuild branch.
+- **PR #323 — Read-only staging preflight for candidate application runtime:** still open and draft, targets the rebuild branch.
+- **PR #319 — Kingsmen One foundation and recovered candidate product slice:** the broader draft rebuild integration PR targeting main; still blocked pending release/security evidence.
 - **PR #316 — Frontend product slice:** open against main; reuse source selectively, do not merge wholesale.
 - **PR #209 — Backend simplification baseline:** open against main; use for architecture/code review, not wholesale merge.
 - **PR #292 — Application draft persistence:** stacked on another feature branch; reconcile dependencies before any transplant.
