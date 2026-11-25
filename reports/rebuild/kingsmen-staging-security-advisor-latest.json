@@ -1,0 +1,26 @@
+{
+  "schema": "kingsmen.staging-security-advisor-audit.v1",
+  "capturedOn": "2026-11-25",
+  "status": "REMEDIATION_REVIEW_REQUIRED",
+  "snapshotPath": "manifests/rebuild/kingsmen-staging-security-advisor-2026-11-25.json",
+  "summary": {
+    "publicTables": 230,
+    "publicTablesWithRlsEnabled": 230,
+    "rlsEnabledNoPolicy": 17,
+    "authenticatedCallableSecurityDefinerFunctions": 6,
+    "multiplePermissivePolicies": 16,
+    "leakedPasswordProtectionWarning": 1,
+    "unusedIndexes": 282
+  },
+  "releaseImpact": "P0 — these live advisor findings must be reviewed and role-tested before public candidate records or live payments are enabled.",
+  "safety": {
+    "readOnly": true,
+    "schemaChanged": false,
+    "dataChanged": false,
+    "policiesChanged": false,
+    "functionsChanged": false,
+    "authSettingsChanged": false,
+    "releaseGateOpened": false
+  },
+  "nextAction": "Inspect the six SECURITY DEFINER functions' bodies, search_path, candidate ownership checks, argument validation and EXECUTE grants. Do not revoke/alter until callers and intended backend-only functions are mapped."
+}
