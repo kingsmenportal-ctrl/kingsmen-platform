@@ -39,7 +39,7 @@ The GitHub repository is accessible. The default branch at the start of this bat
 | Jarvis / AI | Command contracts, policy gate, tool registry and evidence-ledger foundations exist | Source verified; end-to-end capability unverified | Verify allowed SAFE_READ operations, backend authority, approvals and evidence recording |
 | Automation | Workflow APIs and worker/heartbeat/DLQ foundations exist | Runtime unverified | Prove worker runs, retries, idempotency and failure recovery |
 | Infrastructure / Netlify | A connected Netlify project named `kingsmen-jarvis-command-zungu` was found; its last listed ready production deploy is dated 8 July 2026 | Connection found; Kingsmen public-portal mapping unconfirmed | Confirm the intended production site, repository/build settings, current deployed commit and preview deployment |
-| CI / tests | Validators and an extensive root test command exist; this batch adds a focused preview test and a dedicated GitHub Actions workflow | Test source verified; execution unverified | Observe actual workflow result and fix failures before merge |
+| CI / tests | Existing Kingsmen CI plus new focused preview workflow | Root regression tests, API/web build, and focused browser E2E passed on PR #340; `npm ci` for apps/web still fails on a missing Netlify plugin lock entry while canonical `npm install` passes | Clean up strict lockfile mismatch; retain regression and browser checks |
 | Privacy, legal and launch controls | Launch-readiness document defines required evidence gates | Launch blocked | Complete legal review/publication and the required redacted staging evidence |
 
 ## Batch log
@@ -49,7 +49,9 @@ The GitHub repository is accessible. The default branch at the start of this bat
 **Branch:** `feat/free-destiny-map-interactive-preview-20261125`  
 **Pull request:** [#340](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/340)  
 **Base branch:** `main`  
-**Workflow commit:** `d7d6423256aea5ad664213529549fb8cff486bf1`
+**Validated PR head:** `b9d5b3f4af1660c6bcf7b21fc3762dc4df97fd55`  
+**Focused workflow:** [Run #17 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45646132498)  
+**Kingsmen CI:** [Run #640 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45646133193)
 
 Implemented in the branch:
 
@@ -61,7 +63,11 @@ Implemented in the branch:
 
 **Data boundary:** This preview only reads the current form values in the page and renders recommendations. It makes no backend request and does not write to localStorage or sessionStorage. It does not create a candidate profile, save an application, or claim that a real opportunity is open.
 
-**Validation actually performed:** The source-level structural check passed 16 of 16 checks. The actual GitHub Actions root regression suite passed, including the new source-level Free Destiny Map test. The repository's separate `Kingsmen CI` completed successfully with API and Next.js builds. The focused workflow's web install then passed using the canonical `npm install` command, but Chromium installation failed because the runner was Ubuntu 26.04, unsupported by Playwright 1.60. The browser job is now pinned to Ubuntu 24.04. The latest focused run passed the root suite, web dependency installation, Chromium setup and Next.js production build. The Playwright browser test opened the page and completed the university preview; it then failed because the test expected the phrase `official funder` while the actual funding guidance says `funder's own site`. The test assertion has been corrected to match the product guidance. The next run must pass both route previews and the no-transmission/storage checks before the feature can be called runtime-verified.
+**Validation actually performed:** The source-level structural inspection passed 16/16 checks. The actual root `npm test` suite passed, including `test-free-destiny-map-local-preview.mjs`. Existing Kingsmen CI run #640 passed the focused repository tests, API build, web dependency install, and Next.js build. Focused preview workflow run #17 passed all steps: root regression suite, web dependency installation, Playwright Chromium setup, Next.js production build, and browser E2E. The real browser test loaded `/free-destiny-map/`, generated the university preview, changed the route to funding, generated funding-specific guidance, confirmed the local-only notice, and confirmed there were no app write requests or browser-storage changes. Two earlier failures were diagnosed and corrected: the focused workflow first used `npm ci` despite the missing `@netlify/plugin-nextjs@5.16.9` lock entry, then was aligned with the repository's existing `npm install` command; Playwright 1.60 did not support the Ubuntu 26.04 `ubuntu-latest` image, so the browser job was pinned to Ubuntu 24.04. An intermediate E2E assertion expected wording not used by the UI; it was corrected to match the actual guidance. **The tested feature now has a passing browser E2E and production build.** Strict `npm ci` still fails for `apps/web` due the tracked lockfile mismatch; this cleanup remains open and is not concealed by the passing canonical `npm install` path.
+
+## Additional repository protection finding
+
+The read-only `Kingsmen Main Branch Protection Evidence` workflow #3467 failed on this PR head. Its generated report returned HTTP 404 and status `BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE`; captured flags reported `protectionActive: false`, required status checks disabled/not verified, and no required source-guard/release-evidence checks. The run only observed and captured state; it did not change repository settings. Treat `main` branch protection as a P0 gate requiring owner/admin remediation and a new read-only verification.
 
 ## Public launch blockers
 
@@ -84,11 +90,11 @@ The official launch gate remains the authoritative list; this status record does
 
 ## Next implementation sequence
 
-1. Observe the focused GitHub Actions run for PR #340; repair any test or build defects with a new commit.
-2. Merge the feature only after the focused regression and web build are verified. Do not deploy it directly to production as a substitute for testing.
-3. Confirm which Netlify site is the actual public candidate portal, and verify the deploy is tied to the intended repository and branch.
-4. Complete the privacy/legal publication and safe backend/database staging prerequisites before turning any candidate intake into a real data-collection flow.
-5. Continue through the P0 launch gates and candidate journeys, updating this record with evidence rather than estimates.
+1. PR #340's local-preview feature passed tests/build/browser E2E; keep it unmerged until the normal repository review and merge requirements are satisfied.
+2. Resolve `main` branch protection: run #3467 could not verify active protection (HTTP 404/not found or not visible); inspect repository settings with admin authority, apply the checked-in script only after confirming its exact scope, and rerun the read-only evidence workflow.
+3. Repair the tracked `apps/web/package-lock.json` so a clean `npm ci --prefix apps/web` can work without falling back to `npm install`.
+4. Confirm which Netlify site is the actual public candidate portal, and verify deployment repository/build settings and deployed commit.
+5. Complete privacy/legal publication and safe backend/database staging prerequisites before turning any candidate intake into a real data-collection flow, then continue through remaining P0 gates.
 
 ## Timeline
 
