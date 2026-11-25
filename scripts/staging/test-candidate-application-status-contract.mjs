@@ -67,6 +67,14 @@ assert.match(page, /body\.is_editable === true/);
 assert.match(page, /isCandidateEditableApplicationStatus\(application\.kingsmen_status\)/);
 assert.doesNotMatch(page, /status:\s*"DRAFT"/,
   "A draft save in the client must not rewrite the internal workflow state.");
-assert.match(service, /select\("id,application_ref,pathway_type,status,kingsmen_status,readiness_status/);
-console.log("PASS: tracker, workbench, draft editor and authenticated service consume the candidate-facing contract");
+const applicationSelect = service.match(
+  /admin\\.from\\(["']candidate_applications["']\\)\\s*\\.select\\(["']([^"']+)["']\\)/
+);
+assert.ok(applicationSelect, "Candidate preparation must keep an explicit application column list.");
+const selectedApplicationColumns = applicationSelect[1].split(",").map(column => column.trim());
+assert.ok(selectedApplicationColumns.includes("status") && selectedApplicationColumns.includes("readiness_status"));
+assert.ok(!selectedApplicationColumns.includes("kingsmen_status"),
+  "Do not query the candidate-facing status column until the separately reviewed migration is installed.");
+
+console.log("PASS: tracker, workbench and editor consume the candidate-facing contract while the service query remains compatible with the current staging schema");
 console.log("Candidate application status contract: 4/4 groups passed");
