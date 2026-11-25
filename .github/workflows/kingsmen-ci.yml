@@ -39,6 +39,9 @@ jobs:
       - name: Validate Kingsmen project status register
         run: npm run kingsmen:status:validate
 
+      - name: Validate staging migration provenance snapshot
+        run: npm run kingsmen:migrations:provenance:validate
+
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund
 
