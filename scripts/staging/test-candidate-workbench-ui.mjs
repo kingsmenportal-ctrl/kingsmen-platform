@@ -164,6 +164,8 @@ try {
   await prepareButton.click();
   await page.getByText("Parent record: KM-CI-PARENT-001", { exact: true }).waitFor();
   await page.getByText("Kingsmen status: Draft", { exact: false }).waitFor();
+  await page.getByRole("heading", { name: "Next step: continue your draft" }).waitFor();
+  await page.getByText("Draft editing is available only when the server confirms that this record is editable.", { exact: false }).waitFor();
   assert.equal(await page.getByText("Application state: READY_TO_SUBMIT", { exact: true }).count(), 0,
     "internal workflow status must not be rendered as the candidate-facing application status");
   const draftLink = page.getByRole("link", { name: "Open / resume application draft", exact: true });
