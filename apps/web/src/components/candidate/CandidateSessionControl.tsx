@@ -2,19 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-function sessionConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  let storageKey = "sb-euhubhhnumtibbyufghm-auth-token";
-  try {
-    if (url) {
-      const ref = new URL(url).hostname.split(".")[0];
-      if (ref) storageKey = `sb-${ref}-auth-token`;
-    }
-  } catch {}
-  return { url, anonKey, storageKey };
-}
+import { getCandidateSessionState, getCandidateSupabaseConfig } from "@/lib/candidate-session";
 
 export function CandidateSessionControl() {
   const router = useRouter();
@@ -22,37 +10,30 @@ export function CandidateSessionControl() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    try {
-      const config = sessionConfig();
-      const raw = window.localStorage.getItem(config.storageKey);
-      const session = raw ? JSON.parse(raw) as { access_token?: string; expires_at?: number; user?: { email?: string } } : null;
-      if (session?.access_token && typeof session.expires_at === "number" && session.expires_at > Math.floor(Date.now() / 1000)) {
-        setAccountEmail(session.user?.email || "Candidate session");
-      } else {
-        setAccountEmail(null);
-      }
-    } catch {
-      setAccountEmail(null);
-    }
+    const session = getCandidateSessionState();
+    setAccountEmail(session.status === "ready" ? session.email || "Candidate session" : null);
   }, []);
 
   async function signOut() {
     setBusy(true);
-    const config = sessionConfig();
+    const config = getCandidateSupabaseConfig();
+    const session = getCandidateSessionState();
     try {
-      const raw = window.localStorage.getItem(config.storageKey);
-      const session = raw ? JSON.parse(raw) as { access_token?: string } : null;
-      if (config.url && config.anonKey && session?.access_token) {
+      if (config && session.status === "ready") {
         await fetch(`${config.url}/auth/v1/logout?scope=local`, {
           method: "POST",
-          headers: { apikey: config.anonKey, Authorization: `Bearer ${session.access_token}` },
+          headers: { apikey: config.anonKey, Authorization: `Bearer ${session.token}` },
           cache: "no-store"
         });
       }
     } catch {
-      // Local sign-out must still clear this browser session when the network is unavailable.
+      // Local sign-out must still clear this configured browser session when the network is unavailable.
     } finally {
-      window.localStorage.removeItem(config.storageKey);
+      try {
+        if (config) window.localStorage.removeItem(config.storageKey);
+      } catch {
+        // Continue navigation even when browser storage is unavailable.
+      }
       setAccountEmail(null);
       setBusy(false);
       router.replace("/candidate/login");
