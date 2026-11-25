@@ -172,6 +172,18 @@ try {
   assert.equal(await motivation.inputValue(), "Saved motivation");
 
   await motivation.fill("Updated motivation through the Kingsmen draft editor");
+  assert.equal(await page.getByTestId("draft-save-state").textContent(),
+    "Unsaved changes. Save your draft before leaving this page.");
+  let discardPromptShown = false;
+  page.once("dialog", async dialog => {
+    discardPromptShown = dialog.type === "confirm";
+    await dialog.dismiss();
+  });
+  await page.getByRole("button", { name: "Reload saved draft" }).click();
+  assert.equal(discardPromptShown, true, "Reload must ask before discarding unsaved application answers.");
+  assert.equal(await motivation.inputValue(), "Updated motivation through the Kingsmen draft editor",
+    "Dismissing the discard confirmation must preserve the edited answer.");
+
   await page.getByRole("button", { name: "Save application draft" }).click();
   await page.getByRole("status").filter({ hasText: "Fixture draft saved; no provider submission occurred." }).waitFor();
   assert.equal(savedRequests.length, 1);
@@ -181,6 +193,7 @@ try {
   assert.equal(savedRequests[0].answer_data.motivation_statement, "Updated motivation through the Kingsmen draft editor");
   assert.equal(await page.getByText("Draft version 2", { exact: true }).count(), 1);
   assert.equal(await page.getByText("Draft", { exact: true }).count(), 1);
+  assert.equal(await page.getByTestId("draft-save-state").textContent(), "All changes saved.");
   assert.equal(states.get(appA).application.status, "READY_TO_SUBMIT",
     "saving answers must not rewrite the backend workflow state");
 
