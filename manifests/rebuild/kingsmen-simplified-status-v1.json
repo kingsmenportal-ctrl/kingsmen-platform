@@ -531,6 +531,17 @@
       "rulesetId": 26323884,
       "result": "partial_ruleset_active_spec_gaps",
       "reason": "Active ruleset is verified through the rulesets API; the project manifest asks for additional status checks and review/history requirements not yet present in the observed ruleset."
+    },
+    "branchProtectionVerifier": {
+      "status": "RULESET_AWARE_SOURCE_CHANGED_CI_PENDING",
+      "sourceScript": "scripts/ci/capture-main-branch-protection.mjs",
+      "sourceValidator": "scripts/validators/validate-branch-protection-capture.mjs",
+      "unitTests": "scripts/ci/test-main-branch-protection-policy.mjs",
+      "ciCommand": "npm run repo:validate:branch-protection-capture",
+      "normalCiStepAdded": true,
+      "policyWasChanged": false,
+      "rulesetId": 26323884,
+      "activeRulesetCurrentStatus": "partial_ruleset_active_spec_gaps"
     }
   },
   "migrationProvenance": {
@@ -665,6 +676,9 @@
         "GitHub main-branch protection not verified by its evidence workflow (HTTP 404).",
         "Latest post-change CI and web build must complete.",
         "The rebuild branch is not proven deployed to the live Netlify site."
+      ],
+      "remaining": [
+        "Confirm ruleset-aware branch-protection CI passes; then have an authorized maintainer reconcile the active ruleset against the approved policy requirements."
       ]
     }
   },
