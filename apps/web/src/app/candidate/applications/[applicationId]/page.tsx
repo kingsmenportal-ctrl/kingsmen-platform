@@ -1,6 +1,7 @@
 "use client";
 
 import { getCandidateAccessToken } from "../../../../lib/candidate-session";
+import { isCandidateEditableApplicationStatus, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
 import { useParams } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
@@ -13,11 +14,21 @@ type AnswerData = {
   preferred_campus: string;
   additional_answers: AdditionalAnswer[];
 };
+type CandidateFacingApplicationStatus =
+  | "Draft"
+  | "Submitted to Kingsmen"
+  | "Under review"
+  | "Action required"
+  | "Prepared for provider"
+  | "Provider receipt confirmed"
+  | "Decision recorded";
+
 type Application = {
   id: string;
   application_ref: string;
   pathway_type: string;
   status: string;
+  kingsmen_status: CandidateFacingApplicationStatus;
   readiness_status: string;
   readiness_snapshot: Record<string, unknown>;
   title: string;
@@ -94,6 +105,7 @@ export default function CandidateApplicationDraftPage() {
   const [answers, setAnswers] = useState<AnswerData>(EMPTY_ANSWERS);
   const [version, setVersion] = useState(0);
   const [profileAvailable, setProfileAvailable] = useState(false);
+  const [serverEditable, setServerEditable] = useState(false);
   const [profileUpdatedAt, setProfileUpdatedAt] = useState<string | null>(null);
   const [draftUpdatedAt, setDraftUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,6 +141,7 @@ export default function CandidateApplicationDraftPage() {
       setAnswers(normalizeAnswers(body.draft));
       setVersion(Number.isInteger(body.draft_version) ? body.draft_version as number : 0);
       setProfileAvailable(body.shared_profile_available === true);
+      setServerEditable(body.is_editable === true);
       setProfileUpdatedAt(body.shared_profile_updated_at ?? null);
       setDraftUpdatedAt(body.draft_updated_at ?? null);
       setSaveIdempotencyKey("");
@@ -166,14 +179,9 @@ export default function CandidateApplicationDraftPage() {
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!application || !applicationId || !application.status || !application) return;
-    if (application.status === "SUBMISSION_PENDING" || application.status === "SUBMITTED_CONFIRMED"
-      || application.status === "PROVIDER_REVIEW" || application.status === "SHORTLISTED"
-      || application.status === "INTERVIEW" || application.status === "OFFERED"
-      || application.status === "ACCEPTED" || application.status === "REJECTED"
-      || application.status === "WITHDRAWN" || application.status === "CANCELLED"
-      || application.status === "MANUAL_ACTION_REQUIRED" || application.status === "EXPIRED") {
-      setError("This application has moved beyond draft preparation and can no longer be edited here.");
+    if (!application || !applicationId) return;
+    if (!serverEditable || !["Draft", "Action required"].includes(application.kingsmen_status)) {
+      setError("This application is no longer in a candidate-editable Kingsmen status.");
       return;
     }
 
@@ -226,7 +234,6 @@ export default function CandidateApplicationDraftPage() {
       setSaveIdempotencyKey("");
       setApplication(old => old ? {
         ...old,
-        status: "DRAFT",
         readiness_status: "NOT_CHECKED",
         updated_at: body.updated_at ?? new Date().toISOString()
       } : old);
@@ -238,9 +245,8 @@ export default function CandidateApplicationDraftPage() {
     }
   }
 
-  const isEditable = application?.status
-    ? ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(application.status)
-    : false;
+  const isEditable = Boolean(serverEditable && application
+    && ["Draft", "Action required"].includes(application.kingsmen_status));
 
   return <main className="min-h-screen bg-slate-950 px-4 py-8 text-white sm:px-6">
     <div className="mx-auto max-w-5xl space-y-6">
@@ -275,7 +281,7 @@ export default function CandidateApplicationDraftPage() {
             </div>
             <div className="rounded-xl border border-slate-700 px-3 py-2 text-sm">
               <p className="text-xs text-slate-400">Application status</p>
-              <p className="mt-1 font-semibold">{application.status.replaceAll("_", " ")}</p>
+              <p className="mt-1 font-semibold">{application.kingsmen_status}</p>
               <p className="mt-1 text-xs text-slate-400">Draft version {version}</p>
             </div>
           </div>
@@ -292,7 +298,7 @@ export default function CandidateApplicationDraftPage() {
               <p className="mt-2 text-xs text-slate-500">Saving updates the draft version and requires readiness checks to be refreshed. It does not submit to a provider.</p>
             </div>
           </div>
-          {!isEditable && <p className="mt-5 rounded-xl border border-amber-800 bg-amber-950/40 p-4 text-sm text-amber-100">This application has moved beyond the editable draft states. The answer form is read-only.</p>}
+          {!isEditable && <p className="mt-5 rounded-xl border border-amber-800 bg-amber-950/40 p-4 text-sm text-amber-100">This application is in a Kingsmen status that does not allow candidate editing. The answer form is read-only.</p>}
         </section>
 
         <form onSubmit={event => void save(event)} className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
