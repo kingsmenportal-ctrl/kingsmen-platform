@@ -309,8 +309,13 @@
           "minimum": 2,
           "maximum": 3
         },
-        "status": "not_started",
-        "exit": "Migration map approved and RLS/authenticated role tests pass."
+        "status": "in_progress_read_only_audit",
+        "exit": "Migration map approved and RLS/authenticated role tests pass.",
+        "currentProgress": [
+          "Captured migration provenance across eight branches; exact migration-body lineage remains unproven.",
+          "Captured security advisor details for 17 RLS tables, six SECURITY DEFINER RPCs, 16 policy overlaps, Auth leaked-password setting and 282 unused-index findings.",
+          "No staging schema, candidate data, RLS policies, function grants, Auth settings, or indexes have been modified."
+        ]
       },
       {
         "id": 3,
@@ -461,6 +466,19 @@
       "historicalRecordsWithoutNameCandidate": 63,
       "duplicateLedgerNames": 2,
       "replayAuthorized": false
+    },
+    "securityAdvisorAudit": {
+      "status": "captured_pending_ci_validation",
+      "securityAdvisorAuditPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
+      "counts": {
+        "publicTables": 230,
+        "publicTablesWithRlsEnabled": 230,
+        "rlsEnabledNoPolicy": 17,
+        "authenticatedCallableSecurityDefinerFunctions": 6,
+        "multiplePermissivePolicies": 16,
+        "leakedPasswordProtectionWarning": 1,
+        "unusedIndexes": 282
+      }
     }
   },
   "migrationProvenance": {
@@ -492,5 +510,24 @@
       "replayAuthorized": false
     },
     "nextAction": "Reconcile exact SQL body/commit/deployment provenance for all 130 ledger records; resolve duplicates and branch-sequence collisions before any schema change."
+  },
+  "securityAdvisorSnapshot": {
+    "snapshotPath": "manifests/rebuild/kingsmen-staging-security-advisor-2026-11-25.json",
+    "reportPath": "reports/rebuild/kingsmen-staging-security-advisor-latest.json",
+    "documentationPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
+    "validatorPath": "scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
+    "validatorCommand": "npm run kingsmen:security-advisor:validate",
+    "captureType": "read_only",
+    "status": "CAPTURED_PENDING_CI_VALIDATION",
+    "summary": {
+      "publicTables": 230,
+      "publicTablesWithRlsEnabled": 230,
+      "rlsEnabledNoPolicy": 17,
+      "authenticatedCallableSecurityDefinerFunctions": 6,
+      "multiplePermissivePolicies": 16,
+      "leakedPasswordProtectionWarning": 1,
+      "unusedIndexes": 282
+    },
+    "nextAction": "Inspect the six function bodies/grants and test candidate A/B/operator/founder isolation before proposing any role, policy, or Auth change."
   }
 }
