@@ -182,13 +182,33 @@ async function testMissingFixtureIsNotAFalsePass() {
   return "missing expected fixture rows fail instead of being recorded as successful denial";
 }
 
+async function testDuplicateFixtureIdsBlockBeforeRequests() {
+  const { fetchImpl, requests } = mockFetchFactory();
+  const env = completeEnv({ KINGSMEN_RLS_SESSION_B_ID: ids.sessionAId });
+  const report = await runLiveRlsApiBoundaryProbe({ env, fetchImpl });
+  assert.equal(report.status, "BLOCKED_INVALID_FIXTURE_IDS");
+  assert.equal(requests.length, 0);
+  return "duplicate fixture identifiers block the probe before network access";
+}
+
+async function testDuplicateActorTokensBlockBeforeRequests() {
+  const { fetchImpl, requests } = mockFetchFactory();
+  const env = completeEnv({ KINGSMEN_RLS_FOUNDER_JWT: "operator-test-jwt" });
+  const report = await runLiveRlsApiBoundaryProbe({ env, fetchImpl });
+  assert.equal(report.status, "BLOCKED_INVALID_ACTOR_TOKENS");
+  assert.equal(requests.length, 0);
+  return "shared actor tokens block the probe before network access";
+}
+
 const results = [];
 for (const test of [
   testSuccessfulAccessMatrix,
   testCrossCandidateLeakFails,
   testMissingCredentialsBlockWithoutRequests,
   testUnsafeTargetBlocksWithoutRequests,
-  testMissingFixtureIsNotAFalsePass
+  testMissingFixtureIsNotAFalsePass,
+  testDuplicateFixtureIdsBlockBeforeRequests,
+  testDuplicateActorTokensBlockBeforeRequests
 ]) {
   results.push(await test());
 }
