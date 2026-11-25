@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { getCandidateSessionState } from "@/lib/candidate-session";
-import { canResumeCandidateApplicationDraft, candidateFacingApplicationStatusLabel, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
+import { canResumeCandidateApplicationDraft, candidateApplicationStatusGuidance, candidateFacingApplicationStatusLabel, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Session = { url: string; anonKey: string; token: string };
@@ -221,6 +221,7 @@ export default function CandidateApplicationTracker() {
             <div className="grid gap-4">
               {applications.map((application) => {
                 const events = eventsByApplication.get(application.id) ?? [];
+                const statusGuidance = candidateApplicationStatusGuidance(application.kingsmen_status);
                 return (
                   <article key={application.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -232,6 +233,12 @@ export default function CandidateApplicationTracker() {
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Created</dt><dd className="mt-1">{formatDate(application.created_at)}</dd></div>
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Updated</dt><dd className="mt-1">{formatDate(application.updated_at)}</dd></div>
                     </dl>
+                    {statusGuidance ? (
+                      <section className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4" aria-label="Application next step">
+                        <h4 className="text-sm font-bold text-slate-900">{statusGuidance.heading}</h4>
+                        <p className="mt-1 text-sm leading-6 text-slate-700">{statusGuidance.detail}</p>
+                      </section>
+                    ) : null}
                     {canResumeCandidateApplicationDraft(application.kingsmen_status, application.status) ? (
                       <div className="mt-4">
                         <Link
