@@ -103,7 +103,9 @@
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs",
     "kingsmen:status:validate": "node scripts/validators/validate-kingsmen-simplified-status.mjs",
     "kingsmen:migrations:provenance:validate": "node scripts/validators/validate-kingsmen-migration-provenance.mjs",
-    "kingsmen:security-advisor:validate": "node scripts/validators/validate-kingsmen-staging-security-advisor.mjs"
+    "kingsmen:security-advisor:validate": "node scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
+    "security:probe:staging:rls": "node scripts/staging/probe-live-rls-api-boundary.mjs",
+    "security:test:staging:rls": "node scripts/staging/test-live-rls-api-boundary.mjs"
   },
   "repository": {
     "type": "git",

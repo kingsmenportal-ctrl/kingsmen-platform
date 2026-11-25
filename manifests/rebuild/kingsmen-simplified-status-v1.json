@@ -433,6 +433,24 @@
       "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
       "ciRunId": 45640042482,
       "ciResult": "success"
+    },
+    {
+      "number": 342,
+      "title": "Add canonical candidate applications entry route",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "head": "684a915ef236401d2f73b831f19cd7c6581ac8c6",
+      "role": "candidate application route/status/session/document journey; CI passed; broad change set requires deliberate review; not merged/deployed or applied to staging"
+    },
+    {
+      "number": 343,
+      "title": "Add read-only staging RLS API boundary probe",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "head": "security/staging-rls-api-boundary-20261125",
+      "role": "read-only staging RLS/API negative-access probe; initial offline contract passed; fixture filter refinements await fresh CI; live actor/fixture proof pending"
     }
   ],
   "updateRules": [
@@ -583,6 +601,68 @@
       ],
       "migrationOrDeploymentAuthorized": false,
       "notes": "Preflight confirms the candidate application draft runtime is not deployable on current staging. Do not apply migrations 0107–0109 until exact migration provenance, restore rehearsal, schema compatibility, security review and change-control approval are complete."
+    },
+    "rlsApiBoundaryProbe": {
+      "status": "initial_offline_contract_passed_followup_code_validation_pending_live_staging_pending",
+      "pullRequest": 343,
+      "branch": "security/staging-rls-api-boundary-20261125",
+      "implementationCommit": "3b2139f7ab91d1e9e2b2aac16f0276f1ec9f400a",
+      "testedCommit": "22c543ed6eea70748ddc0f8f8ef00711732f471d",
+      "offlineContract": {
+        "result": "success_on_initial_commit_only",
+        "runId": 45692768450,
+        "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45692768450",
+        "checks": 65,
+        "tables": [
+          "candidate_credentials",
+          "candidate_sessions",
+          "evidence_ledger",
+          "workflow_runs",
+          "route_sources"
+        ],
+        "actors": [
+          "anonymous",
+          "candidateA",
+          "candidateB",
+          "operator",
+          "founder"
+        ]
+      },
+      "codeRefinementsAfterLastPassingRun": [
+        "Candidate-owned session, evidence and workflow probes now constrain the target row by candidate_id.",
+        "Route-source probes now constrain status and confidence_band as well as row ID."
+      ],
+      "currentCodeValidation": "pending_fresh_ci_evidence",
+      "liveStaging": {
+        "result": "not_run_fixture_and_actor_prerequisites_missing",
+        "liveApiNegativeRoleTestsRun": 0,
+        "databaseChanges": false,
+        "reason": "No approved staging fixture records or non-production test actor tokens; the probe does not create fixtures."
+      }
+    },
+    "candidateApplicationJourneyPR": {
+      "status": "ci_passed_not_merged_not_deployed_staging_runtime_blocked",
+      "pullRequest": 342,
+      "head": "684a915ef236401d2f73b831f19cd7c6581ac8c6",
+      "workflows": [
+        {
+          "name": "Kingsmen application draft contract",
+          "runId": 45691198324,
+          "result": "success"
+        },
+        {
+          "name": "Kingsmen CI",
+          "runId": 45691198458,
+          "result": "success"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45691198337,
+          "result": "success"
+        }
+      ],
+      "stagingRuntimeResult": "BLOCKED_RUNTIME_PREREQUISITES_MISSING",
+      "changesAppliedToStaging": false
     }
   },
   "migrationProvenance": {
@@ -698,7 +778,8 @@
         "Run real Candidate A/B, operator and founder negative/positive authorization tests across API/RPC/table boundaries.",
         "Review 16 policy-overlap findings and enable/verify leaked-password protection through a separate reviewed Auth change.",
         "Prove durable state, retries, idempotency, worker lease recovery, backup/restore and payment/communication sandbox paths.",
-        "Test anon/Candidate A/Candidate B/operator/founder direct REST/RPC access to candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs; grants are broad at table layer and current RLS predicates need runtime negative proof."
+        "Test anon/Candidate A/Candidate B/operator/founder direct REST/RPC access to candidate_credentials, candidate_sessions, evidence_ledger, route_sources and workflow_runs; grants are broad at table layer and current RLS predicates need runtime negative proof.",
+        "Complete approved staging actor/fixture setup and run the new GET-only RLS API boundary probe; retain release block until live proof passes."
       ],
       "evidence": {
         "migrationAudit": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
@@ -798,13 +879,15 @@
         "Supabase staging ACTIVE_HEALTHY, PostgreSQL 17.11, 230 public tables with RLS enabled",
         "Read-only migration lineage audit: 130 migration ledger records; 63 lack source-name candidates across eight branches; exact applied SQL body/deployment lineage remains unresolved",
         "Six SECURITY DEFINER bodies match selected historical source candidates; anon/PUBLIC execution denied; 17 no-policy tables deny direct anon/authenticated privileges",
-        "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed"
+        "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed",
+        "PR #343 adds a GET-only staging RLS API probe; the initial offline mock contract passed on commit 22c543ed6eea70748ddc0f8f8ef00711732f471d (run 45692768450); later fixture-filter hardening is awaiting fresh CI."
       ],
       "missing": [
         "Authenticated Candidate A/B, operator and founder runtime isolation tests",
         "Five tables have direct anon/authenticated table grants and rely on RLS predicates; verify least-privilege negative API access",
         "Leaked-password protection disabled; requires reviewed Auth-setting change",
-        "Migration lineage/restore/change-control approval before any migration changes"
+        "Migration lineage/restore/change-control approval before any migration changes",
+        "Prepare approved non-production actor tokens and pre-existing test fixtures, then run the GET-only RLS API probe. No fixture creation or policy changes are performed by the probe."
       ]
     },
     "integrationsJarvis": {

@@ -1,0 +1,83 @@
+name: Kingsmen staging RLS API boundary
+
+on:
+  pull_request:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - scripts/staging/probe-live-rls-api-boundary.mjs
+      - scripts/staging/test-live-rls-api-boundary.mjs
+      - docs/security/KINGSMEN_STAGING_RLS_API_BOUNDARY_PROBE.md
+      - package.json
+      - .github/workflows/staging-rls-api-boundary.yml
+  push:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - scripts/staging/probe-live-rls-api-boundary.mjs
+      - scripts/staging/test-live-rls-api-boundary.mjs
+      - docs/security/KINGSMEN_STAGING_RLS_API_BOUNDARY_PROBE.md
+      - package.json
+      - .github/workflows/staging-rls-api-boundary.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-contract:
+    if: github.event_name != 'workflow_dispatch'
+    name: Test RLS probe without staging access
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test mock access matrix, fail-closed target and fixture rules
+        run: npm run security:test:staging:rls
+
+  live-staging-probe:
+    if: github.event_name == 'workflow_dispatch'
+    name: Run read-only staging role-isolation probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      KINGSMEN_STAGING_SUPABASE_URL: https://euhubhhnumtibbyufghm.supabase.co
+      KINGSMEN_STAGING_SUPABASE_ANON_KEY: ${{ secrets.KINGSMEN_STAGING_SUPABASE_ANON_KEY }}
+      KINGSMEN_RLS_CANDIDATE_A_JWT: ${{ secrets.KINGSMEN_RLS_CANDIDATE_A_JWT }}
+      KINGSMEN_RLS_CANDIDATE_B_JWT: ${{ secrets.KINGSMEN_RLS_CANDIDATE_B_JWT }}
+      KINGSMEN_RLS_OPERATOR_JWT: ${{ secrets.KINGSMEN_RLS_OPERATOR_JWT }}
+      KINGSMEN_RLS_FOUNDER_JWT: ${{ secrets.KINGSMEN_RLS_FOUNDER_JWT }}
+      KINGSMEN_RLS_CANDIDATE_A_ID: ${{ secrets.KINGSMEN_RLS_CANDIDATE_A_ID }}
+      KINGSMEN_RLS_CANDIDATE_B_ID: ${{ secrets.KINGSMEN_RLS_CANDIDATE_B_ID }}
+      KINGSMEN_RLS_SESSION_A_ID: ${{ secrets.KINGSMEN_RLS_SESSION_A_ID }}
+      KINGSMEN_RLS_SESSION_B_ID: ${{ secrets.KINGSMEN_RLS_SESSION_B_ID }}
+      KINGSMEN_RLS_EVIDENCE_SAFE_A_ID: ${{ secrets.KINGSMEN_RLS_EVIDENCE_SAFE_A_ID }}
+      KINGSMEN_RLS_EVIDENCE_SAFE_B_ID: ${{ secrets.KINGSMEN_RLS_EVIDENCE_SAFE_B_ID }}
+      KINGSMEN_RLS_EVIDENCE_PROTECTED_A_ID: ${{ secrets.KINGSMEN_RLS_EVIDENCE_PROTECTED_A_ID }}
+      KINGSMEN_RLS_EVIDENCE_PROTECTED_B_ID: ${{ secrets.KINGSMEN_RLS_EVIDENCE_PROTECTED_B_ID }}
+      KINGSMEN_RLS_WORKFLOW_A_ID: ${{ secrets.KINGSMEN_RLS_WORKFLOW_A_ID }}
+      KINGSMEN_RLS_WORKFLOW_B_ID: ${{ secrets.KINGSMEN_RLS_WORKFLOW_B_ID }}
+      KINGSMEN_RLS_ROUTE_SOURCE_VERIFIED_ID: ${{ secrets.KINGSMEN_RLS_ROUTE_SOURCE_VERIFIED_ID }}
+      KINGSMEN_RLS_ROUTE_SOURCE_UNVERIFIED_ID: ${{ secrets.KINGSMEN_RLS_ROUTE_SOURCE_UNVERIFIED_ID }}
+      KINGSMEN_RLS_ROUTE_SOURCE_LOW_CONFIDENCE_ID: ${{ secrets.KINGSMEN_RLS_ROUTE_SOURCE_LOW_CONFIDENCE_ID }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Execute GET-only RLS/API probe against approved staging project
+        run: npm run security:probe:staging:rls
+      - name: Upload redacted RLS evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-staging-rls-api-boundary-report
+          path: reports/security/rls-api-boundary-probe-latest.json
+          if-no-files-found: ignore
+          retention-days: 30
