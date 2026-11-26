@@ -242,7 +242,7 @@ try {
   await page.getByRole("button", { name: "Reload saved draft" }).click();
   await assert.doesNotReject(async () => {
     for (let attempt = 0; attempt < 20; attempt += 1) {
-      if (await motivation.inputValue() === "Updated motivation through the Kingsmen draft editor") return;
+      if (await motivation.inputValue() === "Updated motivation after retry failed; fresh idempotency key") return;
       await delay(100);
     }
     throw new Error("Reload did not restore the saved motivation answer.");

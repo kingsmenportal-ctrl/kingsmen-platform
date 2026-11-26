@@ -1,4 +1,4 @@
--- End-to-end migration-chain contract: 0107 -> 0108 -> 0109.
+-- End-to-end candidate-safe lifecycle: 0107 -> 0108 -> the reviewed status/draft proposal.
 -- Run only in the isolated kingsmen_lifecycle PostgreSQL 17 database.
 \set ON_ERROR_STOP on
 BEGIN;
@@ -86,22 +86,17 @@ INSERT INTO public.candidate_master_application_targets
 SET ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', 'aaaaaaaa-0000-4000-8000-000000000001', true);
 
-DO $lifecycle$
+DO $prepare_lifecycle$
 DECLARE
   v_prepared jsonb;
-  v_saved jsonb;
-  v_loaded jsonb;
   v_application_id uuid;
-  v_message text;
-  v_rejected boolean := false;
-  v_inactive jsonb;
 BEGIN
   IF NOT has_function_privilege('authenticated', 'public.prepare_candidate_application_from_master_target(text)', 'EXECUTE') THEN
     RAISE EXCEPTION 'authenticated role cannot execute application preparation';
   END IF;
   IF NOT has_function_privilege('authenticated', 'public.save_candidate_application_draft(uuid,jsonb,integer,text)', 'EXECUTE')
      OR NOT has_function_privilege('authenticated', 'public.get_candidate_application_draft(uuid)', 'EXECUTE') THEN
-    RAISE EXCEPTION 'authenticated role cannot execute draft read/write RPCs';
+    RAISE EXCEPTION 'authenticated role cannot execute candidate draft read/write RPCs';
   END IF;
 
   v_prepared := public.prepare_candidate_application_from_master_target('target-fixture-A');
@@ -114,7 +109,44 @@ BEGIN
 
   v_application_id := (v_prepared->>'application_id')::uuid;
   PERFORM set_config('kng_fixture.application_id', v_application_id::text, false);
+END
+$prepare_lifecycle$;
 
+RESET ROLE;
+
+-- Simulate a completed readiness check before the candidate edits answers. The
+-- draft save must invalidate readiness without rewriting this internal workflow
+-- state or the separate candidate-facing lifecycle label.
+DO $prior_readiness$
+DECLARE
+  v_application_id uuid := current_setting('kng_fixture.application_id')::uuid;
+BEGIN
+  UPDATE public.candidate_applications
+  SET status = 'READY_TO_SUBMIT',
+      readiness_status = 'READY',
+      readiness_snapshot = '{"fixture_prior_readiness":true}'::jsonb,
+      updated_at = clock_timestamp()
+  WHERE id = v_application_id
+    AND candidate_id = '11111111-1111-4111-8111-111111111111'
+    AND kingsmen_status = 'Draft';
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'could not establish the pre-edit READY_TO_SUBMIT fixture state';
+  END IF;
+END
+$prior_readiness$;
+
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub', 'aaaaaaaa-0000-4000-8000-000000000001', true);
+
+DO $lifecycle$
+DECLARE
+  v_saved jsonb;
+  v_loaded jsonb;
+  v_application_id uuid := current_setting('kng_fixture.application_id')::uuid;
+  v_message text;
+  v_rejected boolean := false;
+  v_inactive jsonb;
+BEGIN
   v_saved := public.save_candidate_application_draft(
     v_application_id,
     '{"motivation_statement":"Created from verified match","relevant_experience":"Disposable fixture","additional_answers":[{"question_key":"fixture-question-1","answer":"fixture answer"}]}'::jsonb,
@@ -123,18 +155,21 @@ BEGIN
   );
   IF v_saved->>'ok' IS DISTINCT FROM 'true'
      OR (v_saved->>'draft_version')::integer <> 1
+     OR v_saved->>'kingsmen_status' IS DISTINCT FROM 'Draft'
      OR v_saved->>'provider_submission_sent' IS DISTINCT FROM 'false'
      OR v_saved->>'readiness_recheck_required' IS DISTINCT FROM 'true' THEN
-    RAISE EXCEPTION '0109 failed to save draft created by 0108: %', v_saved;
+    RAISE EXCEPTION 'candidate-safe draft save failed contract: %', v_saved;
   END IF;
 
   v_loaded := public.get_candidate_application_draft(v_application_id);
   IF v_loaded->>'ok' IS DISTINCT FROM 'true'
      OR v_loaded->>'draft_version' <> '1'
      OR v_loaded#>>'{draft,motivation_statement}' IS DISTINCT FROM 'Created from verified match'
-     OR v_loaded#>>'{application,status}' IS DISTINCT FROM 'DRAFT'
+     OR v_loaded#>>'{application,status}' IS DISTINCT FROM 'READY_TO_SUBMIT'
+     OR v_loaded#>>'{application,kingsmen_status}' IS DISTINCT FROM 'Draft'
+     OR v_loaded#>>'{application,readiness_status}' IS DISTINCT FROM 'NOT_CHECKED'
      OR v_loaded->>'provider_submission_sent' IS DISTINCT FROM 'false' THEN
-    RAISE EXCEPTION 'parent application and saved answers did not round-trip: %', v_loaded;
+    RAISE EXCEPTION 'candidate-safe status/draft round-trip failed or rewrote workflow status: %', v_loaded;
   END IF;
 
   -- An Auth user with no verified identity link must fail closed.
@@ -170,12 +205,20 @@ DECLARE
   v_status text;
   v_count integer;
 BEGIN
-  SELECT status INTO v_status
+  SELECT status, kingsmen_status, readiness_status, readiness_snapshot
+    INTO v_status, v_kingsmen_status, v_readiness_status, v_readiness_snapshot
   FROM public.candidate_applications
   WHERE id = v_application_id
     AND candidate_id = '11111111-1111-4111-8111-111111111111';
-  IF v_status IS DISTINCT FROM 'DRAFT' THEN
-    RAISE EXCEPTION 'prepared parent application is not candidate-owned DRAFT';
+  IF v_status IS DISTINCT FROM 'READY_TO_SUBMIT' THEN
+    RAISE EXCEPTION 'draft save rewrote the internal workflow state: %', v_status;
+  END IF;
+  IF v_kingsmen_status IS DISTINCT FROM 'Draft' THEN
+    RAISE EXCEPTION 'draft save rewrote the candidate-facing lifecycle state: %', v_kingsmen_status;
+  END IF;
+  IF v_readiness_status IS DISTINCT FROM 'NOT_CHECKED'
+     OR v_readiness_snapshot->>'readiness_recheck_required' IS DISTINCT FROM 'true' THEN
+    RAISE EXCEPTION 'draft save did not invalidate previous readiness correctly';
   END IF;
 
   IF NOT EXISTS (
@@ -211,5 +254,5 @@ BEGIN
 END
 $persisted_state$;
 
-SELECT 'PASS: full 0107 -> 0108 -> 0109 application lifecycle contract' AS result;
+SELECT 'PASS: full 0107 -> 0108 -> candidate-safe status/draft lifecycle' AS result;
 ROLLBACK;
