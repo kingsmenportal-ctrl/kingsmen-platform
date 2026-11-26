@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useMemo, useState } from "react";
 
 const PATHWAYS = [
@@ -40,19 +41,10 @@ type Opportunity = {
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
 function getAuthContext(): { url: string; anonKey: string; token: string } | null {
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !anonKey) return null;
-    const projectRef = new URL(url).hostname.split(".")[0];
-    const storageKey = projectRef ? `sb-${projectRef}-auth-token` : "sb-euhubhhnumtibbyufghm-auth-token";
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) return null;
-    const parsed = JSON.parse(stored) as { access_token?: string; expires_at?: number };
-    if (typeof parsed.access_token !== "string") return null;
-    if (typeof parsed.expires_at === "number" && parsed.expires_at <= Math.floor(Date.now() / 1000)) return null;
-    return { url, anonKey, token: parsed.access_token };
-  } catch { return null; }
+  const state = getCandidateSessionState();
+  return state.status === "ready"
+    ? { url: state.url, anonKey: state.anonKey, token: state.token }
+    : null;
 }
 
 export default function CandidateOpportunityMatchesPage() {
