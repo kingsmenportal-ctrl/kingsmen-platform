@@ -53,6 +53,20 @@ assert.ok(!opportunityMatches.includes("window.localStorage") && !opportunityMat
   && !opportunityMatches.includes("euhubhhnumtibbyufghm"),
   "Opportunity matching must not duplicate browser-token parsing or hard-code a project fallback.");
 
+for (const message of [
+  "Candidate opportunity matching is not configured for this deployment.",
+  "Sign in to load and save verified opportunities.",
+  "Your candidate session has expired. Sign in again to continue.",
+  "Your browser session could not be read. Sign in again."
+]) {
+  assert.ok(opportunityMatches.includes(message),
+    "Opportunity matching must explain the specific candidate-session failure: " + message);
+}
+assert.ok(opportunityMatches.includes("if (!session.auth) throw new Error(session.error)"),
+  "Loading verified opportunities must show the actionable session failure instead of a generic authentication error.");
+assert.ok(opportunityMatches.includes("message: session.error"),
+  "Saving a verified opportunity must show the same actionable session failure.");
+
 assert.match(sessionControl, /getCandidateSessionState\(\)/);
 assert.match(sessionControl, /getCandidateSupabaseConfig\(\)/);
 assert.match(authForm, /getCandidateSupabaseConfig\(\)/,
