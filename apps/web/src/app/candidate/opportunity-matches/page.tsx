@@ -40,11 +40,25 @@ type Opportunity = {
 
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
-function getAuthContext(): { url: string; anonKey: string; token: string } | null {
+type CandidateAuthContext = { url: string; anonKey: string; token: string };
+type CandidateAuthContextResult =
+  | { auth: CandidateAuthContext; error: null }
+  | { auth: null; error: string };
+
+function getAuthContext(): CandidateAuthContextResult {
   const state = getCandidateSessionState();
-  return state.status === "ready"
-    ? { url: state.url, anonKey: state.anonKey, token: state.token }
-    : null;
+  switch (state.status) {
+    case "ready":
+      return { auth: { url: state.url, anonKey: state.anonKey, token: state.token }, error: null };
+    case "not_configured":
+      return { auth: null, error: "Candidate opportunity matching is not configured for this deployment. Try again later." };
+    case "missing":
+      return { auth: null, error: "Sign in to load and save verified opportunities." };
+    case "expired":
+      return { auth: null, error: "Your candidate session has expired. Sign in again to continue." };
+    case "unreadable":
+      return { auth: null, error: "Your browser session could not be read. Sign in again." };
+  }
 }
 
 export default function CandidateOpportunityMatchesPage() {
@@ -61,8 +75,9 @@ export default function CandidateOpportunityMatchesPage() {
     setError("");
     setFeed(null);
     try {
-      const auth = getAuthContext();
-      if (!auth) throw new Error("Sign in with an active session. Candidate matching is not configured or your session may have expired.");
+      const session = getAuthContext();
+      if (!session.auth) throw new Error(session.error);
+      const auth = session.auth;
       const response = await fetch(`${auth.url}/functions/v1/n15-candidate-opportunities`, {
         method: "GET",
         headers: { apikey: auth.anonKey, Authorization: `Bearer ${auth.token}` },
@@ -89,11 +104,12 @@ export default function CandidateOpportunityMatchesPage() {
   ), [feed, pathway]);
 
   async function saveOpportunity(item: Opportunity) {
-    const auth = getAuthContext();
-    if (!auth) {
-      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: "Sign in again before saving an opportunity." } }));
+    const session = getAuthContext();
+    if (!session.auth) {
+      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: session.error } }));
       return;
     }
+    const auth = session.auth;
     const requiresPathwayChoice = AMBIGUOUS_SECTORS.has(item.sector);
     const selectedPathway = selectedPathways[item.match_ref] || (item.pathways.length === 1 ? item.pathways[0] : "");
     if (requiresPathwayChoice && (!selectedPathway || !item.pathways.includes(selectedPathway) || !PATHWAY_API_CODES[selectedPathway])) {
