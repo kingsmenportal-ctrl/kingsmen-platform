@@ -230,7 +230,17 @@ export default function CandidateOpportunityMatchesPage() {
                       {savingMatchRef === item.match_ref ? "Saving…" : "Save & prepare draft"}
                     </button>
                   </div>
-                  {saveResults[item.match_ref] ? <p role={saveResults[item.match_ref].ok ? "status" : "alert"} aria-live="polite" className={`mt-3 rounded-xl border p-3 text-sm leading-6 ${saveResults[item.match_ref].ok ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>{saveResults[item.match_ref].message}</p> : null}
+                  {saveResults[item.match_ref] ? (
+                    <div className="mt-3 space-y-3">
+                      <p role={saveResults[item.match_ref].ok ? "status" : "alert"} aria-live="polite" className={`rounded-xl border p-3 text-sm leading-6 ${saveResults[item.match_ref].ok ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>{saveResults[item.match_ref].message}</p>
+                      {saveResults[item.match_ref].ok ? (
+                        <nav aria-label="Next steps after saving opportunity" className="flex flex-wrap gap-3 text-sm font-semibold">
+                          <a href="/candidate/applications" className="inline-flex rounded-lg bg-slate-950 px-4 py-2.5 text-white">Open My Applications →</a>
+                          <a href="/candidate/saved-opportunities/" className="inline-flex rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900">View Saved Opportunities</a>
+                        </nav>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </section>
