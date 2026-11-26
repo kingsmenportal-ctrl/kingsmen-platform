@@ -39,6 +39,7 @@ The earlier batch stopped at API/source-level validation and documentation while
   - Enables and forces RLS, revokes direct table privileges from PUBLIC/anon/authenticated, and exposes only authenticated get/save RPCs.
   - Checks authenticated candidate identity and application ownership inside security-definer functions.
   - Implements row locking, optimistic version conflicts, idempotent retries, editable-status gating and readiness invalidation.
+  - Corrected an idempotency defect on 2026-11-26: reusing a key with a different answer payload now returns `APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT`; only an identical payload may be accepted as a retry. Added the source-contract assertion. This fix is committed, but CI is still pending.
   - Saving a draft does not submit to an external provider.
 - Migration NOT applied to staging. No staging DDL, grants, RLS or Auth changes were made.
 - No verified PostgreSQL backup archive with source identity, creation time, SHA-256 checksum and retention evidence has been established.
@@ -57,7 +58,8 @@ The earlier batch stopped at API/source-level validation and documentation while
 - PostgreSQL migration execution, draft persistence/security fixture tests and browser smoke tests are now available and passed in CI run 191. Live Supabase runtime integration and a full journey against a restored staging copy remain unverified.
 
 ### Backup and restore
-- No actual source database backup archive has been verified.
+- No actual source database backup archive has been verified. Gmail search for PostgreSQL dump/backup/manifest attachments returned no matching archive; the connected Neon project still reports zero snapshots.
+- The user authorized an isolated disposable restore and use of connected integrations, but no concrete secure storage location or archive identifier has been supplied yet. This remains the exact input needed to retrieve the backup; credentials must not be pasted into chat.
 - No isolated restore of staging has been completed.
 - Empty Neon project/snapshot absence is explicitly not restore evidence.
 - Status: NOT COMPLETED.
@@ -86,7 +88,7 @@ The earlier batch stopped at API/source-level validation and documentation while
 - [ ] PR review, merge and change-control decisions recorded
 
 ## Next execution order
-1. Obtain and verify the actual database backup; do not substitute an empty project or unrelated export.
+1. Locate the user-authorized secure backup location/archive; do not substitute an empty project or unrelated export.
 2. Restore it to isolated infrastructure without blindly replaying unresolved application migrations.
 3. Reconcile schema/migration provenance and execute the new migration on the isolated restore.
 4. Run authenticated database security/persistence tests and correct failures.
