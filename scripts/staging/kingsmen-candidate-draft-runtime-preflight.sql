@@ -95,10 +95,10 @@ draft_security AS (
       FROM pg_policies p
       WHERE p.schemaname = 'public' AND p.tablename = 'candidate_application_draft_answers'
     ), '[]'::jsonb) AS policies,
-    has_table_privilege('anon', 'public.candidate_application_draft_answers', 'SELECT') AS anon_can_select,
-    has_table_privilege('authenticated', 'public.candidate_application_draft_answers', 'SELECT') AS authenticated_can_select,
-    has_table_privilege('anon', 'public.candidate_application_draft_answers', 'INSERT') AS anon_can_insert,
-    has_table_privilege('authenticated', 'public.candidate_application_draft_answers', 'INSERT') AS authenticated_can_insert
+    CASE WHEN to_regclass('public.candidate_application_draft_answers') IS NULL THEN false ELSE has_table_privilege('anon', 'public.candidate_application_draft_answers', 'SELECT') END AS anon_can_select,
+    CASE WHEN to_regclass('public.candidate_application_draft_answers') IS NULL THEN false ELSE has_table_privilege('authenticated', 'public.candidate_application_draft_answers', 'SELECT') END AS authenticated_can_select,
+    CASE WHEN to_regclass('public.candidate_application_draft_answers') IS NULL THEN false ELSE has_table_privilege('anon', 'public.candidate_application_draft_answers', 'INSERT') END AS anon_can_insert,
+    CASE WHEN to_regclass('public.candidate_application_draft_answers') IS NULL THEN false ELSE has_table_privilege('authenticated', 'public.candidate_application_draft_answers', 'INSERT') END AS authenticated_can_insert
 ),
 rpc_signatures AS (
   SELECT COALESCE(jsonb_agg(jsonb_build_object(
