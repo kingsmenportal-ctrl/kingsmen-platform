@@ -10,7 +10,14 @@ const route = await readFile(path.join(root, "apps/web/src/app/api/candidate/app
 for (const field of ["given_name", "family_name", "date_of_birth", "nationality", "contact_email"]) {
   assert.ok(contract.includes(`"${field}"`), `required field contract missing: ${field}`);
 }
-for (const behavior of ["validateCandidateDraftAnswers", "submissionReadiness", "assertCandidateDraftVersion", "isValidIdempotencyKey", "canEditCandidateDraft"]) {
+for (const behavior of [
+  "validateCandidateDraftAnswers",
+  "validateCandidateApplicationAnswerData",
+  "submissionReadiness",
+  "assertCandidateDraftVersion",
+  "isValidIdempotencyKey",
+  "canEditCandidateDraft"
+]) {
   assert.ok(contract.includes(`function ${behavior}`), `draft lifecycle helper missing: ${behavior}`);
 }
 assert.match(route, /AUTHENTICATION_REQUIRED/);
@@ -19,8 +26,13 @@ assert.match(route, /get_candidate_application_draft/);
 assert.match(route, /save_candidate_application_draft/);
 assert.match(route, /p_expected_version/);
 assert.match(route, /p_idempotency_key/);
+assert.match(route, /validateCandidateApplicationAnswerData\(incoming\.answer_data\)/);
+assert.match(route, /APPLICATION_DRAFT_ANSWERS_INVALID/);
 assert.match(route, /Cache-Control.*no-store/);
 assert.match(route, /IDENTITY_OR_OWNERSHIP_REQUIRED/);
 assert.match(route, /APPLICATION_DRAFT_VERSION_CONFLICT/);
+assert.match(contract, /additional_answers\.length > 20/);
+assert.match(contract, /motivation_statement: 5000/);
+assert.match(contract, /qualifications_summary: 3000/);
 
 console.log("Candidate application draft contract checks passed.");
