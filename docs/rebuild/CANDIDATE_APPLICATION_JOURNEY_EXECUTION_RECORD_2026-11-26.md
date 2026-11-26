@@ -59,7 +59,9 @@ The earlier batch stopped at API/source-level validation and documentation while
 
 ### Backup and restore
 - No actual source database backup archive has been verified. Gmail search for PostgreSQL dump/backup/manifest attachments returned no matching archive; the connected Neon project still reports zero snapshots.
-- The user authorized an isolated disposable restore and use of connected integrations, but no concrete secure storage location or archive identifier has been supplied yet. This remains the exact input needed to retrieve the backup; credentials must not be pasted into chat.
+- The user selected Option B: use an authorized existing server or CI environment, with isolated disposable restore only and no production modifications.
+- Repository inspection confirms backup/restore scripts exist (`scripts/backup/New-KingsmenTruthVaultBackup.ps1`, `scripts/backup/Test-KingsmenTruthVaultRestore.ps1`), but no dedicated backup workflow is present in `.github/workflows`, no backup archive is attached to the latest draft-contract CI run, and the connected tools do not expose a server shell or GitHub Actions workflow-dispatch/secret configuration capability.
+- Therefore authorization is recorded, but the execution environment/credentials are not currently exposed through the connected tools. Do not infer that selecting Option B grants actual host access. To run it, the authorized server/CI runner must already have `KINGSMEN_DATABASE_URL`, `KINGSMEN_RESTORE_DRILL_DATABASE_URL`, `pg_dump`, `pg_restore`, and `psql` available as protected secrets/tools; never print or commit these values.
 - No isolated restore of staging has been completed.
 - Empty Neon project/snapshot absence is explicitly not restore evidence.
 - Status: NOT COMPLETED.
@@ -88,7 +90,7 @@ The earlier batch stopped at API/source-level validation and documentation while
 - [ ] PR review, merge and change-control decisions recorded
 
 ## Next execution order
-1. Locate the user-authorized secure backup location/archive; do not substitute an empty project or unrelated export.
+1. Use the authorized server/CI environment once its protected database connection secrets and command execution route are available; create or locate the real backup and verify its SHA-256 manifest. No connected server shell or workflow dispatch is currently available.
 2. Restore it to isolated infrastructure without blindly replaying unresolved application migrations.
 3. Reconcile schema/migration provenance and execute the new migration on the isolated restore.
 4. Run authenticated database security/persistence tests and correct failures.
