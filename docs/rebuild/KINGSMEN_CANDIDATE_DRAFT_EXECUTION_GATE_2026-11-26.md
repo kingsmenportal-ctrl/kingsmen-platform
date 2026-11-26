@@ -83,3 +83,19 @@ This correction fixes a repository test syntax defect only. It does not change s
 - Backup/restore, schema reconciliation, and runtime candidate tests: still not executed.
 - Frontend: contract tests only; no verified live end-to-end candidate journey.
 - Backend: four draft persistence objects still absent from the live staging catalog; no DDL or data writes performed.
+
+## Execution ledger refresh — CI and backup artifact search
+
+Observed GitHub Actions run `45850284839` for the current PR head `7ac1a34645ebde4ec783e962423d7f1e287feedd`:
+
+- `Kingsmen CI` run 785 completed successfully. Its `test-and-build` job passed focused repository tests, status-register validation, migration-provenance snapshot validation, security-advisor snapshot validation, branch-protection checks, API build, and web application build.
+- The corresponding staging RLS/API-boundary, candidate-draft contract, and Jarvis Live Runtime workflows also completed successfully.
+- This is repository/workflow validation only. It does not establish that a real backup exists, that restore ran, or that the candidate draft runtime is available in staging.
+- The workflow produced no artifacts for run 785.
+
+Backup artifact search:
+- Searched the connected Gmail mailbox for backup/archive attachment names and Kingsmen staging database backup references. No PostgreSQL dump, SQL export, or backup manifest was found in those results.
+- One unrelated Manus account-export attachment exists; it is not a Kingsmen PostgreSQL backup and is not used as restore input.
+- No backup archive was opened, altered, or represented as database evidence.
+
+Current decision remains unchanged: `restoreRehearsalPassed=false`, `runtimeSecurityPassed=false`, `candidateDraftRuntimeReady=false`, `migrationReplayAuthorized=false`. The remaining prerequisite is an actual Kingsmen database archive (or authorized backup-provider access that can retrieve one), plus its verifiable source metadata and retention details. Do not substitute the Manus account export, an empty database, or migration replay.
