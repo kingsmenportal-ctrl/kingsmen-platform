@@ -72,7 +72,7 @@ PR [#357](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/357) is 
 
 The latest observed PR #357 CI run (`Kingsmen CI`, run 783, merge commit `9ae434c0d9f1a98936361e9627e27347f062a0a7`) failed during focused repository tests before later build/validation steps could run. The failure is a JavaScript parse error in `scripts/staging/test-kingsmen-restored-schema-inventory.mjs`: escaped backticks before the assertion message produced invalid source syntax.
 
-Corrected that test in commit `25f52ebc7da070b0c09fcf03c081f366339c9050` by restoring valid template literals and block structure. The corrected file is now the PR head. **The correction is not yet CI-verified**: no workflow run or status check has been returned for the new head at the time of this record. Do not mark CI green until a new run completes successfully.
+Corrected that test in commit `25f52ebc7da070b0c09fcf03c081f366339c9050` by restoring valid template literals and block structure. A subsequent CI run (785) passed on commit `7ac1a34645ebde4ec783e962423d7f1e287feedd`. That run did not test later documentation or review-fix commits. The current branch head must be checked separately before marking its CI status green.
 
 This correction fixes a repository test syntax defect only. It does not change staging, restore a backup, validate the live candidate journey, or authorize migration replay.
 
@@ -86,7 +86,7 @@ This correction fixes a repository test syntax defect only. It does not change s
 
 ## Execution ledger refresh — CI and backup artifact search
 
-Observed GitHub Actions run `45850284839` for the current PR head `7ac1a34645ebde4ec783e962423d7f1e287feedd`:
+Observed GitHub Actions run `45850284839` for PR commit `7ac1a34645ebde4ec783e962423d7f1e287feedd` (not the current branch head):
 
 - `Kingsmen CI` run 785 completed successfully. Its `test-and-build` job passed focused repository tests, status-register validation, migration-provenance snapshot validation, security-advisor snapshot validation, branch-protection checks, API build, and web application build.
 - The corresponding staging RLS/API-boundary, candidate-draft contract, and Jarvis Live Runtime workflows also completed successfully.
@@ -99,3 +99,15 @@ Backup artifact search:
 - No backup archive was opened, altered, or represented as database evidence.
 
 Current decision remains unchanged: `restoreRehearsalPassed=false`, `runtimeSecurityPassed=false`, `candidateDraftRuntimeReady=false`, `migrationReplayAuthorized=false`. The remaining prerequisite is an actual Kingsmen database archive (or authorized backup-provider access that can retrieve one), plus its verifiable source metadata and retention details. Do not substitute the Manus account export, an empty database, or migration replay.
+
+
+## Independent review follow-up and schema inventory correction
+
+On the current PR, the connected `ndabenhlemvelo-arch` account submitted a review requesting changes. It identified that a static reference to `supabase_migrations.schema_migrations` can fail at parse/planning time even when guarded by `to_regclass`, and that the CI note overstated which commit had been tested.
+
+Implemented follow-up fixes:
+- Commit `76ecaa71c4c230654f5c0385576927b1a2446ec4`: query the optional migration ledger through fixed, read-only `query_to_xml` plus `XMLTABLE`, avoiding a statically bound reference when the ledger relation is absent.
+- Commit `d9a021ec3867b5dd8825c77f6f796dac299211fd`: extend the inventory contract test to assert the dynamic ledger path and missing-relation guard.
+- The CI evidence above remains scoped to `7ac1a34645ebde4ec783e962423d7f1e287feedd`. No passing CI result has yet been observed for these follow-up commits.
+
+Approval remains withheld pending CI validation and the actual backup/restore/runtime evidence. A repository review is not a database change-control approval.
