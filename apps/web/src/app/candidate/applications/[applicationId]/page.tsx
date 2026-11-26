@@ -151,6 +151,7 @@ export default function CandidateApplicationDraftPage() {
 
   function update<K extends keyof AnswerData>(key: K, value: AnswerData[K]) {
     setAnswers(old => ({ ...old, [key]: value }));
+    setSaveIdempotencyKey("");
     setNotice("");
   }
 
@@ -159,6 +160,7 @@ export default function CandidateApplicationDraftPage() {
       ...old,
       additional_answers: old.additional_answers.map((item, i) => i === index ? { ...item, [key]: value } : item)
     }));
+    setSaveIdempotencyKey("");
     setNotice("");
   }
 
