@@ -3,8 +3,8 @@ Date: 2026-11-26
 Repository: `kingsmenportal-ctrl/kingsmen-platform`
 Branch: `feat/candidate-application-journey-batch-2026-11-26`
 PR: #358 — https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/358
-Latest implementation commit: `654ecd20f03a44058e26ddfd8c353a17f5e8cfe3`
-Latest verified CI head: `f8c921fd1f9e88348607c7c3b90032c7c5918634`.
+Latest implementation commit: `fd35e648909921a2eb0bd2e296c40dd8d32f96d2`
+Latest CI observed: Jarvis Live Runtime and staging RLS API boundary passed; Kingsmen CI run 803 and application draft contract run 195 were in progress at last query. These results do not prove runtime persistence or a restore.
 
 ## Required operating contract for Kingsmen work
 - Continue implementation rather than substituting a report for work.
@@ -90,7 +90,7 @@ The earlier batch stopped at API/source-level validation and documentation while
 - [ ] PR review, merge and change-control decisions recorded
 
 ## Next execution order
-1. Use the authorized server/CI environment once its protected database connection secrets and command execution route are available; create or locate the real backup and verify its SHA-256 manifest. No connected server shell or workflow dispatch is currently available.
+1. Obtain an execution path to the authorized existing server/CI runner (not secret values in chat), with protected source and disposable-target connections and PostgreSQL client tools. Create or locate the real backup, verify its SHA-256 manifest, restore to the isolated target, and run counts-only checks. No connected server shell or workflow dispatch is currently available.
 2. Restore it to isolated infrastructure without blindly replaying unresolved application migrations.
 3. Reconcile schema/migration provenance and execute the new migration on the isolated restore.
 4. Run authenticated database security/persistence tests and correct failures.
