@@ -3,7 +3,7 @@ Date: 2026-11-26
 Repository: `kingsmenportal-ctrl/kingsmen-platform`
 Branch: `feat/candidate-application-journey-batch-2026-11-26`
 PR: #358 — https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/358
-Latest verified head: `929959bfa5023130d0fb445bfa63476fc3f4c29f`
+Latest implementation head: `fa8130af22267d401e51e01d0b1de1caa4fd2fb0` (CI for this head not yet verified)
 
 ## Required reporting contract for all Kingsmen work
 For every Kingsmen-related conversation and implementation batch:
@@ -15,7 +15,7 @@ For every Kingsmen-related conversation and implementation batch:
 6. Carry this register forward in future Kingsmen work; update this file when progress changes.
 
 ## Why persistence, security and deployment were not completed earlier
-The previous batch was incorrectly scoped to source-level draft validation and a release package. It did not implement the missing database persistence layer or run an authenticated end-to-end journey. This was insufficient against the stated acceptance criteria. The blocker was not that validation was impossible: staging was inspected and the required RPCs were absent. The safe next step is to produce and verify a real database backup, restore it to isolated infrastructure, reconcile the exact schema and identity model, then implement and test a compatible migration. That process has not been completed, so production deployment cannot honestly be marked complete.
+The previous batch was incorrectly scoped to source-level draft validation and a release package. It did not implement the missing database persistence layer or run an authenticated end-to-end journey. This was insufficient against the stated acceptance criteria. The blocker was not that validation was impossible: staging was inspected and the required RPCs were absent. The backup/restore and provenance gate still blocks applying database DDL to staging. In parallel, the repository now contains a candidate-draft persistence migration built from the live staging schema inspection; it is intentionally not applied to staging. A static migration contract test was added to the repository test command. Runtime execution still requires the verified backup/restore target and SQL-level test evidence.
 
 ## Implementation record
 ### Frontend
@@ -42,7 +42,7 @@ The previous batch was incorrectly scoped to source-level draft validation and a
 - Status: SOURCE-LEVEL BOUNDARIES PRESENT; RUNTIME SECURITY NOT PASSED.
 
 ### Tests and build evidence
-GitHub Actions run 792 / run ID `45856315812` for head `929959bfa5023130d0fb445bfa63476fc3f4c29f` completed successfully:
+GitHub Actions run 792 / run ID `45856315812` for prior head `929959bfa5023130d0fb445bfa63476fc3f4c29f` completed successfully:
 - Focused repository tests: passed
 - Project status register validation: passed
 - Staging migration provenance snapshot validation: passed
@@ -67,7 +67,7 @@ These checks do not constitute a real database restore, authenticated persistenc
 - [ ] Verified source backup, timestamp, checksum, and retention evidence
 - [ ] Isolated restore rehearsal without blind migration replay
 - [ ] Schema and migration provenance reconciled
-- [ ] Persistence functions implemented against verified identity/application schema
+- [x] Persistence functions implemented in a repository migration against inspected staging identity/application schema (not yet applied)\n- [ ] Migration executes successfully on isolated restored database
 - [ ] Database security/RLS and cross-candidate isolation tests pass
 - [ ] Candidate journey works through save, reload/resume, validation and submission
 - [ ] Browser/API end-to-end tests pass
