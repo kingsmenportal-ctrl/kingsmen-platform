@@ -203,6 +203,9 @@ DO $persisted_state$
 DECLARE
   v_application_id uuid := current_setting('kng_fixture.application_id')::uuid;
   v_status text;
+  v_kingsmen_status text;
+  v_readiness_status text;
+  v_readiness_snapshot jsonb;
   v_count integer;
 BEGIN
   SELECT status, kingsmen_status, readiness_status, readiness_snapshot
