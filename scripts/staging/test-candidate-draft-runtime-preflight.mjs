@@ -18,7 +18,7 @@ assert.doesNotMatch(
 );
 for (const required of [
   "supabase_migrations.schema_migrations",
-  "candidate_applications_kingsmen_status_column",
+  "candidate_applications_kingsmen_status_text_column",
   "candidate_application_draft_answers",
   "get_candidate_application_draft",
   "save_candidate_application_draft",
@@ -44,7 +44,7 @@ assert.match(sql, /'migrationsApplied', false/);
 assert.match(sql, /'authOrRlsChanged', false/);
 assert.match(sql, /'candidateDraftRuntimeReady', false/);
 
-assert.match(sql, /kingsmen\\.candidate-draft-runtime-preflight\\.v2/);
+assert.match(sql, /kingsmen\.candidate-draft-runtime-preflight\.v2/);
 assert.match(sql, /CASE WHEN to_regclass/);
 assert.match(sql, /migrationReplayAuthorized/);
 
