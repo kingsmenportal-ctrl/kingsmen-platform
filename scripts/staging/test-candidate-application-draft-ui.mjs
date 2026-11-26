@@ -186,6 +186,10 @@ try {
   await page.goto(baseUrl + "/candidate/applications/" + appA, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Application draft" }).waitFor();
   await page.getByText("CI fixture employment opportunity").waitFor();
+  await page.getByRole("heading", { name: "Your preparation checklist" }).waitFor();
+  await page.getByRole("link", { name: "Document Vault" }).first().waitFor();
+  await page.getByRole("link", { name: "Track application" }).first().waitFor();
+  await page.getByText("Readiness: Not checked yet.", { exact: true }).waitFor();
   const motivation = page.getByLabel("Motivation statement");
   assert.equal(await motivation.inputValue(), "Saved motivation");
 
