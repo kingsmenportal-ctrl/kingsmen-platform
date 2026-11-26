@@ -18,7 +18,7 @@ assert.doesNotMatch(
 );
 for (const required of [
   "supabase_migrations.schema_migrations",
-  "candidate_applications_kingsmen_status_column",
+  "candidate_applications_kingsmen_status_text_column",
   "candidate_application_draft_answers",
   "get_candidate_application_draft",
   "save_candidate_application_draft",
@@ -26,7 +26,16 @@ for (const required of [
   "APPLICATION_DRAFT_SAVED",
   "migrationReplayAuthorized",
   "backup/restore rehearsal",
-  "projectRefMustBeConfirmedInSupabaseDashboard"
+  "projectRefMustBeConfirmedInSupabaseDashboard",
+  "draftTableColumnCompatibility",
+  "draftTableSecurity",
+  "pg_policies",
+  "has_table_privilege",
+  "rpcSignaturesAndSecurityDefiner",
+  "pg_get_function_identity_arguments",
+  "pg_get_function_result",
+  "search_path",
+  "migrationReplayAuthorized"
 ]) {
   assert.ok(sql.includes(required), `Preflight must check/report ${required}.`);
 }
@@ -34,6 +43,10 @@ assert.match(sql, /'writesPerformed', false/);
 assert.match(sql, /'migrationsApplied', false/);
 assert.match(sql, /'authOrRlsChanged', false/);
 assert.match(sql, /'candidateDraftRuntimeReady', false/);
+
+assert.match(sql, /kingsmen\.candidate-draft-runtime-preflight\.v2/);
+assert.match(sql, /CASE WHEN to_regclass/);
+assert.match(sql, /migrationReplayAuthorized/);
 
 console.log("CANDIDATE_DRAFT_RUNTIME_PREFLIGHT_CONTRACT_PASSED");
 console.log("- One SELECT-only SQL statement; no mutation/admin statements.");
