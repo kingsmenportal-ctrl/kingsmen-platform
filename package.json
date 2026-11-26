@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && node scripts/validators/validate-candidate-dashboard-contract.mjs && node scripts/validators/validate-free-destiny-map-preview.mjs && node scripts/staging/test-candidate-document-session-contract.mjs && node scripts/staging/test-candidate-preparation-schema-compat.mjs && node scripts/staging/test-candidate-application-preparation-identity-boundary.mjs && node scripts/staging/test-candidate-draft-runtime-preflight.mjs && node scripts/validators/validate-kingsmen-migration-body-provenance.mjs",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && node scripts/validators/validate-candidate-dashboard-contract.mjs && node scripts/validators/validate-free-destiny-map-preview.mjs && node scripts/staging/test-candidate-document-session-contract.mjs && node scripts/staging/test-candidate-preparation-schema-compat.mjs && node scripts/staging/test-candidate-application-preparation-identity-boundary.mjs && node scripts/staging/test-candidate-draft-runtime-preflight.mjs && node scripts/validators/validate-kingsmen-migration-body-provenance.mjs && node scripts/staging/test-candidate-draft-restore-security-gate.mjs && node scripts/staging/test-kingsmen-restored-schema-inventory.mjs",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -108,7 +108,9 @@
     "security:test:staging:rls": "node scripts/staging/test-live-rls-api-boundary.mjs",
     "db:preflight:candidate-draft:validate": "node scripts/staging/test-candidate-draft-runtime-preflight.mjs",
     "candidate:prep:identity:test": "node scripts/staging/test-candidate-application-preparation-identity-boundary.mjs",
-    "candidate:draft:api:test": "node scripts/staging/test-candidate-application-draft-api-boundary.mjs"
+    "candidate:draft:api:test": "node scripts/staging/test-candidate-application-draft-api-boundary.mjs",
+    "candidate:draft:restore-security:test": "node scripts/staging/test-candidate-draft-restore-security-gate.mjs",
+    "schema:inventory:contract": "node scripts/staging/test-kingsmen-restored-schema-inventory.mjs"
   },
   "repository": {
     "type": "git",
