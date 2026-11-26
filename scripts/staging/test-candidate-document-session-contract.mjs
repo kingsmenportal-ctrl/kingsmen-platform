@@ -11,6 +11,7 @@ const profilePage = read("apps/web/src/components/candidate/CandidateMasterProfi
 const savedOpportunitiesPage = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
 const profile = read("apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
 const savedOpportunities = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
+const opportunityMatches = read("apps/web/src/app/candidate/opportunity-matches/page.tsx");
 const sessionControl = read("apps/web/src/components/candidate/CandidateSessionControl.tsx");
 const authForm = read("apps/web/src/components/candidate/CandidateAuthForm.tsx");
 
@@ -43,6 +44,15 @@ assert.match(profile, /getCandidateSessionState\(\)/,
   "Candidate profile persistence must use the shared candidate session boundary.");
 assert.match(savedOpportunities, /getCandidateSessionState\(\)/,
   "Saved-opportunity reads must use the shared candidate session boundary.");
+
+assert.ok(opportunityMatches.includes('import { getCandidateSessionState } from "@/lib/candidate-session";'),
+  "Opportunity matching must use the shared candidate session boundary.");
+assert.ok(opportunityMatches.includes("const state = getCandidateSessionState()"),
+  "Opportunity matching must use canonical expiry and session validation.");
+assert.ok(!opportunityMatches.includes("window.localStorage") && !opportunityMatches.includes("JSON.parse(stored)")
+  && !opportunityMatches.includes("euhubhhnumtibbyufghm"),
+  "Opportunity matching must not duplicate browser-token parsing or hard-code a project fallback.");
+
 assert.match(sessionControl, /getCandidateSessionState\(\)/);
 assert.match(sessionControl, /getCandidateSupabaseConfig\(\)/);
 assert.match(authForm, /getCandidateSupabaseConfig\(\)/,
