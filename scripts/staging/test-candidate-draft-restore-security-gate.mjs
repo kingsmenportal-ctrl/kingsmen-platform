@@ -14,7 +14,7 @@ for (const required of [
   "isolated disposable restore environment only",
   "Live staging writes:** prohibited",
   "Migration replay:** unauthorized",
-  "schema compatibility diff",
+  "Run the read-only schema inventory and compare",
   "exact tracked SQL body hash",
   "Create draft",
   "Save and retry",
