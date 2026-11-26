@@ -86,5 +86,11 @@ assert.match(session, /storageKey:\s*`sb-\$\{projectRef\}-auth-token`/,
 console.log("PASS: document upload/download share the fail-closed candidate session boundary");
 console.log("PASS: no hard-coded project fallback or duplicate browser-token parser remains");
 console.log("PASS: document vault navigation connects to canonical applications");
+assert.match(opportunityMatches, /aria-label="Next steps after saving opportunity"/,
+  "A successful save must expose a labelled next-step navigation area.");
+assert.match(opportunityMatches, /saveResults\[item\.match_ref\]\.ok \? \([\s\S]*?href="\/candidate\/applications"/,
+  "A successful verified-opportunity save must link directly to My Applications.");
+assert.match(opportunityMatches, /href="\/candidate\/saved-opportunities\//,
+  "A successful verified-opportunity save must also link to Saved Opportunities.");
 console.log("PASS: profile, saved opportunities, auth and sign-out share the same session boundary");
 console.log("Candidate session boundary contract passed.");
