@@ -76,6 +76,16 @@ function formatDate(value: string | null | undefined) {
   return Number.isNaN(date.getTime()) ? "Not recorded"
     : date.toLocaleString("en-ZA", { dateStyle: "medium", timeStyle: "short" });
 }
+function readinessLabel(value: string | null | undefined) {
+  switch (value) {
+    case "READY": return "Ready at last check";
+    case "NOT_CHECKED": return "Not checked yet";
+    case "BLOCKED": return "Blocked at last check";
+    case "NEEDS_REVIEW": return "Needs review";
+    case "INELIGIBLE": return "Not eligible at last check";
+    default: return "Status not available";
+  }
+}
 function normalizeAnswers(input: Partial<AnswerData> | undefined): AnswerData {
   return {
     motivation_statement: typeof input?.motivation_statement === "string" ? input.motivation_statement : "",
@@ -151,6 +161,7 @@ export default function CandidateApplicationDraftPage() {
 
   function update<K extends keyof AnswerData>(key: K, value: AnswerData[K]) {
     setAnswers(old => ({ ...old, [key]: value }));
+    setSaveIdempotencyKey("");
     setNotice("");
   }
 
@@ -159,6 +170,7 @@ export default function CandidateApplicationDraftPage() {
       ...old,
       additional_answers: old.additional_answers.map((item, i) => i === index ? { ...item, [key]: value } : item)
     }));
+    setSaveIdempotencyKey("");
     setNotice("");
   }
 
@@ -266,6 +278,8 @@ export default function CandidateApplicationDraftPage() {
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2">Dashboard</a>
           <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-2">Reusable profile</a>
           <a href="/candidate/applications" className="rounded-xl border border-slate-700 px-4 py-2">My applications</a>
+          <a href="/candidate/documents" className="rounded-xl border border-slate-700 px-4 py-2">Document Vault</a>
+          <a href="/candidate/tracker" className="rounded-xl border border-slate-700 px-4 py-2">Track application</a>
           <button type="button" disabled={loading || saving} onClick={() => {
             if (hasUnsavedChanges && !window.confirm("You have unsaved changes. Reloading will discard them. Continue?")) return;
             void load();
@@ -311,6 +325,42 @@ export default function CandidateApplicationDraftPage() {
             </div>
           </div>
           {!isEditable && <p className="mt-5 rounded-xl border border-amber-800 bg-amber-950/40 p-4 text-sm text-amber-100">This application is in a Kingsmen status that does not allow candidate editing. The answer form is read-only.</p>}
+        </section>
+
+        <section aria-labelledby="application-preparation-checklist" className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">Application journey</p>
+          <h2 id="application-preparation-checklist" className="mt-2 text-xl font-bold">Your preparation checklist</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">Keep each step in its correct evidence state. A saved answer is not a readiness approval, a candidate-reported document upload is not human verification, and neither action submits this application to a provider.</p>
+          <ol className="mt-5 grid gap-3 md:grid-cols-2">
+            <li className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-400">Step 1</p>
+              <h3 className="mt-1 font-semibold">Reusable candidate profile</h3>
+              <p className="mt-2 text-sm text-slate-300">{profileAvailable ? "A saved reusable profile is available." : "No saved reusable profile is confirmed yet."}</p>
+              <a href="/candidate/profile" className="mt-3 inline-flex text-sm font-semibold text-cyan-300 underline">Review profile</a>
+            </li>
+            <li className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-400">Step 2</p>
+              <h3 className="mt-1 font-semibold">Application answers</h3>
+              <p className="mt-2 text-sm text-slate-300">{hasUnsavedChanges ? "Your current answers have unsaved changes." : "The editor matches the latest saved answer snapshot."}</p>
+              <p className="mt-1 text-xs text-slate-400">Draft version {version}</p>
+            </li>
+            <li className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-400">Step 3</p>
+              <h3 className="mt-1 font-semibold">Supporting documents</h3>
+              <p className="mt-2 text-sm text-slate-300">Review the private vault for required files and their human-review status. This page does not assume documents are verified.</p>
+              <a href="/candidate/documents" className="mt-3 inline-flex text-sm font-semibold text-cyan-300 underline">Open Document Vault</a>
+            </li>
+            <li className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+              <p className="text-xs uppercase tracking-wide text-slate-400">Step 4</p>
+              <h3 className="mt-1 font-semibold">Readiness and tracking</h3>
+              <p className="mt-2 text-sm text-slate-300">Readiness: {readinessLabel(application.readiness_status)}.</p>
+              <p className="mt-1 text-xs text-slate-400">Saving new answers invalidates the prior readiness check. Re-check readiness in the workbench before any later submission step.</p>
+              <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
+                <a href="/candidate/workbench" className="text-cyan-300 underline">Open workbench</a>
+                <a href="/candidate/tracker" className="text-cyan-300 underline">Track application</a>
+              </div>
+            </li>
+          </ol>
         </section>
 
         <form onSubmit={event => void save(event)} className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-7">

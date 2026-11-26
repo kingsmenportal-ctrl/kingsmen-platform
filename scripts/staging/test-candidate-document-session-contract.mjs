@@ -11,6 +11,7 @@ const profilePage = read("apps/web/src/components/candidate/CandidateMasterProfi
 const savedOpportunitiesPage = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
 const profile = read("apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
 const savedOpportunities = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
+const opportunityMatches = read("apps/web/src/app/candidate/opportunity-matches/page.tsx");
 const sessionControl = read("apps/web/src/components/candidate/CandidateSessionControl.tsx");
 const authForm = read("apps/web/src/components/candidate/CandidateAuthForm.tsx");
 
@@ -43,6 +44,29 @@ assert.match(profile, /getCandidateSessionState\(\)/,
   "Candidate profile persistence must use the shared candidate session boundary.");
 assert.match(savedOpportunities, /getCandidateSessionState\(\)/,
   "Saved-opportunity reads must use the shared candidate session boundary.");
+
+assert.ok(opportunityMatches.includes('import { getCandidateSessionState } from "@/lib/candidate-session";'),
+  "Opportunity matching must use the shared candidate session boundary.");
+assert.ok(opportunityMatches.includes("const state = getCandidateSessionState()"),
+  "Opportunity matching must use canonical expiry and session validation.");
+assert.ok(!opportunityMatches.includes("window.localStorage") && !opportunityMatches.includes("JSON.parse(stored)")
+  && !opportunityMatches.includes("euhubhhnumtibbyufghm"),
+  "Opportunity matching must not duplicate browser-token parsing or hard-code a project fallback.");
+
+for (const message of [
+  "Candidate opportunity matching is not configured for this deployment.",
+  "Sign in to load and save verified opportunities.",
+  "Your candidate session has expired. Sign in again to continue.",
+  "Your browser session could not be read. Sign in again."
+]) {
+  assert.ok(opportunityMatches.includes(message),
+    "Opportunity matching must explain the specific candidate-session failure: " + message);
+}
+assert.ok(opportunityMatches.includes("if (!session.auth) throw new Error(session.error)"),
+  "Loading verified opportunities must show the actionable session failure instead of a generic authentication error.");
+assert.ok(opportunityMatches.includes("message: session.error"),
+  "Saving a verified opportunity must show the same actionable session failure.");
+
 assert.match(sessionControl, /getCandidateSessionState\(\)/);
 assert.match(sessionControl, /getCandidateSupabaseConfig\(\)/);
 assert.match(authForm, /getCandidateSupabaseConfig\(\)/,
@@ -62,5 +86,11 @@ assert.match(session, /storageKey:\s*`sb-\$\{projectRef\}-auth-token`/,
 console.log("PASS: document upload/download share the fail-closed candidate session boundary");
 console.log("PASS: no hard-coded project fallback or duplicate browser-token parser remains");
 console.log("PASS: document vault navigation connects to canonical applications");
+assert.match(opportunityMatches, /aria-label="Next steps after saving opportunity"/,
+  "A successful save must expose a labelled next-step navigation area.");
+assert.match(opportunityMatches, /saveResults\[item\.match_ref\]\.ok \? \([\s\S]*?href="\/candidate\/applications"/,
+  "A successful verified-opportunity save must link directly to My Applications.");
+assert.match(opportunityMatches, /href="\/candidate\/saved-opportunities\//,
+  "A successful verified-opportunity save must also link to Saved Opportunities.");
 console.log("PASS: profile, saved opportunities, auth and sign-out share the same session boundary");
 console.log("Candidate session boundary contract passed.");

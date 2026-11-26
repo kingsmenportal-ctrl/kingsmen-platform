@@ -51,6 +51,8 @@ const states = new Map([
 ]);
 const providerRequests = [];
 const savedRequests = [];
+const saveAttempts = [];
+let failedSavesRemaining = 2;
 
 const server = spawn(process.execPath, [
   path.resolve(webDirectory, "node_modules/next/dist/bin/next"),
@@ -115,6 +117,15 @@ try {
     } else if (method === "POST") {
       incoming = request.postDataJSON();
       applicationId = incoming.application_id;
+      saveAttempts.push(incoming);
+      if (applicationId === appA && failedSavesRemaining > 0) {
+        failedSavesRemaining -= 1;
+        await route.fulfill({
+          status: 503,
+          json: { ready: false, ok: false, code: "TEMPORARY_SAVE_FAILURE", message: "Temporary save failure. Try again." }
+        });
+        return;
+      }
       savedRequests.push(incoming);
     } else {
       await route.fulfill({ status: 405, json: { ready: false, ok: false, error: "Method not supported in test." } });
@@ -175,6 +186,10 @@ try {
   await page.goto(baseUrl + "/candidate/applications/" + appA, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Application draft" }).waitFor();
   await page.getByText("CI fixture employment opportunity").waitFor();
+  await page.getByRole("heading", { name: "Your preparation checklist" }).waitFor();
+  await page.getByRole("link", { name: "Document Vault" }).first().waitFor();
+  await page.getByRole("link", { name: "Track application" }).first().waitFor();
+  await page.getByText("Readiness: Not checked yet.", { exact: true }).waitFor();
   const motivation = page.getByLabel("Motivation statement");
   assert.equal(await motivation.inputValue(), "Saved motivation");
 
@@ -190,12 +205,37 @@ try {
     "Dismissing the discard confirmation must preserve the edited answer.");
 
   await page.getByRole("button", { name: "Save application draft" }).click();
+  await page.getByRole("alert").filter({ hasText: "Temporary save failure. Try again." }).waitFor();
+  assert.equal(await motivation.inputValue(), "Updated motivation through the Kingsmen draft editor",
+    "A failed save must preserve the candidate's edited answer.");
+  assert.equal(await page.getByTestId("draft-save-state").textContent(),
+    "Unsaved changes. Save your draft before leaving this page.",
+    "A failed save must not mark the draft as persisted.");
+  assert.equal(savedRequests.length, 0, "A failed server response must not be counted as a persisted draft.");
+
+  await page.getByRole("button", { name: "Save application draft" }).click();
+  await page.getByRole("alert").filter({ hasText: "Temporary save failure. Try again." }).waitFor();
+  assert.equal(await motivation.inputValue(), "Updated motivation through the Kingsmen draft editor",
+    "An unchanged retry that fails again must preserve the candidate's answer.");
+  assert.equal(await page.getByTestId("draft-save-state").textContent(),
+    "Unsaved changes. Save your draft before leaving this page.",
+    "A second failed save must still leave the draft unsaved.");
+  assert.equal(savedRequests.length, 0, "Neither failed attempt may be counted as a persisted draft.");
+  assert.equal(saveAttempts.length, 2, "The test must exercise a failed save and an unchanged retry.");
+  assert.equal(saveAttempts[0].idempotency_key, saveAttempts[1].idempotency_key,
+    "Retrying the unchanged answer payload must reuse the same idempotency key.");
+
+  await motivation.fill("Updated motivation after retry failed; fresh idempotency key");
+  await page.getByRole("button", { name: "Save application draft" }).click();
   await page.getByRole("status").filter({ hasText: "Fixture draft saved; no provider submission occurred." }).waitFor();
+  assert.equal(saveAttempts.length, 3, "Editing after a failed save must allow a fresh save attempt.");
+  assert.notEqual(saveAttempts[2].idempotency_key, saveAttempts[1].idempotency_key,
+    "Changing answers after a failed save must generate a new idempotency key.");
   assert.equal(savedRequests.length, 1);
   assert.equal(savedRequests[0].application_id, appA);
   assert.equal(savedRequests[0].expected_version, 1);
   assert.match(savedRequests[0].idempotency_key, /^application-draft-/);
-  assert.equal(savedRequests[0].answer_data.motivation_statement, "Updated motivation through the Kingsmen draft editor");
+  assert.equal(savedRequests[0].answer_data.motivation_statement, "Updated motivation after retry failed; fresh idempotency key");
   assert.equal(await page.getByText("Draft version 2", { exact: true }).count(), 1);
   assert.equal(await page.getByText("Draft", { exact: true }).count(), 1);
   assert.equal(await page.getByTestId("draft-save-state").textContent(), "All changes saved.");
@@ -206,7 +246,7 @@ try {
   await page.getByRole("button", { name: "Reload saved draft" }).click();
   await assert.doesNotReject(async () => {
     for (let attempt = 0; attempt < 20; attempt += 1) {
-      if (await motivation.inputValue() === "Updated motivation through the Kingsmen draft editor") return;
+      if (await motivation.inputValue() === "Updated motivation after retry failed; fresh idempotency key") return;
       await delay(100);
     }
     throw new Error("Reload did not restore the saved motivation answer.");

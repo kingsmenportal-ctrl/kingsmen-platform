@@ -42,6 +42,10 @@ Direct read-only queries against the stated staging project on 25 November 2026 
 
 The selected rebuild branch contains proposed migrations 0107–0110, but a filename is not proof of the exact SQL deployed in staging. A follow-up read-only body-hash capture found exact byte-for-byte source-body matches for 30 ledger records (29 distinct SQL bodies). Another 37 have filename candidates whose bodies differ, and 63 have no filename or body candidate in the eight-branch corpus; 100 of 130 remain without an exact body match. Migration replay authorization remains false.
 
+## Follow-up read-only verification (26 November 2026)
+
+A second direct SELECT-only schema check against staging project euhubhhnumtibbyufghm reconfirmed the blocking prerequisites: public.candidate_applications exists, but the draft-answer table, draft read RPC, draft save RPC, verified-candidate helper and candidate-facing kingsmen_status column are absent. The application-event constraint still does not allow APPLICATION_DRAFT_SAVED. This is source/runtime compatibility evidence only; no staging objects, data, policies, grants, Auth settings or deployments were changed.
+
 ## Release decision
 
 The application draft runtime is **not ready**. Do not enable draft save/resume against staging until migration provenance has been reconciled, backup/restore rehearsal is complete, schema compatibility and RLS/auth isolation have been reviewed, and authorized change control approves the sequence. After that, provision approved non-production test actors and fixture rows; the separate GET-only RLS probe does not create fixtures.

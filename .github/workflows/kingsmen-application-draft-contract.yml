@@ -15,6 +15,8 @@ on:
       - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
       - scripts/staging/test-candidate-application-tracker-ui.mjs
+      - scripts/staging/test-candidate-application-draft-ui.mjs
+      - scripts/staging/test-candidate-opportunity-matches-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/components/candidate/CandidateAuthForm.tsx
@@ -24,6 +26,7 @@ on:
       - scripts/staging/test-candidate-document-session-contract.mjs
       - scripts/staging/test-candidate-document-vault-ui.mjs
       - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/app/candidate/opportunity-matches/page.tsx
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
@@ -52,7 +55,6 @@ on:
       - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
       - scripts/validators/validate-free-destiny-map-preview.mjs
       - package.json
-      - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-profile-ui.mjs
       - scripts/staging/test-candidate-workbench-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
@@ -75,6 +77,8 @@ on:
       - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
       - scripts/staging/test-candidate-application-tracker-ui.mjs
+      - scripts/staging/test-candidate-application-draft-ui.mjs
+      - scripts/staging/test-candidate-opportunity-matches-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/components/candidate/CandidateAuthForm.tsx
@@ -84,6 +88,7 @@ on:
       - scripts/staging/test-candidate-document-session-contract.mjs
       - scripts/staging/test-candidate-document-vault-ui.mjs
       - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/app/candidate/opportunity-matches/page.tsx
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
@@ -111,7 +116,6 @@ on:
       - apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
       - scripts/validators/validate-free-destiny-map-preview.mjs
       - package.json
-      - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-profile-ui.mjs
       - scripts/staging/test-candidate-workbench-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
@@ -211,8 +215,8 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0107_application_capacity_entitlements_20261101.sql
       - name: Apply verified-readiness migration 0108
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
-      - name: Apply application-draft migration 0109
-        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - name: Apply candidate-safe status and draft proposal (disposable lifecycle only)
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
       - name: Test full verified-match to application-draft lifecycle
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < scripts/staging/test-application-lifecycle-postgres.sql
       - name: Create isolated N15 source-review database
@@ -239,6 +243,9 @@ jobs:
       - name: Test candidate draft browser save and resume
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-application-draft-ui.mjs
+      - name: Test candidate opportunity-match session, save and next steps
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-opportunity-matches-ui.mjs
       - name: Test candidate profile save, reload and consent
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-profile-ui.mjs

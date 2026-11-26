@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useMemo, useState } from "react";
 
 const PATHWAYS = [
@@ -39,20 +40,25 @@ type Opportunity = {
 
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
-function getAuthContext(): { url: string; anonKey: string; token: string } | null {
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !anonKey) return null;
-    const projectRef = new URL(url).hostname.split(".")[0];
-    const storageKey = projectRef ? `sb-${projectRef}-auth-token` : "sb-euhubhhnumtibbyufghm-auth-token";
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) return null;
-    const parsed = JSON.parse(stored) as { access_token?: string; expires_at?: number };
-    if (typeof parsed.access_token !== "string") return null;
-    if (typeof parsed.expires_at === "number" && parsed.expires_at <= Math.floor(Date.now() / 1000)) return null;
-    return { url, anonKey, token: parsed.access_token };
-  } catch { return null; }
+type CandidateAuthContext = { url: string; anonKey: string; token: string };
+type CandidateAuthContextResult =
+  | { auth: CandidateAuthContext; error: null }
+  | { auth: null; error: string };
+
+function getAuthContext(): CandidateAuthContextResult {
+  const state = getCandidateSessionState();
+  switch (state.status) {
+    case "ready":
+      return { auth: { url: state.url, anonKey: state.anonKey, token: state.token }, error: null };
+    case "not_configured":
+      return { auth: null, error: "Candidate opportunity matching is not configured for this deployment. Try again later." };
+    case "missing":
+      return { auth: null, error: "Sign in to load and save verified opportunities." };
+    case "expired":
+      return { auth: null, error: "Your candidate session has expired. Sign in again to continue." };
+    case "unreadable":
+      return { auth: null, error: "Your browser session could not be read. Sign in again." };
+  }
 }
 
 export default function CandidateOpportunityMatchesPage() {
@@ -69,8 +75,9 @@ export default function CandidateOpportunityMatchesPage() {
     setError("");
     setFeed(null);
     try {
-      const auth = getAuthContext();
-      if (!auth) throw new Error("Sign in with an active session. Candidate matching is not configured or your session may have expired.");
+      const session = getAuthContext();
+      if (!session.auth) throw new Error(session.error);
+      const auth = session.auth;
       const response = await fetch(`${auth.url}/functions/v1/n15-candidate-opportunities`, {
         method: "GET",
         headers: { apikey: auth.anonKey, Authorization: `Bearer ${auth.token}` },
@@ -97,11 +104,12 @@ export default function CandidateOpportunityMatchesPage() {
   ), [feed, pathway]);
 
   async function saveOpportunity(item: Opportunity) {
-    const auth = getAuthContext();
-    if (!auth) {
-      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: "Sign in again before saving an opportunity." } }));
+    const session = getAuthContext();
+    if (!session.auth) {
+      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: session.error } }));
       return;
     }
+    const auth = session.auth;
     const requiresPathwayChoice = AMBIGUOUS_SECTORS.has(item.sector);
     const selectedPathway = selectedPathways[item.match_ref] || (item.pathways.length === 1 ? item.pathways[0] : "");
     if (requiresPathwayChoice && (!selectedPathway || !item.pathways.includes(selectedPathway) || !PATHWAY_API_CODES[selectedPathway])) {
@@ -222,7 +230,17 @@ export default function CandidateOpportunityMatchesPage() {
                       {savingMatchRef === item.match_ref ? "Saving…" : "Save & prepare draft"}
                     </button>
                   </div>
-                  {saveResults[item.match_ref] ? <p role={saveResults[item.match_ref].ok ? "status" : "alert"} aria-live="polite" className={`mt-3 rounded-xl border p-3 text-sm leading-6 ${saveResults[item.match_ref].ok ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>{saveResults[item.match_ref].message}</p> : null}
+                  {saveResults[item.match_ref] ? (
+                    <div className="mt-3 space-y-3">
+                      <p role={saveResults[item.match_ref].ok ? "status" : "alert"} aria-live="polite" className={`rounded-xl border p-3 text-sm leading-6 ${saveResults[item.match_ref].ok ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>{saveResults[item.match_ref].message}</p>
+                      {saveResults[item.match_ref].ok ? (
+                        <nav aria-label="Next steps after saving opportunity" className="flex flex-wrap gap-3 text-sm font-semibold">
+                          <a href="/candidate/applications" className="inline-flex rounded-lg bg-slate-950 px-4 py-2.5 text-white">Open My Applications →</a>
+                          <a href="/candidate/saved-opportunities/" className="inline-flex rounded-lg border border-slate-300 px-4 py-2.5 text-slate-900">View Saved Opportunities</a>
+                        </nav>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </section>
