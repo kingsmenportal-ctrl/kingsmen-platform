@@ -30,7 +30,7 @@ create table if not exists public.candidate_application_draft_answers (
 
 alter table public.candidate_application_draft_answers enable row level security;
 alter table public.candidate_application_draft_answers force row level security;
-revoke all on public.candidate_application_draft_answers from anon, authenticated;
+revoke all on public.candidate_application_draft_answers from public, anon, authenticated;
 grant select, insert, update, delete on public.candidate_application_draft_answers to service_role;
 
 create or replace function public.get_candidate_application_draft(p_application_id uuid)
