@@ -80,8 +80,10 @@ async function callRpc(request: Request, rpc: string, args: Record<string, unkno
       return respond({ ready: false, code: "INVALID_UPSTREAM_RESPONSE" }, 502);
     }
     const result = payload as Record<string, unknown>;
+    const conflict = result.code === "APPLICATION_DRAFT_VERSION_CONFLICT"
+      || result.code === "APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT";
     return respond({ ready: true, ...result }, result.ok === false
-      ? result.code === "APPLICATION_DRAFT_VERSION_CONFLICT" ? 409 : 400
+      ? conflict ? 409 : 400
       : 200);
   } catch {
     return respond({ ready: false, code: "APPLICATION_DRAFT_UNAVAILABLE", error: "The application draft service could not be reached. Reconnect and retry." }, 503);
