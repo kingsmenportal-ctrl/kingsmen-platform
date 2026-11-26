@@ -68,11 +68,67 @@ export function validateCandidateDraftAnswers(
     }
   }
 
-  return {
-    valid: missingRequired.length === 0 && Object.keys(errors).length === 0,
-    missingRequired,
-    errors,
+  return { valid: missingRequired.length === 0 && Object.keys(errors).length === 0, missingRequired, errors };
+}
+
+export type CandidateApplicationAnswerData = {
+  motivation_statement?: unknown;
+  relevant_experience?: unknown;
+  qualifications_summary?: unknown;
+  availability_date?: unknown;
+  preferred_campus?: unknown;
+  additional_answers?: unknown;
+};
+
+export function validateCandidateApplicationAnswerData(input: unknown): CandidateDraftValidation {
+  const errors: Record<string, string> = {};
+  if (!input || typeof input !== "object" || Array.isArray(input) || !safeValue(input)) {
+    return { valid: false, missingRequired: [], errors: { _root: "Answer data must be a bounded JSON object." } };
+  }
+
+  const record = input as CandidateApplicationAnswerData;
+  const limits: Record<string, number> = {
+    motivation_statement: 5000,
+    relevant_experience: 4000,
+    qualifications_summary: 3000,
+    availability_date: 10,
+    preferred_campus: 180
   };
+  for (const [field, maxLength] of Object.entries(limits)) {
+    const value = record[field as keyof CandidateApplicationAnswerData];
+    if (value !== undefined && typeof value !== "string") errors[field] = "This field must be text.";
+    else if (typeof value === "string" && value.length > maxLength) errors[field] = `This field exceeds ${maxLength} characters.`;
+  }
+
+  if (typeof record.availability_date === "string" && record.availability_date !== "") {
+    const date = new Date(record.availability_date);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(record.availability_date) || Number.isNaN(date.valueOf())
+      || date.toISOString().slice(0, 10) !== record.availability_date) {
+      errors.availability_date = "Enter a valid date in YYYY-MM-DD format.";
+    }
+  }
+
+  if (record.additional_answers !== undefined) {
+    if (!Array.isArray(record.additional_answers) || record.additional_answers.length > 20) {
+      errors.additional_answers = "Provide no more than 20 additional provider answers.";
+    } else {
+      record.additional_answers.forEach((item, index) => {
+        if (!item || typeof item !== "object" || Array.isArray(item)) {
+          errors[`additional_answers.${index}`] = "Each additional answer must be an object.";
+          return;
+        }
+        const answer = item as Record<string, unknown>;
+        if (typeof answer.question_key !== "string" || !/^[A-Za-z0-9._:-]{1,80}$/.test(answer.question_key.trim())) {
+          errors[`additional_answers.${index}.question_key`] = "Use a valid provider question key (1–80 permitted characters).";
+        }
+        if (typeof answer.answer !== "string" || answer.answer.length > 2000) {
+          errors[`additional_answers.${index}.answer`] = "Answer must be text of at most 2,000 characters.";
+        }
+      });
+    }
+  }
+
+  return { valid: Object.keys(errors).length === 0, missingRequired: [], errors };
 }
 
 export type CandidateDraftLifecycle = "Draft" | "Submitted to Kingsmen" | "Action required";
