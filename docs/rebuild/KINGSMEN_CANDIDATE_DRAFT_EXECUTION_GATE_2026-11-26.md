@@ -66,3 +66,20 @@ PR [#357](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/357) is 
 - `runtimeSecurityPassed=false`
 - `candidateDraftRuntimeReady=false`
 - `migrationReplayAuthorized=false`
+
+
+## CI failure triage — 26 November 2026, 15:34 UTC
+
+The latest observed PR #357 CI run (`Kingsmen CI`, run 783, merge commit `9ae434c0d9f1a98936361e9627e27347f062a0a7`) failed during focused repository tests before later build/validation steps could run. The failure is a JavaScript parse error in `scripts/staging/test-kingsmen-restored-schema-inventory.mjs`: escaped backticks before the assertion message produced invalid source syntax.
+
+Corrected that test in commit `25f52ebc7da070b0c09fcf03c081f366339c9050` by restoring valid template literals and block structure. The corrected file is now the PR head. **The correction is not yet CI-verified**: no workflow run or status check has been returned for the new head at the time of this record. Do not mark CI green until a new run completes successfully.
+
+This correction fixes a repository test syntax defect only. It does not change staging, restore a backup, validate the live candidate journey, or authorize migration replay.
+
+## Execution ledger refresh
+
+- Repository test fix: committed on PR #357; CI re-run/pass not yet observed.
+- Independent reviewer: `ndabenhlemvelo-arch` is listed as the requested reviewer; review submission remains pending.
+- Backup/restore, schema reconciliation, and runtime candidate tests: still not executed.
+- Frontend: contract tests only; no verified live end-to-end candidate journey.
+- Backend: four draft persistence objects still absent from the live staging catalog; no DDL or data writes performed.
