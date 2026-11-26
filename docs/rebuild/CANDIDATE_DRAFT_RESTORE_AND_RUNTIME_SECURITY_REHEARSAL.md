@@ -28,6 +28,7 @@ Stop and record `BLOCKED` if any of the following is true:
 3. Restore the selected backup to the isolated target using the approved database-provider procedure. Do not replay application migrations as part of restore.
 4. Capture restore result, duration, database version/extensions, and object counts. Preserve provider logs with secrets redacted.
 5. Run the read-only schema inventory and compare the restored schema to the backup/source manifest: tables/columns/types/nullability/defaults, constraints, indexes, triggers, functions/signatures, grants, RLS enabled/forced state, policies, and migration ledger.
+   - Capture the inventory with `scripts/staging/kingsmen-restored-schema-inventory.sql` on both the restored target and the tracked-source reference. Keep the raw JSON artifacts outside the repository if function definitions or grants contain sensitive details; commit only redacted diffs.
 6. Reconcile each migration ledger entry against the exact tracked SQL body hash and deployment provenance. A filename match is not proof of body identity. Unknown or mismatched bodies remain unresolved; do not replay them.
 7. Execute the runtime security tests in Phase B against the restored isolated environment.
 8. Record pass/fail for each assertion, attach redacted query/test output, and record the restored target's disposal/retention outcome.
