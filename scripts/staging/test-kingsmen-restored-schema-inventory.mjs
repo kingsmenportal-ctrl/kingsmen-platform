@@ -6,8 +6,11 @@ const executableSql = sql.replace(/^\s*--.*$/gm, "").trim();
 
 assert.match(executableSql, /^WITH\b/i, "Schema inventory must be a read-only CTE query.");
 assert.match(executableSql, /SELECT jsonb_build_object/i);
-assert.doesNotMatch(executableSql, /\b(?:INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE|GRANT|REVOKE|COMMENT|CALL|DO|COPY)\b/i,
-  "Schema inventory must not contain mutations or command execution.");
+assert.doesNotMatch(
+  executableSql,
+  /\b(?:INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE|GRANT|REVOKE|COMMENT|CALL|DO|COPY)\b/i,
+  "Schema inventory must not contain mutations or command execution."
+);
 for (const [label, pattern] of [
   ["columns and defaults", /information_schema\.columns/],
   ["constraints", /pg_constraint/],
@@ -20,10 +23,18 @@ for (const [label, pattern] of [
   ["function grants", /aclexplode/],
   ["extensions", /pg_extension/],
   ["migration ledger", /supabase_migrations\.schema_migrations/]
-]) assert.match(executableSql, pattern, \`Inventory missing \${label}.\`);
+]) {
+  assert.match(executableSql, pattern, `Inventory missing ${label}.`);
+}
 
-for (const safetyFlag of ["'readOnly', true", "'writesPerformed', false", "'migrationsApplied', false", "'grantsOrPoliciesChanged', false", "'authChanged', false"]) {
-  assert.ok(executableSql.includes(safetyFlag), \`Missing safety marker: \${safetyFlag}\`);
+for (const safetyFlag of [
+  "'readOnly', true",
+  "'writesPerformed', false",
+  "'migrationsApplied', false",
+  "'grantsOrPoliciesChanged', false",
+  "'authChanged', false"
+]) {
+  assert.ok(executableSql.includes(safetyFlag), `Missing safety marker: ${safetyFlag}`);
 }
 console.log("RESTORED_SCHEMA_INVENTORY_CONTRACT_PASSED");
 console.log("- Covers columns, constraints, indexes, triggers, functions, grants, RLS, policies, extensions and migration ledger.");
