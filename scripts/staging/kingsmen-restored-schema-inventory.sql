@@ -123,8 +123,18 @@ migration_ledger_inventory AS (
     ELSE jsonb_build_object(
       'available', true,
       'entries', COALESCE((
-        SELECT jsonb_agg(jsonb_build_object('version', version, 'name', name) ORDER BY version)
-        FROM supabase_migrations.schema_migrations
+        SELECT jsonb_agg(
+          jsonb_build_object('version', ledger_rows.version, 'name', ledger_rows.name)
+          ORDER BY ledger_rows.version
+        )
+        FROM XMLTABLE(
+          '/table/row'
+          PASSING query_to_xml(
+            'SELECT version::text AS version, name::text AS name FROM supabase_migrations.schema_migrations ORDER BY version',
+            true, false, ''
+          )
+          COLUMNS version text PATH 'version', name text PATH 'name'
+        ) AS ledger_rows
       ), '[]'::jsonb)
     )
   END AS item
