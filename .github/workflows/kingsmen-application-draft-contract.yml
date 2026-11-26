@@ -15,6 +15,7 @@ on:
       - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
       - scripts/staging/test-candidate-application-tracker-ui.mjs
+      - scripts/staging/test-candidate-application-draft-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/components/candidate/CandidateAuthForm.tsx
@@ -76,6 +77,7 @@ on:
       - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
       - scripts/staging/test-candidate-application-tracker-ui.mjs
+      - scripts/staging/test-candidate-application-draft-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/components/candidate/CandidateAuthForm.tsx
