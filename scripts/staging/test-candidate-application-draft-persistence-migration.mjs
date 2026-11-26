@@ -14,6 +14,8 @@ for (const token of [
   "auth.uid()",
   "for update",
   "APPLICATION_DRAFT_VERSION_CONFLICT",
+  "APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT",
+  "is distinct from p_answer_data",
   "p_idempotency_key",
   "octet_length(p_answer_data::text) > 65536",
   "revoke all on function public.get_candidate_application_draft(uuid) from public, anon",
