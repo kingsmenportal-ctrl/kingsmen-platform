@@ -4,7 +4,7 @@ Repository: `kingsmenportal-ctrl/kingsmen-platform`
 Branch: `feat/candidate-application-journey-batch-2026-11-26`
 PR: #358 — https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/358
 Latest implementation commit: `654ecd20f03a44058e26ddfd8c353a17f5e8cfe3`
-Record is updated on this branch; CI for the latest persistence migration commits is not yet visible through the connected workflow-run lookup.
+Latest verified CI head: `f8c921fd1f9e88348607c7c3b90032c7c5918634`.
 
 ## Required operating contract for Kingsmen work
 - Continue implementation rather than substituting a report for work.
@@ -53,8 +53,8 @@ The earlier batch stopped at API/source-level validation and documentation while
 ### Tests and build evidence
 - Previous commit `8598036eff44d09bce5672f4297258dd2e57e2ce`: Kingsmen CI run 793, Jarvis Live Runtime run 2866, and staging RLS API-boundary run 48 completed successfully. These runs preceded the persistence migration.
 - Added `scripts/staging/test-candidate-application-draft-persistence-migration.mjs`, wired into `npm test`; it checks the source-level migration security/behavior contract only.
-- CI for the latest migration/test commits has not been verified. The connected workflow-run lookup returned no PR-triggered runs for latest head `654ecd20f03a44058e26ddfd8c353a17f5e8cfe3`.
-- No actual PostgreSQL execution test, authenticated database integration test, or browser E2E result is available.
+- CI on head `f8c921fd1f9e88348607c7c3b90032c7c5918634` passed: Kingsmen CI run 799, Jarvis Live Runtime run 2872, staging RLS API boundary run 54, and application draft contract run 191. Run 191's job completed successfully, including steps applying the draft-persistence migration to a disposable PostgreSQL fixture, testing save/idempotency/consent/candidate isolation, building the Next.js app, API auth/input boundaries, and Chromium browser smoke tests for draft save/resume, profile save/reload/consent, application workbench navigation and document flows. This is repeatable CI fixture evidence, not a restore of production/staging data and not a live Supabase execution.
+- PostgreSQL migration execution, draft persistence/security fixture tests and browser smoke tests are now available and passed in CI run 191. Live Supabase runtime integration and a full journey against a restored staging copy remain unverified.
 
 ### Backup and restore
 - No actual source database backup archive has been verified.
@@ -78,10 +78,10 @@ The earlier batch stopped at API/source-level validation and documentation while
 - [ ] Isolated backup restore without blind application-migration replay
 - [ ] Migration provenance reconciled against the restored schema
 - [x] Persistence migration and ownership-checked RPCs committed to the repository
-- [ ] SQL migration executes successfully on an isolated restored database
-- [ ] Authenticated save/reload, idempotent retry and optimistic conflict tests pass
+- [x] SQL migration executes successfully against the isolated PostgreSQL CI fixture (run 191)\n- [ ] SQL migration executes successfully on an isolated restored copy of the real staging database
+- [x] CI fixture tests for draft save/idempotency/candidate isolation pass\n- [ ] Authenticated save/reload, idempotent retry and optimistic conflict tests pass against a restored staging copy
 - [ ] Cross-candidate isolation and effective grants/RLS tests pass
-- [ ] Full candidate browser journey passes E2E
+- [x] CI browser smoke tests for draft save/resume, profile save/reload/consent, application workbench navigation and document flows pass\n- [ ] Full authenticated candidate browser journey passes E2E against integrated runtime
 - [ ] Correct target deployment and live smoke test pass
 - [ ] PR review, merge and change-control decisions recorded
 
