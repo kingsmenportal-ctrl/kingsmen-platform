@@ -4,6 +4,10 @@
 
 begin;
 
+-- PostgreSQL requires a unique key matching the composite ownership foreign key.
+create unique index if not exists candidate_applications_id_candidate_id_uidx
+  on public.candidate_applications (id, candidate_id);
+
 create table if not exists public.candidate_application_draft_answers (
   application_id uuid primary key references public.candidate_applications(id) on delete cascade,
   candidate_id uuid not null references public.candidates(id) on delete restrict,
