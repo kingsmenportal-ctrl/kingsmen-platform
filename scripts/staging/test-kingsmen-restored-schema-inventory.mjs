@@ -6,6 +6,9 @@ const executableSql = sql.replace(/^\s*--.*$/gm, "").trim();
 
 assert.match(executableSql, /^WITH\b/i, "Schema inventory must be a read-only CTE query.");
 assert.match(executableSql, /SELECT jsonb_build_object/i);
+assert.match(executableSql, /XMLTABLE\s*\(/i, "Optional migration ledger must be queried dynamically.");
+assert.match(executableSql, /query_to_xml\s*\(/i, "Migration ledger fallback must not statically bind a possibly absent relation.");
+assert.match(executableSql, /to_regclass\('supabase_migrations\.schema_migrations'\)/i);
 assert.doesNotMatch(
   executableSql,
   /\b(?:INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE|GRANT|REVOKE|COMMENT|CALL|DO|COPY)\b/i,
@@ -22,7 +25,9 @@ for (const [label, pattern] of [
   ["table grants", /role_table_grants/],
   ["function grants", /aclexplode/],
   ["extensions", /pg_extension/],
-  ["migration ledger", /supabase_migrations\.schema_migrations/]
+  ["migration ledger", /supabase_migrations\.schema_migrations/],
+  ["dynamic ledger query", /query_to_xml\s*\(/i],
+  ["XML ledger row extraction", /XMLTABLE\s*\(/i]
 ]) {
   assert.match(executableSql, pattern, `Inventory missing ${label}.`);
 }
