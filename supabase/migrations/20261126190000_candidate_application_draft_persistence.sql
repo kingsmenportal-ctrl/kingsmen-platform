@@ -178,6 +178,16 @@ begin
   v_has_existing := found;
 
   if v_has_existing and v_existing.idempotency_key = p_idempotency_key then
+    -- A retry may reuse a key only for the exact payload originally accepted.
+    -- Reusing a key with different content must never silently report success.
+    if v_existing.answer_data is distinct from p_answer_data then
+      return jsonb_build_object(
+        'ok', false,
+        'code', 'APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT',
+        'message', 'This idempotency key was already used with different draft content.'
+      );
+    end if;
+
     return jsonb_build_object(
       'ok', true, 'reused', true,
       'draft_version', v_existing.draft_version,
