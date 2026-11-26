@@ -1,4 +1,5 @@
 import { readLimitedJson } from "../../../../lib/read-limited-json";
+import { isValidIdempotencyKey, validateCandidateApplicationAnswerData } from "../../../../lib/candidate-application-draft-contract";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -115,10 +116,20 @@ export async function POST(request: Request) {
   if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)
     || typeof incoming.application_id !== "string" || !UUID.test(incoming.application_id)
     || !Number.isInteger(incoming.expected_version) || (incoming.expected_version as number) < 0
-    || typeof incoming.idempotency_key !== "string"
-    || !/^[A-Za-z0-9._:-]{8,160}$/.test(incoming.idempotency_key)
+    || !isValidIdempotencyKey(incoming.idempotency_key)
     || !incoming.answer_data || typeof incoming.answer_data !== "object" || Array.isArray(incoming.answer_data)) {
     return respond({ ready: false, code: "APPLICATION_DRAFT_INPUT_INVALID", error: "The application, version, idempotency key or answer data is invalid." }, 400);
+  }
+
+  const validation = validateCandidateApplicationAnswerData(incoming.answer_data);
+  if (!validation.valid) {
+    return respond({
+      ready: false,
+      ok: false,
+      code: "APPLICATION_DRAFT_ANSWERS_INVALID",
+      error: "One or more application answers are invalid.",
+      validation_errors: validation.errors
+    }, 400);
   }
 
   return callRpc(request, "save_candidate_application_draft", {
