@@ -37,6 +37,7 @@ begin
      or p_idempotency_key is null or length(p_idempotency_key) not between 8 and 160
      or p_order_ref is null or p_invoice_ref is null or p_intent_ref is null
      or p_evidence_ref is null or jsonb_typeof(p_signed_payload) is distinct from 'object'
+     or p_return_url is null or p_cancel_url is null or p_notify_url is null
      or p_return_url !~ '^https://' or p_cancel_url !~ '^https://' or p_notify_url !~ '^https://' then
     raise exception 'INVALID_CHECKOUT_BUNDLE_INPUT' using errcode = '22023';
   end if;
