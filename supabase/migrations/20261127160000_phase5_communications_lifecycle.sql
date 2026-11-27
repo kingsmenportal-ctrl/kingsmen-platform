@@ -4,6 +4,7 @@
 begin;
 
 alter table public.notification_outbox
+  add column if not exists provider_delivery_status text not null default 'UNKNOWN',
   add column if not exists attempt_count integer not null default 0,
   add column if not exists max_attempts integer not null default 5,
   add column if not exists next_attempt_at timestamptz not null default now(),
@@ -37,6 +38,17 @@ create table if not exists public.candidate_communication_preferences (
     or (suppressed_at is not null and nullif(trim(suppression_reason),'') is not null)
   )
 );
+
+create table if not exists public.notification_provider_events (
+  event_id text primary key,
+  provider_message_id text not null,
+  event_type text not null check (event_type in ('DELIVERED','BOUNCED','COMPLAINED','DELAYED')),
+  safe_payload jsonb not null default '{}'::jsonb check (jsonb_typeof(safe_payload)='object'),
+  received_at timestamptz not null default now()
+);
+alter table public.notification_provider_events enable row level security;
+revoke all on public.notification_provider_events from public, anon, authenticated;
+grant all on public.notification_provider_events to service_role;
 
 create index if not exists notification_outbox_retry_idx
   on public.notification_outbox(status, next_attempt_at, created_at)
@@ -294,7 +306,7 @@ begin
     update public.notification_outbox set status='SENT', sent_at=statement_timestamp(),
       failed_at=null, last_error=null, provider=p_provider, locked_at=null
     where id=v_outbox.id;
-    return jsonb_build_object('ok',true,'status','SENT','delivery_confirmed',true,'attempt_ref',v_attempt_ref);
+    return jsonb_build_object('ok',true,'status','SENT','delivery_confirmed',false,'attempt_ref',v_attempt_ref);
   elsif p_outcome='SIMULATED' then
     update public.notification_outbox set status='SIMULATED', sent_at=null,
       last_error=null, provider=p_provider, locked_at=null
@@ -524,6 +536,59 @@ revoke all on function public.request_candidate_finance_refund(text,integer,text
 grant execute on function public.request_candidate_finance_refund(text,integer,text) to authenticated;
 revoke all on function public.review_finance_refund_request(text,text,text,text) from public, anon, authenticated;
 grant execute on function public.review_finance_refund_request(text,text,text,text) to authenticated;
+
+create or replace function public.record_notification_provider_event(
+  p_event_id text, p_provider_message_id text, p_event text, p_safe_payload jsonb default '{}'::jsonb
+) returns jsonb
+language plpgsql security definer
+set search_path = ''
+as $function$
+declare
+  v_inserted integer;
+  v_notification_ref text;
+  v_candidate_ref text;
+  v_status text;
+begin
+  if p_event_id is null or length(p_event_id) not between 1 and 200
+     or p_provider_message_id is null or length(p_provider_message_id) not between 1 and 200
+     or p_event not in ('DELIVERED','BOUNCED','COMPLAINED','DELAYED')
+     or jsonb_typeof(coalesce(p_safe_payload,'{}'::jsonb)) is distinct from 'object' then
+    raise exception 'INVALID_PROVIDER_EVENT' using errcode='22023';
+  end if;
+  insert into public.notification_provider_events(event_id,provider_message_id,event_type,safe_payload)
+  values(p_event_id,p_provider_message_id,p_event,coalesce(p_safe_payload,'{}'::jsonb))
+  on conflict(event_id) do nothing;
+  get diagnostics v_inserted = row_count;
+  if v_inserted=0 then return jsonb_build_object('ok',true,'duplicate',true,'delivery_status','UNCHANGED'); end if;
+  select a.notification_ref,o.candidate_ref into v_notification_ref,v_candidate_ref
+  from public.notification_delivery_attempts a
+  join public.notification_outbox o on o.notification_ref=a.notification_ref
+  where a.provider_message_id=p_provider_message_id
+  order by a.attempted_at desc limit 1;
+  if v_notification_ref is null then
+    return jsonb_build_object('ok',true,'matched',false,'delivery_status','UNMATCHED');
+  end if;
+  v_status := p_event;
+  update public.notification_delivery_attempts set status=p_event,
+    response_body=coalesce(response_body,'{}'::jsonb) || jsonb_build_object('providerEvent',p_event)
+  where notification_ref=v_notification_ref and provider_message_id=p_provider_message_id;
+  update public.notification_outbox set provider_delivery_status=p_event
+  where notification_ref=v_notification_ref;
+  if p_event in ('BOUNCED','COMPLAINED') and v_candidate_ref is not null then
+    insert into public.candidate_communication_preferences(
+      candidate_ref,transactional_email_enabled,suppressed_at,suppression_reason,consent_source,consent_updated_at,updated_at
+    ) values (v_candidate_ref,false,statement_timestamp(),case when p_event='BOUNCED' then 'PROVIDER_BOUNCE' else 'PROVIDER_COMPLAINT' end,
+      'PROVIDER_WEBHOOK',statement_timestamp(),statement_timestamp())
+    on conflict(candidate_ref) do update set transactional_email_enabled=false,
+      suppressed_at=excluded.suppressed_at,suppression_reason=excluded.suppression_reason,
+      consent_source='PROVIDER_WEBHOOK',consent_updated_at=excluded.consent_updated_at,updated_at=excluded.updated_at;
+  end if;
+  return jsonb_build_object('ok',true,'matched',true,'delivery_status',v_status,'suppressed',p_event in ('BOUNCED','COMPLAINED'));
+end;
+$function$;
+
+revoke all on function public.record_notification_provider_event(text,text,text,jsonb) from public, anon, authenticated;
+grant execute on function public.record_notification_provider_event(text,text,text,jsonb) to service_role;
 
 revoke all on function public.claim_notification_outbox(integer) from public, anon, authenticated;
 grant execute on function public.claim_notification_outbox(integer) to service_role;
