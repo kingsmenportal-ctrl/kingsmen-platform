@@ -2,7 +2,7 @@
 
 import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const MIME_BY_EXTENSION: Record<string, string> = {
@@ -296,7 +296,7 @@ export function DocumentPreflightPanel() {
     }
   }
 
-  async function submitDeletionRequest(event: React.FormEvent<HTMLFormElement>) {
+  async function submitDeletionRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!deletionTarget || deletionReason.trim().length < 3) return;
     setRequestingDeletion(true);
