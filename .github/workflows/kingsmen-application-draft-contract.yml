@@ -13,6 +13,7 @@ on:
       - scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
       - scripts/staging/test-supabase-candidate-draft-postgres.sql
       - apps/web/src/app/api/candidate/application-handoff/route.ts
+      - scripts/staging/test-candidate-application-handoff-api-boundary.mjs
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
@@ -77,6 +78,7 @@ on:
       - scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
       - scripts/staging/test-supabase-candidate-draft-postgres.sql
       - apps/web/src/app/api/candidate/application-handoff/route.ts
+      - scripts/staging/test-candidate-application-handoff-api-boundary.mjs
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
@@ -244,6 +246,9 @@ jobs:
       - name: Test candidate draft API authentication and input boundary
         timeout-minutes: 3
         run: npm run candidate:draft:api:test
+      - name: Test provider portal handoff API authentication and input boundary
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-application-handoff-api-boundary.mjs
       - name: Install Chromium for browser smoke tests
         run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test application tracker and saved draft resume journey
