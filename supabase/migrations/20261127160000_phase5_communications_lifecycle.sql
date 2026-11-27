@@ -22,6 +22,25 @@ begin
 end
 $constraint$;
 
+alter table public.candidate_private_documents enable row level security;
+alter table public.candidate_private_document_events enable row level security;
+revoke all on public.candidate_private_documents, public.candidate_private_document_events from public, anon, authenticated;
+grant all on public.candidate_private_documents, public.candidate_private_document_events to service_role;
+do $private_document_policies$
+declare p record;
+begin
+  for p in select schemaname,tablename,policyname from pg_policies
+    where schemaname='public' and tablename in ('candidate_private_documents','candidate_private_document_events')
+  loop
+    execute format('drop policy %I on %I.%I',p.policyname,p.schemaname,p.tablename);
+  end loop;
+end
+$private_document_policies$;
+create policy candidate_private_documents_service_role_all on public.candidate_private_documents
+  for all to service_role using (true) with check (true);
+create policy candidate_private_document_events_service_role_all on public.candidate_private_document_events
+  for all to service_role using (true) with check (true);
+
 alter table public.candidate_private_documents
   add column if not exists deleted_at timestamptz,
   add column if not exists retention_expires_at timestamptz;
