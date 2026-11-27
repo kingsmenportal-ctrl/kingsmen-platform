@@ -39,6 +39,26 @@ on:
       - ".github/workflows/kingsmen-phase5-contract.yml"
 
 jobs:
+  root-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install repository dependencies
+        run: npm ci
+      - name: Run repository regression and Phase 5 validators
+        run: npm test
+      - name: Validate canonical finance catalogue
+        run: npm run finance:test:canonical-catalogue
+      - name: Validate PayFast sandbox boundary
+        run: npm run payments:prove:sandbox && npm run payments:validate:sandbox
+      - name: Validate communications boundary
+        run: npm run communications:prove && npm run communications:validate
+
   postgres-contract:
     runs-on: ubuntu-latest
     services:
