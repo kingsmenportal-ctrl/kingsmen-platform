@@ -3,6 +3,7 @@ declare
   v_candidate_a uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
   v_candidate_b uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   v_document_a uuid := 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+  v_document_b uuid := '99999999-9999-4999-8999-999999999999';
   v_review_a uuid := 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
   v_review_b uuid := 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
   v_outbox_count integer;
@@ -10,12 +11,14 @@ begin
   insert into public.candidate_communication_preferences(candidate_id,email_address,email_transactional)
   values (v_candidate_a,'candidate-a@example.test',true),(v_candidate_b,'candidate-b@example.test',false);
   insert into public.candidate_private_documents(id,candidate_id,application_id,original_filename,status)
-  values (v_document_a,v_candidate_a,'11111111-1111-4111-8111-111111111111','proof.pdf','CORRECTION_REQUIRED');
+  values
+    (v_document_a,v_candidate_a,'11111111-1111-4111-8111-111111111111','proof.pdf','CORRECTION_REQUIRED'),
+    (v_document_b,v_candidate_b,'bbbbbbbb-0000-4000-8000-000000000001','opted-out.pdf','VERIFIED');
 
   insert into public.candidate_private_document_reviews(id,document_id,candidate_id,reviewer_auth_user_id,decision,reviewer_note,evidence_reference)
   values (v_review_a,v_document_a,v_candidate_a,'22222222-2222-4222-8222-222222222222','CORRECTION_REQUIRED','Please replace the unreadable file.','review-evidence-001');
   insert into public.candidate_private_document_reviews(id,document_id,candidate_id,reviewer_auth_user_id,decision,reviewer_note,evidence_reference)
-  values (v_review_b,v_document_a,v_candidate_b,'22222222-2222-4222-8222-222222222222','VERIFIED','not applicable','review-evidence-002');
+  values (v_review_b,v_document_b,v_candidate_b,'22222222-2222-4222-8222-222222222222','VERIFIED','not applicable','review-evidence-002');
 
   insert into public.finance_payments(payment_ref,order_ref,candidate_ref,payment_status,verified)
   values ('pay_a','ord_a',v_candidate_a::text,'PENDING',false);
