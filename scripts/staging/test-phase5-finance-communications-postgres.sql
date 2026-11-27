@@ -95,6 +95,18 @@ BEGIN
     RAISE EXCEPTION 'refund review must not execute a provider refund: %',v_review;
   END IF;
 
+  PERFORM set_config('request.jwt.claim.sub','aaaaaaaa-0000-4000-8000-000000000001',true);
+  v_summary := public.update_candidate_communication_preferences(false,true,false,false);
+  IF v_summary#>>'{preferences,transactional_email_enabled}' IS DISTINCT FROM 'false'
+     OR v_summary#>>'{preferences,marketing_email_enabled}' IS DISTINCT FROM 'true'
+     OR (SELECT count(*) FROM public.communication_preference_events WHERE candidate_ref='11111111-1111-4111-8111-111111111111') <> 1 THEN
+    RAISE EXCEPTION 'candidate communication opt-out was not saved and audited: %',v_summary;
+  END IF;
+  v_summary := public.get_candidate_communication_preferences();
+  IF v_summary->>'transactional_email_enabled' IS DISTINCT FROM 'false' THEN
+    RAISE EXCEPTION 'candidate communication preference could not be reloaded: %',v_summary;
+  END IF;
+
   INSERT INTO public.candidate_communication_preferences(candidate_ref,transactional_email_enabled,consent_source)
   VALUES ('optout-candidate',false,'USER_PREFERENCE');
   INSERT INTO public.notification_outbox(

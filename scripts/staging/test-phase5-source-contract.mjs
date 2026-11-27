@@ -23,6 +23,8 @@ assert.match(commMigration, /candidate_private_document_review_notify/);
 assert.match(commMigration, /request_candidate_finance_refund/);
 assert.match(commMigration, /review_finance_refund_request/);
 assert.match(commMigration, /record_notification_provider_event/);
+assert.match(commMigration, /update_candidate_communication_preferences/);
+assert.match(commMigration, /communication_preference_events/);
 assert.match(webhook, /verifySvix/);
 assert.match(webhook, /email\.bounced/);
 assert.match(webhook, /email\.delivered/);
