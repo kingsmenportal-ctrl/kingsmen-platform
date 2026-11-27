@@ -162,3 +162,11 @@ The connected tooling was inspected for safe automation of staging Auth users, p
 
 ### Current release decision
 These gates remain **BLOCKED**, not passed. No production resources were modified, no live payment was initiated, no message was sent, no credentials were exposed, and no backup restore was attempted. The next useful external action is to place the authorized source backup in a connected storage location and configure the required staging secrets/identities through their native admin consoles; after those prerequisites exist, run the runtime tests and attach raw redacted evidence to this record.
+## Follow-up hardening — 2026-11-27
+
+- Fixed malformed numeric Content-Length regular expressions in the PayFast ITN handler and communications outbox worker. The previous escaped pattern rejected ordinary digit-only lengths; the corrected guard accepts numeric lengths while retaining the existing body-size limits.
+- Expanded source regression contracts to assert the numeric-length guards, PayFast duplicate-form rejection and accepted-receipt replay checks, verified-complete settlement gate, candidate identity/active-state and owner scoping, 60-second signed-read TTL, audit-before-signed-link return, and document type/size/extension validation.
+- Changes are committed on the implementation branch. CI success observed before these follow-up commits is not treated as validation of these changes; re-run CI against the resulting branch head before relying on these assertions.
+- PR #358 has no submitted review or inline review threads at the last check. Independent code review remains outstanding.
+- Migration/schema provenance discrepancies remain a hard stop: the actual source backup and isolated restore have not been verified. Do not replay migrations against staging or production to resolve the discrepancy. Use the verified backup to reconcile the source schema and migration history first.
+- No production deployment, live payment, or live message send was performed. These gates remain open.
