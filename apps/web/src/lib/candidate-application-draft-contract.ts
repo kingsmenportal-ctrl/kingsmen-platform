@@ -80,6 +80,15 @@ export type CandidateApplicationAnswerData = {
   additional_answers?: unknown;
 };
 
+export function normalizeCandidateApplicationAnswerData(input: unknown): unknown {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return input;
+  const normalized = { ...(input as Record<string, unknown>) };
+  // The candidate editor submits empty optional date controls as an empty string.
+  // Omit that value before the SQL contract, which stores either a valid date or no value.
+  if (normalized.availability_date === "") delete normalized.availability_date;
+  return normalized;
+}
+
 export function validateCandidateApplicationAnswerData(input: unknown): CandidateDraftValidation {
   const errors: Record<string, string> = {};
   if (!input || typeof input !== "object" || Array.isArray(input) || !safeValue(input)) {
