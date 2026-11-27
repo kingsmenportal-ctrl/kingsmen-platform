@@ -4,7 +4,8 @@
 **Status:** IMPLEMENTATION IN PROGRESS — not release-complete  
 **Repository:** https://github.com/kingsmenportal-ctrl/kingsmen-platform  
 **Branch:** `feat/candidate-application-journey-batch-2026-11-26`  
-**Recorded HEAD:** `1bf31040e4caa22d15bcbe61d789165478a00d8f`  
+**Source implementation head with successful build/browser validation:** `6156082f4185e6779f3476e92fb05c40d03dfb55`  
+**Current branch head at this update:** `5c4c0b5bb055f4f6a4fdc2586da239658762d59f` (subsequent commits correct regression-test assertions; latest rerun pending)  
 **Pull request:** https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/358
 
 ## Implemented in source
@@ -31,18 +32,20 @@
 
 ## Validation evidence
 
-Latest HEAD workflows are running; do not treat them as complete until the run conclusions are recorded:
-- Kingsmen CI: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009950360
-- Kingsmen staging RLS API boundary: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009949820
-- Jarvis Live Runtime: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009949906
-- Kingsmen application draft contract: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009949831
+Latest code validation:
+- **Application draft contract completed successfully on source implementation commit `6156082f4185e6779f3476e92fb05c40d03dfb55`**: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46010379571. This run built the Next.js application and passed the authenticated document proxy boundary, exact candidate-draft migration/handoff SQL test, isolated finance least-privilege migration test, isolated communications outbox/claim/retry SQL test, and Chromium candidate/document journeys.
+- Jarvis Live Runtime passed on current source: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46010643149
+- Staging RLS API boundary passed on current source: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46010643134
+- Current Kingsmen CI: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46010643241 (in progress at this record update)
+- Current application draft contract rerun: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46010643103 (in progress at this record update)
+- The preceding Kingsmen CI failure on `6156082...` was a malformed regular expression in the new finance-operator static test, not an application build failure. The assertion was corrected; the current CI rerun must pass before merge.
 
 On commit `04f1ea9ac7fa96a07ac1efc3fb964f66824e87f7`, the root CI, staging RLS boundary and Jarvis Live Runtime completed successfully:
 - https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009741629
 - https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009741663
 - https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/46009741769
 
-The application draft contract run on that prior commit had passed the document proxy boundary, the exact candidate-draft migration/handoff integration test, the isolated finance least-privilege migration test and the isolated communications outbox integration test; the workflow was still building/running browser journeys at the last inspection. The latest HEAD reruns are pending.
+The successful application draft contract run above is the first complete run covering both new Phase 5 SQL migrations and the full candidate/document browser suite. The current source changes after that validated implementation head are regression-test assertion corrections; their final CI reruns are pending.
 
 ## Verified external/runtime findings and blockers
 
