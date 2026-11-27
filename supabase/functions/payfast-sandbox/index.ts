@@ -161,7 +161,8 @@ async function checkout(request: Request, body: Record<string, unknown>) {
       p_return_url: returnUrl,
       p_cancel_url: cancelUrl,
       p_notify_url: notifyUrl,
-      p_signed_payload: signed,
+      // Persist only non-secret checkout fields. The merchant key and signature are reconstructed server-side on retry.
+      p_signed_payload: Object.fromEntries(Object.entries(fields).filter(([key]) => key !== "merchant_key" && key !== "signature" && key !== "passphrase")),
     }),
   });
   const result = Array.isArray(bundle) ? bundle[0] : bundle;
