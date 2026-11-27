@@ -643,14 +643,14 @@ begin
   values(p_event_id,p_provider_message_id,p_event,coalesce(p_safe_payload,'{}'::jsonb))
   on conflict(event_id) do nothing;
   get diagnostics v_inserted = row_count;
-  if v_inserted=0 then return jsonb_build_object('ok',true,'duplicate',true,'delivery_status','UNCHANGED'); end if;
+  -- Even duplicate webhooks retry the lookup so an event received before the send-attempt write can be reconciled.
   select a.notification_ref,o.candidate_ref into v_notification_ref,v_candidate_ref
   from public.notification_delivery_attempts a
   join public.notification_outbox o on o.notification_ref=a.notification_ref
   where a.provider_message_id=p_provider_message_id
   order by a.attempted_at desc limit 1;
   if v_notification_ref is null then
-    return jsonb_build_object('ok',true,'matched',false,'delivery_status','UNMATCHED');
+    return jsonb_build_object('ok',true,'duplicate',v_inserted=0,'matched',false,'delivery_status','UNMATCHED');
   end if;
   v_status := p_event;
   update public.notification_delivery_attempts set status=p_event,
@@ -667,7 +667,7 @@ begin
       suppressed_at=excluded.suppressed_at,suppression_reason=excluded.suppression_reason,
       consent_source='PROVIDER_WEBHOOK',consent_updated_at=excluded.consent_updated_at,updated_at=excluded.updated_at;
   end if;
-  return jsonb_build_object('ok',true,'matched',true,'delivery_status',v_status,'suppressed',p_event in ('BOUNCED','COMPLAINED'));
+  return jsonb_build_object('ok',true,'duplicate',v_inserted=0,'matched',true,'delivery_status',v_status,'suppressed',p_event in ('BOUNCED','COMPLAINED'));
 end;
 $function$;
 
