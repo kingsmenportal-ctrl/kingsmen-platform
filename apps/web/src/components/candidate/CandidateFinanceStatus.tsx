@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getCandidateSessionState } from "@/lib/candidate-session";
 
 type FinanceOrder = { order_ref: string; plan_code: string; order_status: string; amount_cents: number; currency: string; created_at: string };
@@ -57,7 +57,7 @@ export default function CandidateFinanceStatus() {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  async function submitRefund(event: React.FormEvent<HTMLFormElement>) {
+  async function submitRefund(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
     setError("");

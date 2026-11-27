@@ -131,6 +131,24 @@ BEGIN
     RAISE EXCEPTION 'document review did not enqueue portal/email notifications';
   END IF;
 
+  INSERT INTO public.candidate_communication_preferences(candidate_ref,transactional_email_enabled,consent_source)
+  VALUES ('candidate-bounce',true,'USER_PREFERENCE');
+  INSERT INTO public.notification_outbox(
+    notification_ref,candidate_ref,channel,recipient,subject,body,purpose,status,idempotency_key,
+    scheduled_for,evidence_ref,provider_delivery_status
+  ) VALUES (
+    'notif-bounce-001','candidate-bounce','EMAIL_PRIMARY','bounce@example.test','Test','Test body',
+    'TEST','SENT','idem-bounce-001',now(),'evidence-bounce-001','ACCEPTED'
+  );
+  INSERT INTO public.notification_delivery_attempts(
+    attempt_ref,notification_ref,channel,provider,provider_message_id,status,response_code,response_body,evidence_ref
+  ) VALUES ('attempt-bounce-001','notif-bounce-001','EMAIL_PRIMARY','RESEND','resend_msg_001','SENT','200','{}'::jsonb,'evidence-bounce-001');
+  PERFORM public.record_notification_provider_event('svix-event-001','resend_msg_001','BOUNCED','{"provider":"RESEND","event_type":"email.bounced"}'::jsonb);
+  IF (SELECT provider_delivery_status FROM public.notification_outbox WHERE notification_ref='notif-bounce-001') <> 'BOUNCED'
+     OR (SELECT transactional_email_enabled FROM public.candidate_communication_preferences WHERE candidate_ref='candidate-bounce') IS NOT FALSE THEN
+    RAISE EXCEPTION 'provider bounce did not update delivery state and suppress further transactional email';
+  END IF;
+
   IF has_table_privilege('authenticated','public.notification_outbox','SELECT')
      OR has_table_privilege('anon','public.finance_payments','SELECT')
      OR has_table_privilege('authenticated','public.finance_orders','SELECT')
