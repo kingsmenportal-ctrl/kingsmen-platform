@@ -21,6 +21,10 @@ const serviceRequests = [];
 const storageRequests = [];
 let uploadedBytes = null;
 let serverDocument = null;
+let latestDocumentType = "ID_DOCUMENT";
+let latestFilename = "CI-candidate-document.pdf";
+let latestApplicationId = null;
+let latestEvidencePurpose = "CANDIDATE_DOCUMENT";
 
 const corsHeaders = {
   "access-control-allow-origin": baseUrl,
@@ -59,11 +63,21 @@ async function installAuth(contextToConfigure, expiresAt) {
 
 function servicePayload(action) {
   if (action.action === "create_upload") {
-    assert.equal(action.documentTypeCode, "ID_DOCUMENT");
-    assert.equal(action.filename, "CI-candidate-document.pdf");
     assert.equal(action.mimeType, "application/pdf");
     assert.equal(action.sizeBytes, pdfBytes.length);
-    assert.equal(action.evidencePurpose, "CANDIDATE_DOCUMENT");
+    if (action.applicationId) {
+      assert.equal(action.applicationId, "ffffffff-ffff-4fff-8fff-fffffffffff1");
+      assert.equal(action.documentTypeCode, "APPLICATION_PROOF");
+      assert.equal(action.evidencePurpose, "PROVIDER_SUBMISSION_RECEIPT");
+    } else {
+      assert.equal(action.documentTypeCode, "ID_DOCUMENT");
+      assert.equal(action.filename, "CI-candidate-document.pdf");
+      assert.equal(action.evidencePurpose, "CANDIDATE_DOCUMENT");
+    }
+    latestDocumentType = action.documentTypeCode;
+    latestFilename = action.filename;
+    latestApplicationId = action.applicationId ?? null;
+    latestEvidencePurpose = action.evidencePurpose;
     return {
       ok: true,
       documentId,
@@ -80,9 +94,11 @@ function servicePayload(action) {
     assert.equal(serverDigest, expectedDigest);
     serverDocument = {
       id: documentId,
-      filename: "CI-candidate-document.pdf",
-      original_filename: "CI-candidate-document.pdf",
-      document_type: "ID_DOCUMENT",
+      filename: latestFilename,
+      original_filename: latestFilename,
+      document_type: latestDocumentType,
+      application_id: latestApplicationId,
+      evidence_purpose: latestEvidencePurpose,
       size_bytes: uploadedBytes.length,
       status: "UPLOADED_CANDIDATE_REPORTED",
       sha256_hex: serverDigest,
@@ -125,7 +141,7 @@ try {
   page.setDefaultTimeout(10_000);
   page.setDefaultNavigationTimeout(15_000);
 
-  await page.route("**/functions/v1/candidate-private-documents", async route => {
+  await context.route("**/functions/v1/candidate-private-documents", async route => {
     const request = route.request();
     const method = request.method();
     if (method === "OPTIONS") {
@@ -149,7 +165,7 @@ try {
     await route.fulfill({ status: 200, headers: corsHeaders, json: servicePayload(action) });
   });
 
-  await page.route("https://ci-storage.test/**", async route => {
+  await context.route("https://ci-storage.test/**", async route => {
     const request = route.request();
     if (request.method() === "OPTIONS") {
       await route.fulfill({ status: 204, headers: corsHeaders });
@@ -206,6 +222,40 @@ try {
   await page.getByText("expires in approximately 60 seconds", { exact: false }).waitFor();
   assert.equal(serviceRequests.filter(item => item.action === "create_download_url").length, 1);
 
+  // Provider receipts are attached to the exact parent application and stay
+  // candidate-reported until independent reviewer verification.
+  const receiptPage = await context.newPage();
+  const parentApplicationId = "ffffffff-ffff-4fff-8fff-fffffffffff1";
+  await receiptPage.goto(baseUrl + "/candidate/documents/?application_id=" + parentApplicationId
+    + "&evidence_purpose=PROVIDER_SUBMISSION_RECEIPT", { waitUntil: "networkidle" });
+  await receiptPage.getByText("Provider receipt for this Kingsmen application", { exact: true }).waitFor();
+  const receiptType = receiptPage.getByLabel("Document type");
+  await receiptPage.waitForFunction(() => document.querySelector("select")?.value === "APPLICATION_PROOF");
+  assert.equal(await receiptType.isDisabled(), true, "Receipt evidence must keep the provider-proof document type.");
+  await receiptPage.locator('input[type="file"]').setInputFiles({
+    name: "CI-provider-receipt.pdf",
+    mimeType: "application/pdf",
+    buffer: pdfBytes
+  });
+  await receiptPage.getByText("Local preflight passed", { exact: true }).waitFor();
+  await receiptPage.getByRole("button", { name: /Upload securely and finalise/ }).click();
+  await receiptPage.getByText("CI-provider-receipt.pdf", { exact: true }).waitFor();
+  const providerReceiptRequest = serviceRequests.find(item =>
+    item.action === "create_upload" && item.body?.evidencePurpose === "PROVIDER_SUBMISSION_RECEIPT");
+  assert.ok(providerReceiptRequest, "Provider receipt flow must call create_upload.");
+  assert.equal(providerReceiptRequest.body.applicationId, parentApplicationId);
+  assert.equal(providerReceiptRequest.body.documentTypeCode, "APPLICATION_PROOF");
+  assert.equal(providerReceiptRequest.body.evidencePurpose, "PROVIDER_SUBMISSION_RECEIPT");
+  // The visible filename can render before the asynchronous server finalisation completes.
+  // Wait for the authoritative mocked server record, not the preflight filename.
+  for (let attempt = 0; attempt < 50 && serverDocument?.application_id !== parentApplicationId; attempt += 1) {
+    await delay(100);
+  }
+  assert.equal(serverDocument.application_id, parentApplicationId);
+  assert.equal(serverDocument.evidence_purpose, "PROVIDER_SUBMISSION_RECEIPT");
+  assert.equal(serverDocument.status, "UPLOADED_CANDIDATE_REPORTED",
+    "A candidate upload must not be promoted to verified status.");
+
   expiredContext = await browser.newContext();
   await installAuth(expiredContext, Math.floor(Date.now() / 1000) - 60);
   const expiredPage = await expiredContext.newPage();
@@ -222,6 +272,7 @@ try {
   console.log("PASS: candidate upload uses a signed, non-upserting capability and a separate finalisation request");
   console.log("PASS: server-confirmed document and digest appear in the private-document list");
   console.log("PASS: download uses a short-lived signed URL and safe new-tab attributes");
+  console.log("PASS: provider receipt upload is linked to the correct parent application and remains candidate-reported");
   console.log("PASS: expired candidate session is rejected before private-document service calls");
 } finally {
   if (expiredContext) await expiredContext.close().catch(() => {});

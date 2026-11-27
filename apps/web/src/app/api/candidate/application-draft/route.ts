@@ -1,4 +1,5 @@
 import { readLimitedJson } from "../../../../lib/read-limited-json";
+import { isValidIdempotencyKey, normalizeCandidateApplicationAnswerData, validateCandidateApplicationAnswerData } from "../../../../lib/candidate-application-draft-contract";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -79,8 +80,10 @@ async function callRpc(request: Request, rpc: string, args: Record<string, unkno
       return respond({ ready: false, code: "INVALID_UPSTREAM_RESPONSE" }, 502);
     }
     const result = payload as Record<string, unknown>;
+    const conflict = result.code === "APPLICATION_DRAFT_VERSION_CONFLICT"
+      || result.code === "APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT";
     return respond({ ready: true, ...result }, result.ok === false
-      ? result.code === "APPLICATION_DRAFT_VERSION_CONFLICT" ? 409 : 400
+      ? conflict ? 409 : 400
       : 200);
   } catch {
     return respond({ ready: false, code: "APPLICATION_DRAFT_UNAVAILABLE", error: "The application draft service could not be reached. Reconnect and retry." }, 503);
@@ -115,15 +118,26 @@ export async function POST(request: Request) {
   if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)
     || typeof incoming.application_id !== "string" || !UUID.test(incoming.application_id)
     || !Number.isInteger(incoming.expected_version) || (incoming.expected_version as number) < 0
-    || typeof incoming.idempotency_key !== "string"
-    || !/^[A-Za-z0-9._:-]{8,160}$/.test(incoming.idempotency_key)
+    || !isValidIdempotencyKey(incoming.idempotency_key)
     || !incoming.answer_data || typeof incoming.answer_data !== "object" || Array.isArray(incoming.answer_data)) {
     return respond({ ready: false, code: "APPLICATION_DRAFT_INPUT_INVALID", error: "The application, version, idempotency key or answer data is invalid." }, 400);
   }
 
+  const answerData = normalizeCandidateApplicationAnswerData(incoming.answer_data);
+  const validation = validateCandidateApplicationAnswerData(answerData);
+  if (!validation.valid) {
+    return respond({
+      ready: false,
+      ok: false,
+      code: "APPLICATION_DRAFT_ANSWERS_INVALID",
+      error: "One or more application answers are invalid.",
+      validation_errors: validation.errors
+    }, 400);
+  }
+
   return callRpc(request, "save_candidate_application_draft", {
     p_application_id: incoming.application_id,
-    p_answer_data: incoming.answer_data,
+    p_answer_data: answerData,
     p_expected_version: incoming.expected_version,
     p_idempotency_key: incoming.idempotency_key
   });

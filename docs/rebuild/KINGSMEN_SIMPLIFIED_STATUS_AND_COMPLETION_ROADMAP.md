@@ -212,6 +212,14 @@ The schedule is expressed as engineering effort plus explicit gates, not as a cl
 
 **Working estimate:** 12–21 engineering days assuming code reuse and prompt decisions. External provider accounts, runtime credentials, security remediation, legal review and retesting may add roughly 3–10 working days. A realistic planning window is therefore **about 3–6 calendar weeks**. From 25 November 2026, the tentative planning window for a small private beta is **16 December 2026–6 January 2027**, conditional on the phase exit criteria and provider/legal dependencies; this is not a guarantee date. Re-estimate after Phase 2 and the first full candidate journey. Every phase has an explicit pass/fail exit condition.
 
+
+
+## Phase 5 implementation evidence — 27 November 2026
+
+Phase 5 implementation is underway on branch `feat/candidate-application-journey-batch-2026-11-26` and tracked in [the execution record](PHASE5_DOCUMENTS_FINANCE_COMMUNICATIONS_EXECUTION_RECORD_2026-11-27.md). The source implementation at `6156082f4185e6779f3476e92fb05c40d03dfb55` passed the application-draft-contract workflow, including Next.js build, candidate/document browser flows, the isolated finance privilege migration test and the isolated consent/outbox/claim/retry test. Subsequent changes correct regression-test assertions; the latest rerun is pending.
+
+**Phase 5 is not release-complete.** Read-only staging catalog inspection found direct client table grants on finance and candidate-communication tables; the new hardening migration is not applied. No real backup/isolated restore, live PayFast sandbox transaction, real email provider delivery, refund schema reconciliation, or deployment has been verified. Refund mutation remains disabled because the newer `finance_refund_requests` / `finance_orders` model does not match the legacy tables used by `n10_review_refund_request`. Live payments and production messaging remain disabled.
+
 ### What “complete” means
 
 Kingsmen is complete for a release only when:

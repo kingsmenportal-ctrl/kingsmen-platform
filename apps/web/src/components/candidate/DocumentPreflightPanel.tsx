@@ -1,6 +1,7 @@
 "use client";
 
 import { getCandidateSessionState } from "@/lib/candidate-session";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -128,6 +129,11 @@ async function documentApi(session: SessionConfig, action?: Record<string, unkno
 }
 
 export function DocumentPreflightPanel() {
+  const searchParams = useSearchParams();
+  const requestedApplicationId = searchParams.get("application_id") ?? "";
+  const applicationId = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedApplicationId)
+    ? requestedApplicationId : "";
+  const receiptFlow = searchParams.get("evidence_purpose") === "PROVIDER_SUBMISSION_RECEIPT";
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [documentType, setDocumentType] = useState<DocumentType>("OTHER");
   const [preflight, setPreflight] = useState<Preflight | null>(null);
@@ -157,6 +163,9 @@ export function DocumentPreflightPanel() {
   }, []);
 
   useEffect(() => { void loadDocuments(); }, [loadDocuments]);
+  useEffect(() => {
+    if (receiptFlow) setDocumentType("APPLICATION_PROOF");
+  }, [receiptFlow]);
 
   async function onChooseFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0] ?? null;
@@ -211,13 +220,20 @@ export function DocumentPreflightPanel() {
     try {
       const session = readSession();
       setNotice("Requesting a short-lived, candidate-scoped private upload capability…");
+      if (receiptFlow && !applicationId) {
+        throw new Error("A valid parent application reference is required to attach provider receipt evidence.");
+      }
+      const evidencePurpose = receiptFlow && applicationId
+        ? "PROVIDER_SUBMISSION_RECEIPT"
+        : "CANDIDATE_DOCUMENT";
       const uploadRequest = await documentApi(session, {
         action: "create_upload",
         documentTypeCode: documentType,
         filename: selectedFile.name,
         mimeType: preflight.mime,
         sizeBytes: selectedFile.size,
-        evidencePurpose: "CANDIDATE_DOCUMENT"
+        ...(applicationId ? { applicationId } : {}),
+        evidencePurpose
       });
       documentId = uploadRequest.document?.id || uploadRequest.documentId || uploadRequest.document_id || "";
       const signedUrl = uploadRequest.signedUploadUrl;
@@ -282,10 +298,16 @@ export function DocumentPreflightPanel() {
       <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-700">Secure document workflow</p>
       <h2 id="document-preflight-title" className="mt-2 text-xl font-bold text-slate-950">Preflight, upload and track your documents.</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">PDF, JPEG or PNG, up to 10 MiB per file. The browser computes an advisory SHA-256 digest; the private-document service independently validates file signatures and records the authoritative digest. Upload requires a live Supabase session and a reviewer-verified candidate identity.</p>
+      {receiptFlow && applicationId ? (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4" role="status">
+          <p className="font-semibold text-slate-950">Provider receipt for this Kingsmen application</p>
+          <p className="mt-1 text-sm leading-6 text-slate-700">The upload will be attached to parent application {applicationId} as candidate-reported provider receipt evidence. It remains unverified until an authorised Kingsmen reviewer checks it.</p>
+        </div>
+      ) : null}
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-semibold text-slate-800">Document type
-          <select value={documentType} onChange={(event) => setDocumentType(event.target.value as DocumentType)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm font-normal outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200">
+          <select value={documentType} onChange={(event) => setDocumentType(event.target.value as DocumentType)} disabled={receiptFlow} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm font-normal outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 disabled:bg-slate-100">
             {DOCUMENT_TYPES.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
           </select>
         </label>

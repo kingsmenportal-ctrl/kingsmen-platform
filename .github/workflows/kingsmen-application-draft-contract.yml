@@ -9,6 +9,20 @@ on:
       - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
+      - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+      - supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+      - supabase/functions/communications-outbox-worker/index.ts
+      - scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
+      - scripts/staging/test-phase5-communications-outbox.sql
+      - scripts/staging/test-phase5-communications-outbox-contract.mjs
+      - scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
+      - scripts/staging/test-phase5-finance-privileges.sql
+      - scripts/staging/test-phase5-finance-privileges-contract.mjs
+      - scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
+      - scripts/staging/test-supabase-candidate-draft-postgres.sql
+      - apps/web/src/app/api/candidate/application-handoff/route.ts
+      - scripts/staging/test-candidate-application-handoff-api-boundary.mjs
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
@@ -24,6 +38,18 @@ on:
       - scripts/staging/test-candidate-document-session-contract.mjs
       - scripts/staging/test-candidate-document-vault-ui.mjs
       - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/lib/private-document-proxy.ts
+      - apps/web/src/app/api/candidate/documents/upload-url/route.ts
+      - apps/web/src/app/api/candidate/documents/read-url/route.ts
+      - apps/web/src/app/api/candidate/documents/status/route.ts
+      - apps/web/src/app/api/founder/documents/review/route.ts
+      - apps/web/src/app/api/founder/finance/route.ts
+      - apps/web/src/app/operator/finance/page.tsx
+      - scripts/staging/test-phase5-finance-operator-boundary.mjs
+      - apps/web/src/app/api/founder/documents/review/download-url/route.ts
+      - apps/web/src/app/operator/documents/page.tsx
+      - apps/web/src/components/operator/DocumentReviewConsole.tsx
+      - scripts/staging/test-document-proxy-boundary.mjs
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
@@ -69,6 +95,20 @@ on:
       - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
+      - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+      - supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+      - supabase/functions/communications-outbox-worker/index.ts
+      - scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
+      - scripts/staging/test-phase5-communications-outbox.sql
+      - scripts/staging/test-phase5-communications-outbox-contract.mjs
+      - scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
+      - scripts/staging/test-phase5-finance-privileges.sql
+      - scripts/staging/test-phase5-finance-privileges-contract.mjs
+      - scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
+      - scripts/staging/test-supabase-candidate-draft-postgres.sql
+      - apps/web/src/app/api/candidate/application-handoff/route.ts
+      - scripts/staging/test-candidate-application-handoff-api-boundary.mjs
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
@@ -84,6 +124,18 @@ on:
       - scripts/staging/test-candidate-document-session-contract.mjs
       - scripts/staging/test-candidate-document-vault-ui.mjs
       - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/lib/private-document-proxy.ts
+      - apps/web/src/app/api/candidate/documents/upload-url/route.ts
+      - apps/web/src/app/api/candidate/documents/read-url/route.ts
+      - apps/web/src/app/api/candidate/documents/status/route.ts
+      - apps/web/src/app/api/founder/documents/review/route.ts
+      - apps/web/src/app/api/founder/finance/route.ts
+      - apps/web/src/app/operator/finance/page.tsx
+      - scripts/staging/test-phase5-finance-operator-boundary.mjs
+      - apps/web/src/app/api/founder/documents/review/download-url/route.ts
+      - apps/web/src/app/operator/documents/page.tsx
+      - apps/web/src/components/operator/DocumentReviewConsole.tsx
+      - scripts/staging/test-document-proxy-boundary.mjs
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
@@ -169,6 +221,8 @@ jobs:
         run: npm run db:preflight:candidate-draft:validate
       - name: Test candidate document session and navigation contract
         run: node scripts/staging/test-candidate-document-session-contract.mjs
+      - name: Test authenticated private document API proxy boundary
+        run: node scripts/staging/test-document-proxy-boundary.mjs
       - name: Test canonical candidate applications entry route
         run: node scripts/staging/test-candidate-applications-entry-route.mjs
       - name: Validate N15 source-review security contract
@@ -191,6 +245,30 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - name: Test draft save, idempotency, consent and candidate isolation
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/test-application-draft-postgres.sql
+      - name: Create isolated database for the current Supabase draft migration
+        run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_supabase_candidate_draft"
+      - name: Bootstrap schema-aligned Supabase candidate fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_supabase_candidate_draft -v ON_ERROR_STOP=1 < scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
+      - name: Apply the exact Supabase candidate-draft migration from this PR
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_supabase_candidate_draft -v ON_ERROR_STOP=1 < supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
+      - name: Test exact Supabase candidate-draft migration and official portal handoff
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_supabase_candidate_draft -v ON_ERROR_STOP=1 < scripts/staging/test-supabase-candidate-draft-postgres.sql
+      - name: Test Phase 5 finance table least-privilege migration in isolated PostgreSQL
+        run: |
+          set -euo pipefail
+          docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_phase5_finance"
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < scripts/staging/test-phase5-finance-privileges.sql
+          node scripts/staging/test-phase5-finance-privileges-contract.mjs
+      - name: Test document and verified-payment notification outbox in isolated PostgreSQL
+        run: |
+          set -euo pipefail
+          docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_phase5_comms"
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_comms -v ON_ERROR_STOP=1 < scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_comms -v ON_ERROR_STOP=1 < supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_comms -v ON_ERROR_STOP=1 < scripts/staging/test-phase5-communications-outbox.sql
+          node scripts/staging/test-phase5-communications-outbox-contract.mjs
       - name: Create isolated candidate status-contract database
         run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_status_contract"
       - name: Bootstrap candidate status-contract database
@@ -228,6 +306,9 @@ jobs:
       - name: Test candidate draft API authentication and input boundary
         timeout-minutes: 3
         run: npm run candidate:draft:api:test
+      - name: Test provider portal handoff API authentication and input boundary
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-application-handoff-api-boundary.mjs
       - name: Install Chromium for browser smoke tests
         run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test application tracker and saved draft resume journey

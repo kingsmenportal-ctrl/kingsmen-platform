@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { DocumentPreflightPanel } from "../../../components/candidate/DocumentPreflightPanel";
 
 export const metadata = {
@@ -61,7 +62,9 @@ export default function CandidateDocumentsPage() {
         </aside>
 
         <section className="space-y-5">
-          <DocumentPreflightPanel />
+          <Suspense fallback={<section className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading your private document workflow…</section>}>
+            <DocumentPreflightPanel />
+          </Suspense>
           <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:p-6" aria-labelledby="upload-runtime-boundary">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-800">Upload runtime</p>
             <h2 id="upload-runtime-boundary" className="mt-2 text-xl font-bold text-slate-950">Upload receipt and verification are separate states.</h2>

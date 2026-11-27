@@ -29,6 +29,15 @@ type Application = {
   created_at: string;
   updated_at: string;
 };
+type Handoff = {
+  submission_ref: string;
+  job_status?: string;
+  delivery_mode?: string;
+  provider_name?: string;
+  official_url: string;
+  provider_submission_sent: false;
+  next_steps?: string[];
+};
 type ApiResponse = {
   ready?: boolean;
   ok?: boolean;
@@ -47,6 +56,13 @@ type ApiResponse = {
   current_version?: number;
   readiness_recheck_required?: boolean;
   provider_submission_sent?: boolean;
+  handoff?: Handoff | null;
+  submission_ref?: string;
+  job_status?: string;
+  delivery_mode?: string;
+  official_url?: string;
+  provider_name?: string;
+  next_steps?: string[];
 };
 
 const EMPTY_ANSWERS: AnswerData = {
@@ -103,6 +119,8 @@ export default function CandidateApplicationDraftPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveIdempotencyKey, setSaveIdempotencyKey] = useState("");
+  const [handoff, setHandoff] = useState<Handoff | null>(null);
+  const [handoffPreparing, setHandoffPreparing] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
@@ -138,6 +156,7 @@ export default function CandidateApplicationDraftPage() {
       setServerEditable(body.is_editable === true);
       setProfileUpdatedAt(body.shared_profile_updated_at ?? null);
       setDraftUpdatedAt(body.draft_updated_at ?? null);
+      setHandoff(body.handoff ?? null);
       setSaveIdempotencyKey("");
       setNotice("");
     } catch (e) {
@@ -216,7 +235,9 @@ export default function CandidateApplicationDraftPage() {
       const body = await response.json() as ApiResponse;
       if (!response.ok || body.ready !== true || body.ok !== true) {
         if (body.code === "APPLICATION_DRAFT_VERSION_CONFLICT") {
-          setError("This draft was changed in another session. Reload the latest saved version before applying your changes.");
+          setError("This draft was changed in another session. Reload the latest saved version before applying your changes. Your current edits will remain on screen until you confirm the reload.");
+        } else if (body.code === "APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT") {
+          setError("This save key was already used for different content, so these newer edits were not saved. Choose “Reload saved draft” to reconcile the latest saved version, then reapply your changes before saving again. This did not submit your application to a provider.");
         } else {
           throw new Error(message(body));
         }
@@ -243,6 +264,62 @@ export default function CandidateApplicationDraftPage() {
   const isEditable = Boolean(serverEditable && application
     && isCandidateEditableApplicationStatus(application.kingsmen_status));
   const hasUnsavedChanges = isEditable && JSON.stringify(answers) !== JSON.stringify(savedAnswers);
+
+  async function prepareOfficialHandoff() {
+    if (!application || !applicationId || !isEditable || version < 1 || hasUnsavedChanges) {
+      setError("Save all application answers before preparing the official provider handoff.");
+      return;
+    }
+    const token = getCandidateAccessToken();
+    if (!token) {
+      setError("AUTHENTICATION_REQUIRED: Sign in again before preparing the provider handoff.");
+      return;
+    }
+    setHandoffPreparing(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/candidate/application-handoff", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({ application_id: applicationId }),
+        cache: "no-store"
+      });
+      const body = await response.json() as ApiResponse;
+      if (!response.ok || body.ready !== true || body.ok !== true) {
+        throw new Error(message(body));
+      }
+      const officialUrl = typeof body.official_url === "string" ? body.official_url : "";
+      let parsedUrl: URL;
+      try { parsedUrl = new URL(officialUrl); }
+      catch { throw new Error("The official provider URL was not valid. The handoff was not shown."); }
+      if (parsedUrl.protocol !== "https:" || body.provider_submission_sent !== false
+        || typeof body.submission_ref !== "string" || !body.submission_ref.trim()) {
+        throw new Error("The server did not return a valid manual handoff confirmation. No provider submission is claimed.");
+      }
+      setHandoff({
+        submission_ref: body.submission_ref,
+        job_status: body.job_status,
+        delivery_mode: body.delivery_mode,
+        provider_name: body.provider_name ?? application.provider_name,
+        official_url: parsedUrl.toString(),
+        provider_submission_sent: false,
+        next_steps: Array.isArray(body.next_steps) ? body.next_steps : undefined
+      });
+      setApplication(old => old ? {
+        ...old,
+        status: "MANUAL_ACTION_REQUIRED",
+        kingsmen_status: "Action required",
+        updated_at: new Date().toISOString()
+      } : old);
+      setServerEditable(false);
+      setNotice("Official provider portal handoff prepared. Kingsmen has not submitted your application; complete the provider process and upload its receipt for review.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not prepare the official provider handoff.");
+    } finally {
+      setHandoffPreparing(false);
+    }
+  }
 
   useEffect(() => {
     if (!hasUnsavedChanges) return;
@@ -371,6 +448,40 @@ export default function CandidateApplicationDraftPage() {
             <span className="text-xs text-slate-500">Optimistic version control prevents a newer saved draft being silently overwritten.</span>
           </div>
         </form>
+
+        {isEditable && version > 0 && !hasUnsavedChanges && !handoff ? (
+          <section className="rounded-3xl border border-amber-300 bg-amber-50 p-5 sm:p-6" aria-labelledby="provider-handoff-title">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-800">Final preparation step</p>
+            <h2 id="provider-handoff-title" className="mt-2 text-xl font-bold text-slate-950">Prepare the official provider portal handoff</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Your saved application draft and current official-source checks are required. Kingsmen will create a manual handoff record and show the provider's HTTPS portal. It will not submit the application, create an account with the provider, or claim a receipt.</p>
+            <button type="button" onClick={() => void prepareOfficialHandoff()} disabled={handoffPreparing || saving || loading} className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-wait disabled:opacity-50">
+              {handoffPreparing ? "Preparing handoff…" : "Prepare official portal handoff"}
+            </button>
+          </section>
+        ) : null}
+
+        {handoff ? (
+          <section className="rounded-3xl border border-slate-800 bg-slate-900 p-5 text-white sm:p-6" aria-labelledby="provider-handoff-result">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cyan-300">Manual handoff recorded</p>
+            <h2 id="provider-handoff-result" className="mt-2 text-xl font-bold">Complete the provider's official process</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-300">Kingsmen prepared a manual portal handoff. This is not a provider submission or provider receipt. Your application remains in Action required until the appropriate evidence is reviewed.</p>
+            <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div><dt className="text-xs uppercase tracking-wide text-slate-400">Kingsmen submission reference</dt><dd className="mt-1 font-semibold">{handoff.submission_ref}</dd></div>
+              <div><dt className="text-xs uppercase tracking-wide text-slate-400">Handoff status</dt><dd className="mt-1 font-semibold">{handoff.job_status ?? "MANUAL_REQUIRED"}</dd></div>
+            </dl>
+            <a href={handoff.official_url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-cyan-300 px-4 py-3 text-sm font-extrabold text-slate-950 hover:bg-cyan-200">Open official provider portal ↗</a>
+            <ol className="mt-5 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
+              {(handoff.next_steps?.length ? handoff.next_steps : [
+                "Review the official provider requirements.",
+                "Complete the provider portal yourself or with authorised Kingsmen support.",
+                "Upload the provider receipt to this parent application in the private document vault.",
+                "Wait for independent review before treating receipt or outcome as verified."
+              ]).map((step, index) => <li key={index}>{step}</li>)}
+            </ol>
+            <a href={"/candidate/documents?application_id=" + encodeURIComponent(applicationId) + "&evidence_purpose=PROVIDER_SUBMISSION_RECEIPT"} className="mt-5 inline-flex min-h-11 items-center rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-white hover:bg-slate-800">Upload provider receipt to this application</a>
+            <p className="mt-3 text-xs leading-5 text-slate-400">Provider submission sent: No. A candidate-reported receipt still requires authorised verification before Kingsmen records provider receipt confirmation.</p>
+          </section>
+        ) : null}
       </>}
       <footer className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-xs leading-5 text-slate-500">
         A saved application draft is not an external provider submission. CAO programme choices remain child records under one Kingsmen parent application. Candidate-reported submission, provider-confirmed receipt and provider decision remain separate evidence-backed states.
