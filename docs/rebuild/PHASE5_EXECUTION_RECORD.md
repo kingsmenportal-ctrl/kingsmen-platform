@@ -75,3 +75,28 @@ These results establish CI success for that exact commit and workflows; they do 
 ## Next execution target
 
 Repair any current PR-head CI regressions, then run the Phase 5 finance and communications SQL tests against a disposable PostgreSQL database without touching staging or production. In parallel, inspect the current private-document Edge Function and payment ITN handler against the required authorization and provider contracts. Keep the restore/provenance gate intact.
+
+
+## Disposable PostgreSQL execution — 2026-11-27
+
+An isolated Neon branch was created in the existing rehearsal project:
+- Project: `kingsmen-isolated-restore-rehearsal-2026-11-26` (`bitter-mouse-01847035`)
+- Disposable branch: `phase5-sql-test-clean-2026-11-27` (`br-hidden-paper-bhnilnhk`)
+- Parent: `br-young-surf-bhthqivn`
+- This is a test branch of the rehearsal project, not a verified restore of the real Kingsmen database.
+
+Observed execution:
+- Finance fixture: PASS — 48 SQL statements executed.
+- Finance least-privilege migration: PASS — 6 SQL statements executed.
+- Finance SQL integration test: PASS — 2 SQL test blocks executed.
+- Communications fixture: BLOCKED — it collides with tables already created by the finance fixture (`candidate_communication_preferences` already exists). A separate clean branch was used to avoid treating partial fixture setup as success.
+- Communications migration: BLOCKED — its explicit preflight raised `PHASE5_COMMUNICATION_SCHEMA_INCOMPLETE`, naming missing `candidate_private_document_reviews`, `candidate_private_documents`, `communication_templates`, `notification_delivery_attempts`, and `notification_outbox`. The communications SQL test was not run.
+
+Required repair: make the finance and communications disposable fixtures composable or run each against independent clean branches, then supply the complete existing document/outbox schema needed by the communications migration and rerun migration plus SQL tests. Do not remove the migration preflight or weaken the test. No source database or production schema was changed by these test calls.
+
+## Updated acceptance state
+
+- [x] Finance migration and SQL privilege test executed on a disposable Neon branch.
+- [ ] Communications migration and SQL integration test — blocked by incomplete/overlapping fixture schema; exact error above.
+- [ ] Full document-review and payment-notification end-to-end journeys — not yet runtime-verified.
+- [ ] Verified backup and isolated restore of the real Kingsmen database — still unavailable; the Neon rehearsal branch is not a substitute.
