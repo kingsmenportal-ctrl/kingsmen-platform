@@ -1,5 +1,5 @@
 import { readLimitedJson } from "../../../../lib/read-limited-json";
-import { isValidIdempotencyKey, validateCandidateApplicationAnswerData } from "../../../../lib/candidate-application-draft-contract";
+import { isValidIdempotencyKey, normalizeCandidateApplicationAnswerData, validateCandidateApplicationAnswerData } from "../../../../lib/candidate-application-draft-contract";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -123,7 +123,8 @@ export async function POST(request: Request) {
     return respond({ ready: false, code: "APPLICATION_DRAFT_INPUT_INVALID", error: "The application, version, idempotency key or answer data is invalid." }, 400);
   }
 
-  const validation = validateCandidateApplicationAnswerData(incoming.answer_data);
+  const answerData = normalizeCandidateApplicationAnswerData(incoming.answer_data);
+  const validation = validateCandidateApplicationAnswerData(answerData);
   if (!validation.valid) {
     return respond({
       ready: false,
@@ -136,7 +137,7 @@ export async function POST(request: Request) {
 
   return callRpc(request, "save_candidate_application_draft", {
     p_application_id: incoming.application_id,
-    p_answer_data: incoming.answer_data,
+    p_answer_data: answerData,
     p_expected_version: incoming.expected_version,
     p_idempotency_key: incoming.idempotency_key
   });
