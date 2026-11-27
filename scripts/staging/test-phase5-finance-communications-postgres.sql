@@ -161,6 +161,29 @@ BEGIN
     RAISE EXCEPTION 'provider bounce did not update delivery state and suppress further transactional email';
   END IF;
 
+  -- Candidate deletion is a request; storage deletion requires a platform-admin decision.
+  INSERT INTO public.candidate_private_documents(id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,document_type,original_filename,mime_type,size_bytes,status)
+  VALUES ('99999999-9999-4999-8999-999999999998','11111111-1111-4111-8111-111111111111','aaaaaaaa-0000-4000-8000-000000000001','candidate-private-documents','11111111-1111-4111-8111-111111111111/retention-test.pdf','OTHER','retention-test.pdf','application/pdf',1200,'VERIFIED');
+  v_refund := public.request_candidate_private_document_deletion('aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111','99999999-9999-4999-8999-999999999998','Candidate privacy request for this document');
+  IF v_refund->>'request_status' IS DISTINCT FROM 'PENDING_REVIEW' OR v_refund->>'fileDeleted' IS DISTINCT FROM 'false' THEN
+    RAISE EXCEPTION 'candidate deletion request must not immediately remove a file: %',v_refund;
+  END IF;
+  v_refund_ref := v_refund->>'request_id';
+  v_bad := false;
+  BEGIN
+    PERFORM public.review_candidate_private_document_deletion(v_refund_ref::uuid,'eeeeeeee-0000-4000-8000-000000000001','APPROVE','Not an administrator','approval-invalid');
+  EXCEPTION WHEN insufficient_privilege THEN v_bad := true;
+  END;
+  IF NOT v_bad THEN RAISE EXCEPTION 'finance reviewer was allowed to approve private document deletion'; END IF;
+  INSERT INTO public.platform_reviewers(auth_user_id,role_code,is_active,revoked_at)
+    VALUES ('eeeeeeee-0000-4000-8000-000000000002','PLATFORM_ADMIN',true,null);
+  PERFORM public.review_candidate_private_document_deletion(v_refund_ref::uuid,'eeeeeeee-0000-4000-8000-000000000002','APPROVE','Approved after retention review','approval-delete-001');
+  PERFORM public.complete_candidate_private_document_deletion(v_refund_ref::uuid,'eeeeeeee-0000-4000-8000-000000000002','document-deletion-test-evidence');
+  IF (SELECT deleted_at FROM public.candidate_private_documents WHERE id='99999999-9999-4999-8999-999999999998') IS NULL
+     OR (SELECT request_status FROM public.candidate_private_document_retention_requests WHERE id=v_refund_ref::uuid) <> 'COMPLETED' THEN
+    RAISE EXCEPTION 'approved document deletion did not persist its soft-delete and audit state';
+  END IF;
+
   IF has_table_privilege('authenticated','public.notification_outbox','SELECT')
      OR has_table_privilege('anon','public.finance_payments','SELECT')
      OR has_table_privilege('authenticated','public.finance_orders','SELECT')

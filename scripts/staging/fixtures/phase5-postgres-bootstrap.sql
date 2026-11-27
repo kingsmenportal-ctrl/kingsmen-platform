@@ -34,6 +34,24 @@ CREATE TABLE public.platform_reviewers (
   is_active boolean NOT NULL DEFAULT true,
   revoked_at timestamptz
 );
+CREATE TABLE public.candidate_private_documents (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  candidate_id uuid NOT NULL REFERENCES public.candidates(id),
+  created_by_auth_user_id uuid NOT NULL,
+  storage_bucket text NOT NULL,
+  storage_path text NOT NULL,
+  document_type text NOT NULL DEFAULT 'OTHER',
+  application_id uuid,
+  preparation_item_id uuid,
+  original_filename text NOT NULL,
+  mime_type text NOT NULL,
+  size_bytes bigint NOT NULL DEFAULT 0,
+  sha256_hex text,
+  status text NOT NULL DEFAULT 'UPLOADED_CANDIDATE_REPORTED',
+  uploaded_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE public.candidate_private_document_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   document_id uuid NOT NULL,
