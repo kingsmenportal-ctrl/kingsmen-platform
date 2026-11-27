@@ -133,9 +133,14 @@ create trigger n09_document_review_email_outbox
 after insert on public.candidate_private_document_reviews
 for each row execute function public.n09_queue_document_review_email();
 
-drop trigger if exists n09_verified_payment_email_outbox on public.finance_payments;
-create trigger n09_verified_payment_email_outbox
-after insert or update of payment_status, verified on public.finance_payments
+drop trigger if exists n09_verified_payment_email_outbox_insert on public.finance_payments;
+create trigger n09_verified_payment_email_outbox_insert
+after insert on public.finance_payments
+for each row execute function public.n09_queue_verified_payment_email();
+
+drop trigger if exists n09_verified_payment_email_outbox_update on public.finance_payments;
+create trigger n09_verified_payment_email_outbox_update
+after update of payment_status, verified on public.finance_payments
 for each row execute function public.n09_queue_verified_payment_email();
 
 revoke all on function public.n09_queue_document_review_email() from public, anon, authenticated;
