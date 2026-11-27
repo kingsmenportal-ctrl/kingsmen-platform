@@ -8,7 +8,10 @@ const routes = [
   "apps/web/src/app/api/candidate/documents/upload-url/route.ts",
   "apps/web/src/app/api/candidate/documents/read-url/route.ts",
   "apps/web/src/app/api/candidate/documents/status/route.ts",
-  "apps/web/src/app/api/founder/documents/review/route.ts"
+  "apps/web/src/app/api/founder/documents/review/route.ts",
+  "apps/web/src/app/api/founder/documents/review/download-url/route.ts",
+  "apps/web/src/app/operator/documents/page.tsx",
+  "apps/web/src/components/operator/DocumentReviewConsole.tsx"
 ];
 const source = await Promise.all(routes.map((route) => readFile(path.join(root, route), "utf8")));
 assert.ok(helper.includes("Bearer\\\\s+"), "upstream proxy must require a bearer token");
@@ -25,6 +28,9 @@ assert.match(source[1], /create_download_url/);
 assert.match(source[2], /proxyPrivateDocumentRequest\(request\)/);
 assert.match(source[3], /list_review_queue/);
 assert.match(source[3], /review_document/);
+assert.match(source[4], /create_reviewer_download_url/);
+assert.match(source[5], /DocumentReviewConsole/);
+assert.match(source[6], /Document review queue/);
 assert.ok(!source.join("\\n").includes("SIGNER_RUNTIME_REQUIRED"), "placeholder signed URLs must be removed");
 assert.ok(!source.join("\\n").includes("productionReady: false"), "placeholder route success must be removed");
 console.log("PASS: candidate upload/read/status and reviewer decision routes call the existing private-document runtime.");

@@ -5,7 +5,7 @@ const NO_STORE = {
   Vary: "Authorization",
   "Content-Type": "application/json; charset=utf-8"
 };
-type ProxyOptions = { action?: "create_upload" | "create_download_url" | "list_review_queue" | "review_document" };
+type ProxyOptions = { action?: "create_upload" | "create_download_url" | "create_reviewer_download_url" | "list_review_queue" | "review_document" };
 function reply(body: Record<string, unknown>, status: number): Response {
   return Response.json(body, { status, headers: NO_STORE });
 }
@@ -43,7 +43,7 @@ function allowlistedBody(action: NonNullable<ProxyOptions["action"]>, source: Re
     preparationItemId: source.preparationItemId ?? source.preparation_item_id ?? null,
     evidencePurpose: source.evidencePurpose ?? source.evidence_purpose ?? "CANDIDATE_DOCUMENT"
   };
-  if (action === "create_download_url") return { action, documentId: source.documentId ?? source.document_id };
+  if (action === "create_download_url" || action === "create_reviewer_download_url") return { action, document_id: source.document_id ?? source.documentId };
   if (action === "review_document") return {
     action, document_id: source.document_id ?? source.documentId, decision: source.decision,
     reviewer_note: source.reviewer_note ?? source.reviewerNote,

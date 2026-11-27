@@ -38,6 +38,9 @@ on:
       - apps/web/src/app/api/candidate/documents/read-url/route.ts
       - apps/web/src/app/api/candidate/documents/status/route.ts
       - apps/web/src/app/api/founder/documents/review/route.ts
+      - apps/web/src/app/api/founder/documents/review/download-url/route.ts
+      - apps/web/src/app/operator/documents/page.tsx
+      - apps/web/src/components/operator/DocumentReviewConsole.tsx
       - scripts/staging/test-document-proxy-boundary.mjs
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
@@ -113,6 +116,9 @@ on:
       - apps/web/src/app/api/candidate/documents/read-url/route.ts
       - apps/web/src/app/api/candidate/documents/status/route.ts
       - apps/web/src/app/api/founder/documents/review/route.ts
+      - apps/web/src/app/api/founder/documents/review/download-url/route.ts
+      - apps/web/src/app/operator/documents/page.tsx
+      - apps/web/src/components/operator/DocumentReviewConsole.tsx
       - scripts/staging/test-document-proxy-boundary.mjs
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
