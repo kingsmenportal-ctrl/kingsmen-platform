@@ -468,7 +468,8 @@ begin
     );
   end if;
 
-  if v_app.source_status <> 'VERIFIED' or v_app.is_published is not true
+  if v_app.source_status is distinct from 'VERIFIED'
+     or v_app.is_published is distinct from true
      or v_app.source_checked_at is null
      or v_app.source_checked_at < now() - interval '24 hours' then
     return jsonb_build_object('ok',false,'code','OFFICIAL_SOURCE_REFRESH_REQUIRED',
@@ -480,7 +481,8 @@ begin
     return jsonb_build_object('ok',false,'code','OFFICIAL_HTTPS_URL_REQUIRED');
   end if;
 
-  if v_app.application_method not in ('EXTERNAL_PORTAL','MANUAL_ONLY') then
+  if v_app.application_method is null
+     or v_app.application_method not in ('EXTERNAL_PORTAL','MANUAL_ONLY') then
     return jsonb_build_object('ok',false,'code','MANUAL_PORTAL_NOT_APPLICABLE',
       'message','This opportunity is not configured for an external-portal handoff.');
   end if;
