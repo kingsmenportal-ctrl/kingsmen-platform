@@ -12,7 +12,8 @@ begin
     ('candidate_communication_preferences'),
     ('finance_payments'),
     ('communication_templates'),
-    ('notification_outbox')
+    ('notification_outbox'),
+    ('notification_delivery_attempts')
   ) as t(table_name)
   where to_regclass('public.' || quote_ident(t.table_name)) is null;
   if missing_tables is not null then
@@ -201,7 +202,7 @@ declare
 begin
   if coalesce(length(btrim(p_notification_ref)),0) < 1 or length(p_notification_ref)>200
      or coalesce(length(btrim(p_provider)),0) < 1 or length(p_provider)>80
-     or p_result not in ('SENT','FAILED','SIMULATED') then
+     or coalesce(p_result,'') not in ('SENT','FAILED','SIMULATED') then
     raise exception 'notification attempt arguments are invalid';
   end if;
   if p_provider = 'MOCK' and p_result = 'SENT' then

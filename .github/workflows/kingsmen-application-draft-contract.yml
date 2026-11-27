@@ -12,6 +12,7 @@ on:
       - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
       - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
       - supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+      - supabase/functions/communications-outbox-worker/index.ts
       - scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
       - scripts/staging/test-phase5-communications-outbox.sql
       - scripts/staging/test-phase5-communications-outbox-contract.mjs
@@ -94,6 +95,7 @@ on:
       - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
       - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
       - supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+      - supabase/functions/communications-outbox-worker/index.ts
       - scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
       - scripts/staging/test-phase5-communications-outbox.sql
       - scripts/staging/test-phase5-communications-outbox-contract.mjs
