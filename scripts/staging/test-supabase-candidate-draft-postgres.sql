@@ -201,11 +201,13 @@ BEGIN
     RAISE EXCEPTION 'candidate could not reload its latest saved answers: %',v_result;
   END IF;
 
-  -- Handoff is unavailable until a saved draft exists.
+  -- Candidate B's own application has no saved draft; verify the correct prerequisite error.
+  PERFORM set_config('request.jwt.claim.sub','bbbbbbbb-0000-4000-8000-000000000002',true);
   v_result := public.prepare_candidate_manual_portal_submission('ffffffff-ffff-4fff-8fff-fffffffffff2');
   IF v_result->>'code' IS DISTINCT FROM 'APPLICATION_DRAFT_REQUIRED' THEN
-    RAISE EXCEPTION 'portal handoff allowed without saved draft: %',v_result;
+    RAISE EXCEPTION 'portal handoff without saved draft did not fail with the draft prerequisite: %',v_result;
   END IF;
+  PERFORM set_config('request.jwt.claim.sub','aaaaaaaa-0000-4000-8000-000000000001',true);
 
   -- Saved draft can be prepared for the verified official portal, but no
   -- provider submission is sent and retries reuse the same manual job.
