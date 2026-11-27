@@ -161,7 +161,8 @@ async function checkout(request: Request, body: Record<string, unknown>) {
       p_return_url: returnUrl,
       p_cancel_url: cancelUrl,
       p_notify_url: notifyUrl,
-      p_signed_payload: signed,
+      // Persist only non-secret checkout fields. The merchant key and signature are reconstructed server-side on retry.
+      p_signed_payload: Object.fromEntries(Object.entries(fields).filter(([key]) => key !== "merchant_key" && key !== "signature" && key !== "passphrase")),
     }),
   });
   const result = Array.isArray(bundle) ? bundle[0] : bundle;
@@ -317,9 +318,10 @@ async function receiveItn(request: Request) {
   const amountCents = Math.round(Number(fields.amount_gross) * 100);
   const amountValid = Boolean(intent) && Number.isFinite(amountCents) && amountCents === Number(intent.amount_cents);
   const duplicateKey = `payfast-itn:${merchantReference}:${providerPaymentId}:${paymentStatus}`;
-  const prior = await rest(`payfast_itn_receipts?select=id,itn_ref,evidence_ref,accepted,merchant_reference,provider_payment_id,payment_status,amount_gross&idempotency_key=eq.${encodeURIComponent(duplicateKey)}&accepted=eq.true&limit=1`);
+  const prior = await rest(`payfast_itn_receipts?select=id,itn_ref,evidence_ref,accepted,merchant_reference,provider_payment_id,payment_status,amount_gross&idempotency_key=eq.${encodeURIComponent(duplicateKey)}&limit=1`);
   const priorReceipt = Array.isArray(prior) && prior.length === 1 ? prior[0] : null;
-  const duplicate = Boolean(priorReceipt);
+  const priorExists = Boolean(priorReceipt);
+  const duplicate = Boolean(priorReceipt?.accepted);
   const priorMatches = Boolean(priorReceipt)
     && priorReceipt.merchant_reference === merchantReference
     && String(priorReceipt.provider_payment_id ?? "") === providerPaymentId
@@ -330,24 +332,30 @@ async function receiveItn(request: Request) {
   // A replay of a previously accepted receipt is allowed to reach idempotent settlement recovery.
   // It must not create a second receipt or payment. A rejected/mismatched prior receipt stays rejected.
   const accepted = Boolean(intent) && signatureValid && providerValid && ipValid && amountValid
-    && (!duplicate || priorAccepted) && paymentStatus === "COMPLETE" && merchantValid;
-  const rejectionReason = accepted ? null : !intent ? "unknown_payment_reference" : !signatureValid ? "invalid_signature" : !providerValid ? "provider_validation_failed" : !ipValid ? "source_ip_not_allowlisted" : !amountValid ? "amount_mismatch" : duplicate && !priorAccepted ? "duplicate_itn" : paymentStatus !== "COMPLETE" ? "payment_not_complete" : !merchantValid ? "merchant_mismatch" : "rejected";
+    && (!priorExists || priorMatches) && (!duplicate || priorAccepted) && paymentStatus === "COMPLETE" && merchantValid;
+  const rejectionReason = accepted ? null : !intent ? "unknown_payment_reference" : priorExists && !priorMatches ? "itn_idempotency_conflict" : !signatureValid ? "invalid_signature" : !providerValid ? "provider_validation_failed" : !ipValid ? "source_ip_not_allowlisted" : !amountValid ? "amount_mismatch" : duplicate && !priorAccepted ? "duplicate_itn" : paymentStatus !== "COMPLETE" ? "payment_not_complete" : !merchantValid ? "merchant_mismatch" : "rejected";
   const receiptRef = priorReceipt?.itn_ref ?? ref("itn");
   const receiptEvidenceRef = priorReceipt?.evidence_ref ?? ref("pay_ev");
   const safePayload = sanitize(fields);
-  if (!duplicate) {
+  const receiptUpdate = {
+    merchant_reference: merchantReference, provider_payment_id: providerPaymentId || null,
+    payment_status: paymentStatus || null, amount_gross: fields.amount_gross ?? null,
+    amount_fee: fields.amount_fee ?? null, amount_net: fields.amount_net ?? null,
+    received_payload: safePayload, received_signature: fields.signature ?? null,
+    calculated_signature: expectedSignature, signature_valid: signatureValid, ip_valid: ipValid,
+    amount_valid: amountValid, duplicate, accepted, rejection_reason: rejectionReason,
+    idempotency_key: duplicateKey, evidence_ref: receiptEvidenceRef,
+  };
+  if (!priorExists) {
     await rest("payfast_itn_receipts", {
-      method: "POST",
-      headers: { prefer: "return=minimal" },
-      body: JSON.stringify({
-        itn_ref: receiptRef, merchant_reference: merchantReference, provider_payment_id: providerPaymentId || null,
-        payment_status: paymentStatus || null, amount_gross: fields.amount_gross ?? null,
-        amount_fee: fields.amount_fee ?? null, amount_net: fields.amount_net ?? null,
-        received_payload: safePayload, received_signature: fields.signature ?? null,
-        calculated_signature: expectedSignature, signature_valid: signatureValid, ip_valid: ipValid,
-        amount_valid: amountValid, duplicate, accepted, rejection_reason: rejectionReason,
-        idempotency_key: duplicateKey, evidence_ref: receiptEvidenceRef,
-      }),
+      method: "POST", headers: { prefer: "return=minimal" },
+      body: JSON.stringify({ ...receiptUpdate, itn_ref: receiptRef }),
+    });
+  } else if (!priorReceipt?.accepted && accepted && priorMatches) {
+    // A transient provider-validation failure can be retried safely by updating the same rejected receipt.
+    await rest(`payfast_itn_receipts?id=eq.${encodeURIComponent(String(priorReceipt.id))}`, {
+      method: "PATCH", headers: { prefer: "return=minimal" },
+      body: JSON.stringify(receiptUpdate),
     });
   }
   await rest("payfast_signature_audit", {
@@ -361,8 +369,7 @@ async function receiveItn(request: Request) {
   });
   if (!accepted || !intent) return new Response("INVALID", { status: 400, headers: { "content-type": "text/plain", "cache-control": "no-store" } });
 
-  const existing = await rest(`finance_payments?select=id&provider=eq.PAYFAST&provider_payment_id=eq.${encodeURIComponent(providerPaymentId)}&limit=1`);
-  if (Array.isArray(existing) && existing.length) return new Response("OK", { status: 200, headers: { "content-type": "text/plain" } });
+  // The settlement RPC performs the authoritative duplicate comparison and state transition.
 
   const paymentRef = ref("pay");
   const paymentEvidenceRef = ref("pay_ev");

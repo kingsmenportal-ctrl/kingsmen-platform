@@ -2,7 +2,7 @@
 
 import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const MIME_BY_EXTENSION: Record<string, string> = {
@@ -146,6 +146,9 @@ export function DocumentPreflightPanel() {
   const [documents, setDocuments] = useState<ServerDocument[]>([]);
   const [inputVersion, setInputVersion] = useState(0);
   const [download, setDownload] = useState<{ id: string; url: string; expiresAt: number } | null>(null);
+  const [deletionTarget, setDeletionTarget] = useState<string | null>(null);
+  const [deletionReason, setDeletionReason] = useState("");
+  const [requestingDeletion, setRequestingDeletion] = useState(false);
 
   const loadDocuments = useCallback(async () => {
     setLoadingDocuments(true);
@@ -293,6 +296,26 @@ export function DocumentPreflightPanel() {
     }
   }
 
+  async function submitDeletionRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!deletionTarget || deletionReason.trim().length < 3) return;
+    setRequestingDeletion(true);
+    setError("");
+    setNotice("");
+    try {
+      const session = readSession();
+      const result = await documentApi(session, { action: "request_deletion", documentId: deletionTarget, reason: deletionReason.trim() });
+      setNotice(result.message || "Deletion request recorded for authorised review. The file has not been deleted.");
+      setDeletionTarget(null);
+      setDeletionReason("");
+      await loadDocuments();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not request private document deletion.");
+    } finally {
+      setRequestingDeletion(false);
+    }
+  }
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="document-preflight-title">
       <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-700">Secure document workflow</p>
@@ -360,6 +383,17 @@ export function DocumentPreflightPanel() {
               {doc.latestReview ? <p className="mt-2 text-xs leading-5 text-slate-600">Latest review: {String(doc.latestReview.decision ?? "pending")}.</p> : null}
               {["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status) ? <button type="button" onClick={() => void requestDownload(doc.id)} className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 hover:border-slate-500 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500">Request temporary private download</button> : null}
               {download?.id === doc.id ? <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm"><p className="text-slate-700">This link expires at {new Date(download.expiresAt).toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}. Do not share it.</p><a href={download.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-bold underline">Open private file</a></div> : null}
+              {doc.status !== "UPLOAD_PENDING" && doc.status !== "UPLOAD_FAILED" ? <button type="button" onClick={() => { setDeletionTarget(doc.id); setDeletionReason(""); setError(""); setNotice(""); }} className="ml-2 mt-3 inline-flex min-h-10 items-center rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-800 hover:bg-red-50">Request deletion</button> : null}
+              {deletionTarget === doc.id ? <form onSubmit={submitDeletionRequest} className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                <label className="block text-xs font-bold text-slate-800">Reason for deletion request
+                  <textarea required minLength={3} maxLength={1200} rows={3} value={deletionReason} onChange={event => setDeletionReason(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-300 bg-white p-2 text-sm" />
+                </label>
+                <p className="mt-2 text-xs text-slate-600">This submits a request for platform-admin review. The private file remains stored until an authorised deletion completes.</p>
+                <div className="mt-3 flex gap-2">
+                  <button type="submit" disabled={requestingDeletion} className="rounded-lg bg-red-800 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">{requestingDeletion ? "Submitting…" : "Submit deletion request"}</button>
+                  <button type="button" onClick={() => setDeletionTarget(null)} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold">Cancel</button>
+                </div>
+              </form> : null}
             </article>
           ))}
         </div>

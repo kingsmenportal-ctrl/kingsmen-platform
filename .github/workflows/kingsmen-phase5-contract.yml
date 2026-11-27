@@ -1,0 +1,123 @@
+name: Kingsmen Phase 5 contract
+
+on:
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "supabase/migrations/20261016151400_payfast_finance_tx.sql"
+      - "supabase/migrations/20261127160000_phase5_communications_lifecycle.sql"
+      - "supabase/functions/candidate-private-documents/**"
+      - "apps/web/src/components/founder/**"
+      - "apps/web/src/app/founder/documents/**"
+      - "supabase/functions/payfast-sandbox/**"
+      - "supabase/functions/communications-dispatch/**"
+      - "supabase/functions/communications-provider-webhook/**"
+      - "apps/web/src/components/candidate/CandidateFinanceStatus.tsx"
+      - "apps/web/src/components/candidate/CandidateMessagesInbox.tsx"
+      - "apps/web/src/app/candidate/finance/page.tsx"
+      - "apps/web/src/app/candidate/messages/page.tsx"
+      - "scripts/staging/test-phase5-*.mjs"
+      - "scripts/staging/test-phase5-*.sql"
+      - "scripts/staging/fixtures/phase5-postgres-bootstrap.sql"
+      - ".github/workflows/kingsmen-phase5-contract.yml"
+  push:
+    branches:
+      - "feat/phase5-documents-finance-communications-2026-11-27"
+    paths:
+      - "supabase/migrations/20261016151400_payfast_finance_tx.sql"
+      - "supabase/migrations/20261127160000_phase5_communications_lifecycle.sql"
+      - "supabase/functions/payfast-sandbox/**"
+      - "supabase/functions/communications-dispatch/**"
+      - "supabase/functions/communications-provider-webhook/**"
+      - "apps/web/src/components/candidate/CandidateFinanceStatus.tsx"
+      - "apps/web/src/components/candidate/CandidateMessagesInbox.tsx"
+      - "apps/web/src/app/candidate/finance/page.tsx"
+      - "apps/web/src/app/candidate/messages/page.tsx"
+      - "scripts/staging/test-phase5-*.mjs"
+      - "scripts/staging/test-phase5-*.sql"
+      - "scripts/staging/fixtures/phase5-postgres-bootstrap.sql"
+      - ".github/workflows/kingsmen-phase5-contract.yml"
+
+jobs:
+  root-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install repository dependencies
+        run: npm ci
+      - name: Run repository regression and Phase 5 validators
+        run: npm test
+      - name: Validate canonical finance catalogue
+        run: npm run finance:test:canonical-catalogue
+      - name: Validate PayFast sandbox boundary
+        run: npm run payments:prove:sandbox && npm run payments:validate:sandbox
+      - name: Validate communications boundary
+        run: npm run communications:prove && npm run communications:validate
+
+  postgres-contract:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bootstrap isolated PostgreSQL fixture
+        run: |
+          set -euo pipefail
+          container_id="$(docker ps --format '{{.ID}} {{.Image}}' | awk '$2 == "postgres:17" { print $1; exit }')"
+          test -n "$container_id"
+          docker exec -i "$container_id" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/fixtures/phase5-postgres-bootstrap.sql
+      - name: Apply canonical communication and finance table fixtures
+        run: |
+          set -euo pipefail
+          container_id="$(docker ps --format '{{.ID}} {{.Image}}' | awk '$2 == "postgres:17" { print $1; exit }')"
+          docker exec -i "$container_id" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < db/migrations/0007_n09_notifications_communications.sql
+          docker exec -i "$container_id" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < db/migrations/0008_n10_finance_payfast.sql
+      - name: Apply Phase 5 migrations only to the disposable fixture
+        run: |
+          set -euo pipefail
+          container_id="$(docker ps --format '{{.ID}} {{.Image}}' | awk '$2 == "postgres:17" { print $1; exit }')"
+          docker exec -i "$container_id" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/migrations/20261016151400_payfast_finance_tx.sql
+          docker exec -i "$container_id" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/migrations/20261127160000_phase5_communications_lifecycle.sql
+      - name: Run payment, refund, RLS, outbox, retry and document-notification assertions
+        run: |
+          set -euo pipefail
+          container_id="$(docker ps --format '{{.ID}} {{.Image}}' | awk '$2 == "postgres:17" { print $1; exit }')"
+          docker exec -i "$container_id" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/test-phase5-finance-communications-postgres.sql
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run source security contract
+        run: node scripts/staging/test-phase5-source-contract.mjs
+
+  web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install web dependencies
+        run: npm ci --prefix apps/web
+      - name: Build candidate and operator interfaces
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-project.supabase.test
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-only-not-a-real-anon-key
+        run: npm --prefix apps/web run build
