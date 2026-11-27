@@ -16,5 +16,6 @@ assert.match(worker,/KINGSMEN_LIVE_MESSAGING_ENABLED.*true/);
 assert.match(worker,/x-kingsmen-worker-token/);
 assert.match(worker,/SERVICE_AUTH_REQUIRED/);
 assert.match(worker,/REQUEST_TOO_LARGE/);
+assert.ok(worker.includes(String.raw`/^\d+$/`), "worker must accept numeric Content-Length values");
 assert.match(worker,/liveSendExecuted: false/);
 console.log("PASS: document and verified-payment events enqueue idempotent, consent-gated notifications without claiming delivery.");
