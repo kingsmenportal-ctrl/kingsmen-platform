@@ -34,7 +34,11 @@ assert.match(migration, /status not in \('DRAFT','READINESS_BLOCKED','READY_FOR_
 assert.match(migration, /on conflict \(application_id\) do update/i);
 assert.doesNotMatch(migration, /drop schema|drop table public\.candidate_applications|truncate public\.candidate_applications/i);
 
-assert.doesNotMatch(migration, /set status\\s*=/i, "Saving draft answers must not rewrite internal application lifecycle status.");
-assert.match(migration, /v_application\\.status, v_application\\.status/i, "Draft audit events must preserve the existing workflow status.");
+const saveFunctionStart = migration.indexOf("create or replace function public.save_candidate_application_draft(");
+const handoffFunctionStart = migration.indexOf("-- Candidate-triggered handoff only records a manual portal task.");
+assert.ok(saveFunctionStart >= 0 && handoffFunctionStart > saveFunctionStart, "Could not isolate the draft save RPC for its state-transition contract.");
+const saveFunction = migration.slice(saveFunctionStart, handoffFunctionStart);
+assert.doesNotMatch(saveFunction, /set status\s*=/i, "Saving draft answers must not rewrite internal application lifecycle status.");
+assert.match(saveFunction, /v_application\.status, v_application\.status/i, "Draft audit events must preserve the existing workflow status.");
 
 console.log("Candidate application draft persistence migration contract checks passed.");
