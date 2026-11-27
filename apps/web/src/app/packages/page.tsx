@@ -72,8 +72,7 @@ const plans = [
 const sharedFeatures = [
   "One reusable candidate profile",
   "One unified application workbench",
-  "Discovery across all six pathways",
-  "Accommodation support included"
+  "Discovery across all six pathways"
 ];
 
 function PlanCard({ plan, featured = false }: { plan: (typeof plans)[number]; featured?: boolean }) {
@@ -121,7 +120,7 @@ export default function PackagesPage() {
           <p className="mx-auto mt-5 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">Every plan keeps all six pathways available for discovery through one candidate profile and one unified application workbench. Plans change priority application volume and managed-service capacity—not access to pathways.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs font-semibold">
             <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">South African rand (ZAR)</span>
-            <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">Accommodation support included with paid plans</span>
+            <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">8 accommodation routes included with Foundational Accord</span>
             <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">No guaranteed outcomes</span>
             <span className="rounded-full border border-slate-700 px-3 py-2 text-amber-200">PayFast sandbox only · no live charges</span>
           </div>
