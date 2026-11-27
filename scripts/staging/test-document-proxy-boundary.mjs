@@ -4,6 +4,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const helper = await readFile(path.join(root, "apps/web/src/lib/private-document-proxy.ts"), "utf8");
+const runtime = await readFile(path.join(root, "supabase/functions/candidate-private-documents/index.ts"), "utf8");
 const routes = [
   "apps/web/src/app/api/candidate/documents/upload-url/route.ts",
   "apps/web/src/app/api/candidate/documents/read-url/route.ts",
@@ -31,6 +32,16 @@ assert.match(source[3], /review_document/);
 assert.match(source[4], /create_reviewer_download_url/);
 assert.match(source[5], /DocumentReviewConsole/);
 assert.match(source[6], /Document review queue/);
+assert.match(runtime, /READ_URL_TTL_SECONDS = 60/);
+assert.match(runtime, /link_status === "VERIFIED"/);
+assert.match(runtime, /verified_by/);
+assert.match(runtime, /candidate\.is_active !== true/);
+assert.match(runtime, /\.eq\("candidate_id", ctx\.candidateId\)/);
+assert.match(runtime, /record_candidate_private_document_read_link/);
+assert.ok(runtime.indexOf("record_candidate_private_document_read_link") < runtime.indexOf("signedReadUrl: signedRead.signedUrl"), "signed read links must only be returned after audit succeeds");
+assert.match(runtime, /DOCUMENT_TYPE_NOT_ALLOWED/);
+assert.match(runtime, /DOCUMENT_SIZE_OUT_OF_RANGE/);
+assert.match(runtime, /DOCUMENT_EXTENSION_MISMATCH/);
 assert.ok(!source.join("\\n").includes("SIGNER_RUNTIME_REQUIRED"), "placeholder signed URLs must be removed");
 assert.ok(!source.join("\\n").includes("productionReady: false"), "placeholder route success must be removed");
 console.log("PASS: candidate upload/read/status and reviewer decision routes call the existing private-document runtime.");
