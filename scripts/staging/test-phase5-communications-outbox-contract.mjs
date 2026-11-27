@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const migration = await readFile("supabase/migrations/20261127140000_phase5_communications_event_outbox.sql", "utf8");
+const fixture = await readFile("scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql", "utf8");
+const test = await readFile("scripts/staging/test-phase5-communications-outbox.sql", "utf8");
+for (const token of ["n09_queue_document_review_email","n09_queue_verified_payment_email","candidate.document.review.updated.email","candidate.payment.verified.email","on conflict (idempotency_key) do nothing","status","QUEUED"]) assert.ok(migration.includes(token), "missing migration contract: "+token);
+for (const token of ["candidate_private_document_reviews","candidate_communication_preferences","finance_payments","notification_outbox","notification_delivery_attempts"]) assert.ok(fixture.includes(token) && test.includes(token), "missing integration fixture/test table: "+token);
+assert.match(migration,/security definer[\s\S]*set search_path = pg_catalog, public/i);
+assert.match(test,/email_transactional/);
+assert.match(test,/status <> 'QUEUED' or sent_at is not null/);
+console.log("PASS: document and verified-payment events enqueue idempotent, consent-gated notifications without claiming delivery.");

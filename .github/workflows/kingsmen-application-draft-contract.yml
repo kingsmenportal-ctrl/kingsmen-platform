@@ -11,6 +11,10 @@ on:
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
       - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+      - supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+      - scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
+      - scripts/staging/test-phase5-communications-outbox.sql
+      - scripts/staging/test-phase5-communications-outbox-contract.mjs
       - scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
       - scripts/staging/test-phase5-finance-privileges.sql
       - scripts/staging/test-phase5-finance-privileges-contract.mjs
@@ -89,6 +93,10 @@ on:
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
       - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+      - supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+      - scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
+      - scripts/staging/test-phase5-communications-outbox.sql
+      - scripts/staging/test-phase5-communications-outbox-contract.mjs
       - scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
       - scripts/staging/test-phase5-finance-privileges.sql
       - scripts/staging/test-phase5-finance-privileges-contract.mjs
@@ -245,6 +253,14 @@ jobs:
           docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
           docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < scripts/staging/test-phase5-finance-privileges.sql
           node scripts/staging/test-phase5-finance-privileges-contract.mjs
+      - name: Test document and verified-payment notification outbox in isolated PostgreSQL
+        run: |
+          set -euo pipefail
+          docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_phase5_comms"
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_comms -v ON_ERROR_STOP=1 < scripts/staging/fixtures/phase5-communications-outbox-bootstrap.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_comms -v ON_ERROR_STOP=1 < supabase/migrations/20261127140000_phase5_communications_event_outbox.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_comms -v ON_ERROR_STOP=1 < scripts/staging/test-phase5-communications-outbox.sql
+          node scripts/staging/test-phase5-communications-outbox-contract.mjs
       - name: Create isolated candidate status-contract database
         run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_status_contract"
       - name: Bootstrap candidate status-contract database
