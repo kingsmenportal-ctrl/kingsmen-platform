@@ -231,14 +231,18 @@ BEGIN
   END;
   IF NOT v_rejected THEN RAISE EXCEPTION 'cross-candidate read was not blocked'; END IF;
 
-  v_result := public.save_candidate_application_draft(
-    'ffffffff-ffff-4fff-8fff-fffffffffff1','{"motivation_statement":"Cross candidate"}'::jsonb,
-    2,'draft-key-B-001'
-  );
-  IF v_result->>'code' IS DISTINCT FROM 'APPLICATION_DRAFT_INPUT_INVALID' THEN
-    -- Ownership failures are deliberately raised rather than returned as a
-    -- data-dependent response; capture the expected SQL privilege failure.
-    RAISE EXCEPTION 'cross-candidate write unexpectedly did not raise a privilege error: %',v_result;
+  v_rejected := false;
+  BEGIN
+    PERFORM public.save_candidate_application_draft(
+      'ffffffff-ffff-4fff-8fff-fffffffffff1','{"motivation_statement":"Cross candidate"}'::jsonb,
+      2,'draft-key-B-001'
+    );
+  EXCEPTION WHEN insufficient_privilege THEN
+    GET STACKED DIAGNOSTICS v_message = MESSAGE_TEXT;
+    v_rejected := v_message = 'OWNED_APPLICATION_NOT_FOUND';
+  END;
+  IF NOT v_rejected THEN
+    RAISE EXCEPTION 'cross-candidate write was not blocked by ownership checks';
   END IF;
 
   -- Missing reusable profile is denied.
