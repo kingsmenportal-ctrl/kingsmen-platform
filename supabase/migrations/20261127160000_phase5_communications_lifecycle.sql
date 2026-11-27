@@ -91,8 +91,14 @@ create policy candidate_portal_messages_candidate_read_own
   using (
     visible_to_candidate is true
     and exists (
-      select 1 from public.candidates c
-      where c.id = kingsmen_security.current_verified_kingsmen_candidate_id()
+      select 1
+      from public.candidate_auth_identity_links l
+      join public.candidates c on c.id=l.candidate_id and c.is_active is true
+      where l.supabase_user_id=auth.uid()
+        and l.candidate_id=c.id
+        and l.link_status='VERIFIED'
+        and l.verified_at is not null and l.verified_at <= statement_timestamp()
+        and l.verified_by is not null
         and (c.id::text = candidate_ref or c.public_ref::text = candidate_ref)
     )
   );
@@ -153,8 +159,10 @@ begin
     from public.notification_outbox o
     left join public.candidate_communication_preferences p on p.candidate_ref=o.candidate_ref
     where o.channel='EMAIL_PRIMARY'
-      and o.status in ('QUEUED','FAILED')
-      and coalesce(o.next_attempt_at,o.scheduled_for) <= statement_timestamp()
+      and (
+        (o.status in ('QUEUED','FAILED') and coalesce(o.next_attempt_at,o.scheduled_for) <= statement_timestamp())
+        or (o.status='LOCKED' and o.locked_at < statement_timestamp() - interval '10 minutes')
+      )
       and o.attempt_count < o.max_attempts
       and o.suppressed_at is null
       and coalesce(p.transactional_email_enabled,true) is true
