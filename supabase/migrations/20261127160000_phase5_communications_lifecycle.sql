@@ -880,6 +880,8 @@ declare
   v_inserted integer;
   v_notification_ref text;
   v_candidate_ref text;
+  v_stored_event public.notification_provider_events%rowtype;
+  v_effective_event text;
   v_status text;
 begin
   if p_event_id is null or length(p_event_id) not between 1 and 200
@@ -888,11 +890,22 @@ begin
      or jsonb_typeof(coalesce(p_safe_payload,'{}'::jsonb)) is distinct from 'object' then
     raise exception 'INVALID_PROVIDER_EVENT' using errcode='22023';
   end if;
+
   insert into public.notification_provider_events(event_id,provider_message_id,event_type,safe_payload)
   values(p_event_id,p_provider_message_id,p_event,coalesce(p_safe_payload,'{}'::jsonb))
   on conflict(event_id) do nothing;
   get diagnostics v_inserted = row_count;
-  -- Even duplicate webhooks retry the lookup so an event received before the send-attempt write can be reconciled.
+
+  -- An event ID is immutable: a replay must match the original provider message and event type.
+  select * into v_stored_event from public.notification_provider_events
+    where event_id=p_event_id;
+  if not found then raise exception 'PROVIDER_EVENT_LEDGER_WRITE_FAILED' using errcode='55000'; end if;
+  if v_stored_event.provider_message_id is distinct from p_provider_message_id
+     or v_stored_event.event_type is distinct from p_event then
+    raise exception 'PROVIDER_EVENT_ID_REUSE_MISMATCH' using errcode='22023';
+  end if;
+  v_effective_event := v_stored_event.event_type;
+
   select a.notification_ref,o.candidate_ref into v_notification_ref,v_candidate_ref
   from public.notification_delivery_attempts a
   join public.notification_outbox o on o.notification_ref=a.notification_ref
@@ -901,22 +914,29 @@ begin
   if v_notification_ref is null then
     return jsonb_build_object('ok',true,'duplicate',v_inserted=0,'matched',false,'delivery_status','UNMATCHED');
   end if;
-  v_status := p_event;
-  update public.notification_delivery_attempts set status=p_event,
-    response_body=coalesce(response_body,'{}'::jsonb) || jsonb_build_object('providerEvent',p_event)
-  where notification_ref=v_notification_ref and provider_message_id=p_provider_message_id;
-  update public.notification_outbox set provider_delivery_status=p_event
-  where notification_ref=v_notification_ref;
-  if p_event in ('BOUNCED','COMPLAINED') and v_candidate_ref is not null then
+
+  -- Never downgrade a hard negative delivery event because a delayed/duplicate positive event arrived later.
+  select provider_delivery_status into v_status from public.notification_outbox
+    where notification_ref=v_notification_ref for update;
+  if v_status not in ('BOUNCED','COMPLAINED') or v_effective_event in ('BOUNCED','COMPLAINED') then
+    update public.notification_delivery_attempts set status=v_effective_event,
+      response_body=coalesce(response_body,'{}'::jsonb) || jsonb_build_object('providerEvent',v_effective_event)
+    where notification_ref=v_notification_ref and provider_message_id=p_provider_message_id;
+    update public.notification_outbox set provider_delivery_status=v_effective_event
+    where notification_ref=v_notification_ref;
+  end if;
+
+  if v_effective_event in ('BOUNCED','COMPLAINED') and v_candidate_ref is not null then
     insert into public.candidate_communication_preferences(
       candidate_ref,transactional_email_enabled,suppressed_at,suppression_reason,consent_source,consent_updated_at,updated_at
-    ) values (v_candidate_ref,false,statement_timestamp(),case when p_event='BOUNCED' then 'PROVIDER_BOUNCE' else 'PROVIDER_COMPLAINT' end,
+    ) values (v_candidate_ref,false,statement_timestamp(),case when v_effective_event='BOUNCED' then 'PROVIDER_BOUNCE' else 'PROVIDER_COMPLAINT' end,
       'PROVIDER_WEBHOOK',statement_timestamp(),statement_timestamp())
     on conflict(candidate_ref) do update set transactional_email_enabled=false,
-      suppressed_at=excluded.suppressed_at,suppression_reason=excluded.suppression_reason,
+      suppressed_at=coalesce(public.candidate_communication_preferences.suppressed_at,excluded.suppressed_at),
+      suppression_reason=coalesce(public.candidate_communication_preferences.suppression_reason,excluded.suppression_reason),
       consent_source='PROVIDER_WEBHOOK',consent_updated_at=excluded.consent_updated_at,updated_at=excluded.updated_at;
   end if;
-  return jsonb_build_object('ok',true,'duplicate',v_inserted=0,'matched',true,'delivery_status',v_status,'suppressed',p_event in ('BOUNCED','COMPLAINED'));
+  return jsonb_build_object('ok',true,'duplicate',v_inserted=0,'matched',true,'delivery_status',v_effective_event,'suppressed',v_effective_event in ('BOUNCED','COMPLAINED'));
 end;
 $function$;
 
