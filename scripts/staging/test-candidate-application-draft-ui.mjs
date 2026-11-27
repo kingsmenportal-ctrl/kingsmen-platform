@@ -159,8 +159,6 @@ try {
       state.version += 1;
       state.draft = incoming.answer_data;
       state.updatedAt = "2026-11-19T12:05:00.000Z";
-      state.application.status = "DRAFT";
-      state.application.kingsmen_status = "Draft";
       state.application.readiness_status = "NOT_CHECKED";
       state.application.updated_at = state.updatedAt;
       await route.fulfill({
@@ -225,8 +223,10 @@ try {
   assert.equal(await page.getByText("Draft version 2", { exact: true }).count(), 1);
   assert.equal(await page.getByText("Draft", { exact: true }).count(), 1);
   assert.equal(await page.getByTestId("draft-save-state").textContent(), "All changes saved.");
-  assert.equal(states.get(appA).application.status, "DRAFT",
-    "saving updated answers must reset stale readiness to DRAFT before a new readiness check");
+  assert.equal(states.get(appA).application.status, "READY_TO_SUBMIT",
+    "saving updated answers must preserve the internal workflow state");
+  assert.equal(states.get(appA).application.readiness_status, "NOT_CHECKED",
+    "saving updated answers must invalidate stale readiness before a new readiness check");
 
   // Reload must read the server-saved version, not merely preserve the React state.
   await page.getByRole("button", { name: "Reload saved draft" }).click();
