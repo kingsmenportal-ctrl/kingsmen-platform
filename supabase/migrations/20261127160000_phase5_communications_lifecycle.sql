@@ -85,6 +85,7 @@ grant all on table public.communication_templates, public.communication_threads,
 to service_role;
 grant select on table public.candidate_portal_messages to authenticated;
 
+drop policy if exists candidate_portal_messages_candidate_read_own on public.candidate_portal_messages;
 create policy candidate_portal_messages_candidate_read_own
   on public.candidate_portal_messages for select to authenticated
   using (
@@ -108,6 +109,7 @@ drop policy if exists finance_refund_requests_all on public.finance_refund_reque
 drop policy if exists finance_ledger_entries_all on public.finance_ledger_entries;
 drop policy if exists payment_evidence_ledger_all on public.payment_evidence_ledger;
 
+drop policy if exists finance_plan_catalog_active_read on public.finance_plan_catalog;
 create policy finance_plan_catalog_active_read
   on public.finance_plan_catalog for select to anon, authenticated using (active is true);
 
@@ -255,6 +257,192 @@ begin
   return true;
 end;
 $function$;
+
+create or replace function public.get_candidate_finance_summary()
+returns jsonb
+language plpgsql security definer
+set search_path = ''
+as $function$
+declare
+  v_uid uuid := auth.uid();
+  v_candidate_id uuid;
+  v_identity_count integer;
+begin
+  if v_uid is null then raise insufficient_privilege using message='AUTHENTICATION_REQUIRED'; end if;
+  select count(*), (array_agg(l.candidate_id order by l.id))[1]
+    into v_identity_count, v_candidate_id
+  from public.candidate_auth_identity_links l
+  join public.candidates c on c.id=l.candidate_id and c.is_active is true
+  where l.supabase_user_id=v_uid and l.link_status='VERIFIED'
+    and l.verified_at is not null and l.verified_at <= statement_timestamp()
+    and l.verified_by is not null;
+  if v_identity_count <> 1 or v_candidate_id is null then
+    raise insufficient_privilege using message='VERIFIED_CANDIDATE_IDENTITY_REQUIRED';
+  end if;
+
+  return jsonb_build_object(
+    'orders', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'order_ref',o.order_ref,'plan_code',o.plan_code,'order_status',o.order_status,
+        'amount_cents',o.amount_cents,'currency',o.currency,'created_at',o.created_at
+      ) order by o.created_at desc)
+      from public.finance_orders o where o.candidate_ref=v_candidate_id::text
+    ),'[]'::jsonb),
+    'invoices', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'invoice_ref',i.invoice_ref,'order_ref',i.order_ref,'invoice_status',i.invoice_status,
+        'amount_cents',i.amount_cents,'currency',i.currency,'issued_at',i.issued_at,'paid_at',i.paid_at
+      ) order by i.issued_at desc)
+      from public.finance_invoices i where i.candidate_ref=v_candidate_id::text
+    ),'[]'::jsonb),
+    'payments', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'payment_ref',p.payment_ref,'order_ref',p.order_ref,'payment_status',p.payment_status,
+        'amount_gross_cents',p.amount_gross_cents,'currency',p.currency,'verified',p.verified,
+        'verified_at',p.verified_at,'created_at',p.created_at
+      ) order by p.created_at desc)
+      from public.finance_payments p where p.candidate_ref=v_candidate_id::text
+    ),'[]'::jsonb),
+    'refunds', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'refund_ref',r.refund_ref,'payment_ref',r.payment_ref,'amount_cents',r.amount_cents,
+        'currency',r.currency,'refund_status',r.refund_status,'reason',r.reason,'created_at',r.created_at
+      ) order by r.created_at desc)
+      from public.finance_refund_requests r where r.candidate_ref=v_candidate_id::text
+    ),'[]'::jsonb),
+    'entitlements_activate_only_on_verified_payment', true
+  );
+end;
+$function$;
+
+create or replace function public.request_candidate_finance_refund(
+  p_payment_ref text, p_amount_cents integer, p_reason text
+) returns jsonb
+language plpgsql security definer
+set search_path = ''
+as $function$
+declare
+  v_uid uuid := auth.uid();
+  v_candidate_id uuid;
+  v_identity_count integer;
+  v_payment public.finance_payments%rowtype;
+  v_refund_ref text := 'refund_' || replace(gen_random_uuid()::text,'-','');
+  v_evidence_ref text := 'refund_ev_' || replace(gen_random_uuid()::text,'-','');
+begin
+  if v_uid is null then raise insufficient_privilege using message='AUTHENTICATION_REQUIRED'; end if;
+  if p_payment_ref is null or length(p_payment_ref) not between 1 and 120
+     or p_amount_cents is null or p_amount_cents <= 0
+     or p_reason is null or length(trim(p_reason)) not between 3 and 1200 then
+    raise exception 'INVALID_REFUND_REQUEST' using errcode='22023';
+  end if;
+  select count(*), (array_agg(l.candidate_id order by l.id))[1]
+    into v_identity_count, v_candidate_id
+  from public.candidate_auth_identity_links l
+  join public.candidates c on c.id=l.candidate_id and c.is_active is true
+  where l.supabase_user_id=v_uid and l.link_status='VERIFIED'
+    and l.verified_at is not null and l.verified_at <= statement_timestamp()
+    and l.verified_by is not null;
+  if v_identity_count <> 1 or v_candidate_id is null then
+    raise insufficient_privilege using message='VERIFIED_CANDIDATE_IDENTITY_REQUIRED';
+  end if;
+
+  select * into v_payment from public.finance_payments p
+  where p.payment_ref=p_payment_ref and p.candidate_ref=v_candidate_id::text
+    and p.payment_status='COMPLETE' and p.verified is true for share;
+  if not found then raise insufficient_privilege using message='VERIFIED_OWN_PAYMENT_REQUIRED'; end if;
+  if p_amount_cents > v_payment.amount_gross_cents then
+    raise exception 'REFUND_EXCEEDS_VERIFIED_PAYMENT' using errcode='22023';
+  end if;
+
+  insert into public.finance_refund_requests(
+    refund_ref,payment_ref,order_ref,candidate_ref,amount_cents,currency,reason,
+    refund_status,requested_by,evidence_ref
+  ) values (
+    v_refund_ref,v_payment.payment_ref,v_payment.order_ref,v_candidate_id::text,p_amount_cents,
+    v_payment.currency,left(trim(p_reason),1200),'PENDING_REVIEW',v_uid::text,v_evidence_ref
+  );
+  insert into public.finance_ledger_entries(
+    ledger_ref,candidate_ref,order_ref,payment_ref,refund_ref,entry_type,debit_cents,credit_cents,
+    currency,description,evidence_ref
+  ) values (
+    'ledger-refund-request:' || v_refund_ref,v_candidate_id::text,v_payment.order_ref,
+    v_payment.payment_ref,v_refund_ref,'REFUND_REQUESTED',0,0,v_payment.currency,
+    'Candidate refund request submitted for human finance review.',v_evidence_ref
+  );
+  insert into public.payment_evidence_ledger(
+    evidence_ref,source_type,source_ref,candidate_ref,order_ref,payment_ref,event_name,event_summary,proof_payload
+  ) values (
+    v_evidence_ref,'REFUND_REQUEST',v_refund_ref,v_candidate_id::text,v_payment.order_ref,
+    v_payment.payment_ref,'REFUND_REQUESTED','Refund request recorded; no refund was executed.',
+    jsonb_build_object('amount_cents',p_amount_cents,'currency',v_payment.currency,'automatic_refund',false)
+  );
+  return jsonb_build_object('ok',true,'refund_ref',v_refund_ref,'refund_status','PENDING_REVIEW','refund_executed',false);
+end;
+$function$;
+
+create or replace function public.review_finance_refund_request(
+  p_refund_ref text, p_decision text, p_reviewer_note text, p_approval_ref text default null
+) returns jsonb
+language plpgsql security definer
+set search_path = ''
+as $function$
+declare
+  v_uid uuid := auth.uid();
+  v_refund public.finance_refund_requests%rowtype;
+  v_status text;
+  v_evidence_ref text := 'refund_review_ev_' || replace(gen_random_uuid()::text,'-','');
+begin
+  if v_uid is null then raise insufficient_privilege using message='AUTHENTICATION_REQUIRED'; end if;
+  if p_refund_ref is null or p_decision not in ('APPROVE','REJECT')
+     or p_reviewer_note is null or length(trim(p_reviewer_note)) not between 3 and 1200
+     or (p_decision='APPROVE' and nullif(trim(coalesce(p_approval_ref,'')),'') is null) then
+    raise exception 'INVALID_REFUND_REVIEW' using errcode='22023';
+  end if;
+  if not exists (
+    select 1 from public.platform_reviewers r
+    where r.auth_user_id=v_uid and r.is_active is true and r.revoked_at is null
+      and r.role_code in ('FINANCE_REVIEWER','PLATFORM_ADMIN')
+  ) then
+    raise insufficient_privilege using message='FINANCE_REVIEWER_REQUIRED';
+  end if;
+  select * into v_refund from public.finance_refund_requests
+    where refund_ref=p_refund_ref for update;
+  if not found then raise exception 'REFUND_REQUEST_NOT_FOUND' using errcode='P0002'; end if;
+  if v_refund.refund_status <> 'PENDING_REVIEW' then
+    raise exception 'REFUND_REQUEST_ALREADY_REVIEWED' using errcode='55000';
+  end if;
+  v_status := case when p_decision='APPROVE' then 'APPROVED' else 'REJECTED' end;
+  update public.finance_refund_requests set refund_status=v_status,
+    reviewed_by_operator_ref=v_uid::text, approval_ref=case when p_decision='APPROVE' then p_approval_ref else null end,
+    reviewed_at=statement_timestamp(), evidence_ref=v_evidence_ref
+  where id=v_refund.id;
+
+  insert into public.finance_ledger_entries(
+    ledger_ref,candidate_ref,order_ref,payment_ref,refund_ref,entry_type,debit_cents,credit_cents,
+    currency,description,evidence_ref
+  ) values (
+    'ledger-refund-review:' || v_refund.refund_ref,v_refund.candidate_ref,v_refund.order_ref,
+    v_refund.payment_ref,v_refund.refund_ref,case when p_decision='APPROVE' then 'REFUND_APPROVED' else 'ADJUSTMENT' end,
+    0,0,v_refund.currency,'Finance reviewer decision: ' || v_status || '. ' || left(trim(p_reviewer_note),1200),v_evidence_ref
+  );
+  insert into public.payment_evidence_ledger(
+    evidence_ref,source_type,source_ref,candidate_ref,order_ref,payment_ref,event_name,event_summary,proof_payload
+  ) values (
+    v_evidence_ref,'REFUND_REVIEW',v_refund.refund_ref,v_refund.candidate_ref,v_refund.order_ref,
+    v_refund.payment_ref,'REFUND_' || v_status,'Human finance review recorded; no provider refund was executed.',
+    jsonb_build_object('decision',v_status,'reviewer_auth_user_id',v_uid,'approval_ref',p_approval_ref,
+      'automatic_refund',false,'note',left(trim(p_reviewer_note),1200))
+  );
+  return jsonb_build_object('ok',true,'refund_ref',v_refund.refund_ref,'refund_status',v_status,'refund_executed',false);
+end;
+$function$;
+
+revoke all on function public.get_candidate_finance_summary() from public, anon;
+grant execute on function public.get_candidate_finance_summary() to authenticated;
+revoke all on function public.request_candidate_finance_refund(text,integer,text) from public, anon;
+grant execute on function public.request_candidate_finance_refund(text,integer,text) to authenticated;
+revoke all on function public.review_finance_refund_request(text,text,text,text) from public, anon, authenticated;
+grant execute on function public.review_finance_refund_request(text,text,text,text) to authenticated;
 
 revoke all on function public.claim_notification_outbox(integer) from public, anon, authenticated;
 grant execute on function public.claim_notification_outbox(integer) to service_role;
