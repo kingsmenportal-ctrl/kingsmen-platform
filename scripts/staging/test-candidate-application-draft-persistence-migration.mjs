@@ -10,7 +10,10 @@ for (const token of [
   "candidate_application_draft_answers",
   "enable row level security",
   "force row level security",
-  "current_authenticated_candidate_id()",
+  "private.current_verified_candidate_id()",
+  "candidate_auth_identity_links",
+  "link_status = 'VERIFIED'",
+  "verified_by ~*",
   "auth.uid()",
   "for update",
   "APPLICATION_DRAFT_VERSION_CONFLICT",
@@ -30,5 +33,8 @@ assert.match(migration, /where id = p_application_id and candidate_id = v_candid
 assert.match(migration, /status not in \('DRAFT','READINESS_BLOCKED','READY_FOR_REVIEW','READY_TO_SUBMIT'\)/i);
 assert.match(migration, /on conflict \(application_id\) do update/i);
 assert.doesNotMatch(migration, /drop schema|drop table public\.candidate_applications|truncate public\.candidate_applications/i);
+
+assert.doesNotMatch(migration, /set status\\s*=/i, "Saving draft answers must not rewrite internal application lifecycle status.");
+assert.match(migration, /v_application\\.status, v_application\\.status/i, "Draft audit events must preserve the existing workflow status.");
 
 console.log("Candidate application draft persistence migration contract checks passed.");
