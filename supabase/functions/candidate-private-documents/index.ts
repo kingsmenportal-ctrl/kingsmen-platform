@@ -285,7 +285,7 @@ async function finalizeUpload(req: Request, body: Record<string, unknown>, ctx: 
   }
   const { data: doc, error: docError } = await ctx.admin.from("candidate_private_documents")
     .select("id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,mime_type,size_bytes,status,sha256_hex")
-    .eq("id", documentId).eq("candidate_id", ctx.candidateId).maybeSingle();
+    .eq("id", documentId).eq("candidate_id", ctx.candidateId).is("deleted_at", null).maybeSingle();
   if (docError) return fail(req, 503, "DOCUMENT_LOOKUP_FAILED");
   if (!doc) return fail(req, 404, "DOCUMENT_NOT_FOUND");
   if (doc.storage_bucket !== DOCUMENT_BUCKET) return fail(req, 409, "DOCUMENT_STORAGE_BUCKET_MISMATCH");
@@ -347,7 +347,7 @@ async function readUrl(req: Request, body: Record<string, unknown>, ctx: Candida
   }
   const { data: doc, error: lookupError } = await ctx.admin.from("candidate_private_documents")
     .select("id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,original_filename,mime_type,size_bytes,status")
-    .eq("id", documentId).eq("candidate_id", ctx.candidateId).maybeSingle();
+    .eq("id", documentId).eq("candidate_id", ctx.candidateId).is("deleted_at", null).maybeSingle();
   if (lookupError) return fail(req, 503, "DOCUMENT_LOOKUP_FAILED");
   if (!doc) return fail(req, 404, "DOCUMENT_NOT_FOUND");
   if (doc.storage_bucket !== DOCUMENT_BUCKET ||
@@ -381,10 +381,27 @@ async function readUrl(req: Request, body: Record<string, unknown>, ctx: Candida
   });
 }
 
+async function requestDeletion(req: Request, body: Record<string, unknown>, ctx: CandidateContext): Promise<Response> {
+  const documentId = typeof body.documentId === "string" ? body.documentId : "";
+  const reason = typeof body.reason === "string" ? body.reason.trim() : "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(documentId)) return fail(req, 400, "DOCUMENT_ID_INVALID");
+  if (reason.length < 3 || reason.length > 1200) return fail(req, 400, "DOCUMENT_DELETION_REASON_REQUIRED");
+  const { data, error } = await ctx.admin.rpc("request_candidate_private_document_deletion", {
+    p_supabase_user_id: ctx.userId, p_candidate_id: ctx.candidateId, p_document_id: documentId, p_reason: reason
+  });
+  if (error || !data) {
+    const code = errorCode(error);
+    return fail(req, code === "42501" ? 403 : code === "P0002" ? 404 : code === "55000" ? 409 : 503, code);
+  }
+  return response(req, { ok: true, requestId: data.request_id, requestRef: data.request_ref,
+    status: data.request_status, fileDeleted: false,
+    message: "Deletion is a request, not an immediate file removal. A platform administrator must review it; the file remains private until approved." });
+}
+
 async function listDocuments(req: Request, ctx: CandidateContext): Promise<Response> {
   const { data, error } = await ctx.admin.from("candidate_private_documents")
     .select("id,document_type,application_id,preparation_item_id,original_filename,mime_type,size_bytes,status,sha256_hex,uploaded_at,created_at,updated_at")
-    .eq("candidate_id", ctx.candidateId)
+    .eq("candidate_id", ctx.candidateId).is("deleted_at", null)
     .order("created_at", { ascending: false }).limit(100);
   if (error) return fail(req, 503, "DOCUMENT_LIST_FAILED");
   const { data: applications, error: applicationError } = await ctx.admin.from("candidate_applications")
@@ -465,7 +482,8 @@ Deno.serve(async (req: Request) => {
   const action = ({
     create_upload: "upload-url",
     finalize_upload: "finalize-upload",
-    create_download_url: "read-url"
+    create_download_url: "read-url",
+    request_deletion: "request-deletion"
   } as Record<string, string>)[requestedAction] ?? requestedAction;
   if (requestedAction === "create_upload") {
     body = {
@@ -483,7 +501,7 @@ Deno.serve(async (req: Request) => {
 
   // Preserve the deployed v14 reviewer actions when the upgraded function is published.
   // Reviewers are authorized by platform_reviewers, not candidate identity links.
-  if (["list_review_queue", "create_reviewer_download_url", "review_document"].includes(action)) {
+  if (["list_review_queue", "create_reviewer_download_url", "review_document", "review_deletion_request"].includes(action)) {
     const authorization = req.headers.get("authorization") ?? "";
     const token = /^Bearer\s+(\S+)$/i.exec(authorization)?.[1];
     if (!token) return fail(req, 401, "AUTHENTICATION_REQUIRED");
@@ -497,6 +515,56 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const origin = req.headers.get("origin");
     const reply = (status: number, payload: Record<string, unknown>, _origin: string | null) => response(req, payload, status);
+
+if (action === "review_deletion_request") {
+    const adminRole = await admin.from("platform_reviewers").select("role_code")
+      .eq("auth_user_id", authData.user.id).eq("is_active", true).is("revoked_at", null)
+      .eq("role_code", "PLATFORM_ADMIN").maybeSingle();
+    if (adminRole.error) return reply(503, { error: "Could not verify document-retention permissions." }, origin);
+    if (!adminRole.data) return reply(403, { code: "PLATFORM_ADMIN_REQUIRED", error: "Only an active platform administrator may approve document deletion." }, origin);
+    const requestId = typeof body.request_id === "string" ? body.request_id : "";
+    const decision = typeof body.decision === "string" ? body.decision : "";
+    const note = typeof body.reviewer_note === "string" ? body.reviewer_note.trim() : "";
+    const approvalRef = typeof body.approval_ref === "string" ? body.approval_ref.trim() : "";
+    if (!/^[0-9a-f-]{36}$/i.test(requestId) || !["APPROVE", "REJECT"].includes(decision) ||
+        note.length < 3 || note.length > 1200 || (decision === "APPROVE" && (approvalRef.length < 3 || approvalRef.length > 200))) {
+      return reply(400, { error: "A valid request, decision, reviewer note and approval reference are required." }, origin);
+    }
+    const { data: reviewed, error: reviewError } = await admin.rpc("review_candidate_private_document_deletion", {
+      p_request_id: requestId, p_reviewer_auth_user_id: authData.user.id,
+      p_decision: decision, p_reviewer_note: note, p_approval_ref: approvalRef || null
+    });
+    if (reviewError || !reviewed) {
+      const code = reviewError?.code ?? "unknown";
+      return reply(code === "42501" ? 403 : code === "P0002" ? 404 : 409,
+        { error: "The document-retention decision could not be recorded." }, origin);
+    }
+    if (decision === "REJECT") return reply(200, { ok: true, request_status: "REJECTED", file_deleted: false }, origin);
+    const { data: retention, error: retentionError } = await admin.from("candidate_private_document_retention_requests")
+      .select("id,document_id,candidate_id,request_status").eq("id", requestId).maybeSingle();
+    if (retentionError || !retention) return reply(503, { error: "Approved retention request could not be reloaded." }, origin);
+    if (retention.request_status === "COMPLETED") return reply(200, { ok: true, request_status: "COMPLETED", file_deleted: true, idempotent: true }, origin);
+    const { data: document, error: documentError } = await admin.from("candidate_private_documents")
+      .select("id,candidate_id,storage_bucket,storage_path,deleted_at")
+      .eq("id", retention.document_id).eq("candidate_id", retention.candidate_id).maybeSingle();
+    if (documentError || !document) return reply(404, { error: "Private document record not found." }, origin);
+    if (!document.deleted_at) {
+      if (document.storage_bucket !== BUCKET || !String(document.storage_path).startsWith(String(document.candidate_id) + "/")) {
+        return reply(409, { error: "Document storage ownership validation failed; no file was deleted." }, origin);
+      }
+      const { error: removeError } = await admin.storage.from(BUCKET).remove([document.storage_path]);
+      if (removeError) {
+        console.error("approved document deletion failed", removeError.name ?? "storage_error");
+        return reply(503, { error: "The request is approved but storage deletion did not complete. Retry the same request." }, origin);
+      }
+    }
+    const { data: completed, error: completeError } = await admin.rpc("complete_candidate_private_document_deletion", {
+      p_request_id: requestId, p_reviewer_auth_user_id: authData.user.id,
+      p_evidence_ref: "document-deletion:" + requestId
+    });
+    if (completeError || !completed) return reply(503, { error: "Storage deletion completed but its audit state could not be finalized. Retry the same request." }, origin);
+    return reply(200, { ok: true, request_status: "COMPLETED", file_deleted: true, audit_recorded: true }, origin);
+  }
 
 // Reviewer queue and read access are gated independently of candidate identity.
   // Never return storage paths or file bytes; downloads are short-lived and audited.
@@ -515,7 +583,7 @@ Deno.serve(async (req: Request) => {
     if (action === "list_review_queue") {
       const { data, error } = await admin.from("candidate_private_documents")
         .select("id,candidate_id,preparation_item_id,original_filename,mime_type,size_bytes,status,uploaded_at,created_at,updated_at")
-        .in("status", ["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW"])
+        .in("status", ["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW"]).is("deleted_at", null)
         .order("created_at", { ascending: true }).limit(100);
       if (error) {
         console.error("private document review queue failed", error.code ?? "unknown");
@@ -528,7 +596,7 @@ Deno.serve(async (req: Request) => {
     if (!/^[0-9a-f-]{36}$/i.test(id)) return reply(400, { error: "A valid document identifier is required." }, origin);
     const { data: doc, error } = await admin.from("candidate_private_documents")
       .select("id,candidate_id,storage_bucket,storage_path,status")
-      .eq("id", id).maybeSingle();
+      .eq("id", id).is("deleted_at", null).maybeSingle();
     if (error || !doc) return reply(404, { error: "Private document record not found." }, origin);
     if (doc.storage_bucket !== BUCKET || !String(doc.storage_path).startsWith(String(doc.candidate_id) + "/") ||
         !["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status)) {
@@ -604,6 +672,7 @@ if (action === "review_document") {
       case "upload-url": return await uploadUrl(req, body, context);
       case "finalize-upload": return await finalizeUpload(req, body, context);
       case "read-url": return await readUrl(req, body, context);
+      case "request-deletion": return await requestDeletion(req, body, context);
       case "list": return await listDocuments(req, context);
       default: return fail(req, 400, "ACTION_NOT_SUPPORTED");
     }
