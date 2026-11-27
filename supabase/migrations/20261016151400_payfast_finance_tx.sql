@@ -160,6 +160,7 @@ as $function$
 declare
   v_intent public.payfast_payment_intents%rowtype;
   v_receipt public.payfast_itn_receipts%rowtype;
+  v_candidate_email text;
   v_existing public.finance_payments%rowtype;
   v_payment public.finance_payments%rowtype;
 begin
@@ -256,6 +257,29 @@ begin
       'amount_fee_cents', p_amount_fee_cents, 'amount_net_cents', p_amount_net_cents,
       'currency', 'ZAR', 'verified', true, 'environment', 'sandbox')
   );
+
+  -- Persist candidate-visible status and an email-first outbox event in the same settlement transaction.
+  select ca.email into v_candidate_email from public.candidate_accounts ca
+    where ca.candidate_id::text=p_candidate_ref and ca.email_verified is true limit 1;
+  insert into public.candidate_portal_messages(
+    portal_message_ref,candidate_ref,title,body,message_type,visible_to_candidate,evidence_ref
+  ) values (
+    'portal-payment-verified:' || p_payment_ref,p_candidate_ref,'Payment verified',
+    'Your Kingsmen payment has been verified. Review your plan status and next steps in the finance workspace.',
+    'PAYMENT_STATUS',true,p_evidence_ref
+  ) on conflict (portal_message_ref) do nothing;
+  if v_candidate_email is not null then
+    insert into public.notification_outbox(
+      notification_ref,candidate_ref,template_key,channel,recipient,subject,body,purpose,urgency,status,
+      idempotency_key,scheduled_for,evidence_ref
+    ) values (
+      'notif-payment-verified:' || p_payment_ref,p_candidate_ref,'payment_verified_v1','EMAIL_PRIMARY',
+      v_candidate_email,'Kingsmen payment verified',
+      'Your Kingsmen payment has been verified. Sign in to review your plan status and next steps.',
+      'PAYMENT_VERIFIED','NORMAL','QUEUED','payment-verified:' || p_payment_ref,
+      statement_timestamp(),p_evidence_ref
+    ) on conflict (idempotency_key) do nothing;
+  end if;
 
   return jsonb_build_object('outcome', 'recorded', 'payment_ref', p_payment_ref,
     'order_status', 'PAID', 'invoice_status', 'PAID', 'entitlement_activation', 'verified_payment_only');
