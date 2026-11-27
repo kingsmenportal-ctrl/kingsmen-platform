@@ -22,6 +22,41 @@ begin
 end
 $constraint$;
 
+alter table public.candidate_private_documents
+  add column if not exists deleted_at timestamptz,
+  add column if not exists retention_expires_at timestamptz;
+create index if not exists candidate_private_documents_retention_idx
+  on public.candidate_private_documents(candidate_id,retention_expires_at)
+  where deleted_at is null;
+
+create table if not exists public.candidate_private_document_retention_requests (
+  id uuid primary key default gen_random_uuid(),
+  request_ref text unique not null,
+  document_id uuid not null references public.candidate_private_documents(id) on delete restrict,
+  candidate_id uuid not null references public.candidates(id) on delete restrict,
+  requested_by_auth_user_id uuid not null,
+  reason text not null check (length(trim(reason)) between 3 and 1200),
+  request_status text not null default 'PENDING_REVIEW' check (request_status in ('PENDING_REVIEW','APPROVED','REJECTED','COMPLETED')),
+  reviewed_by_auth_user_id uuid,
+  reviewer_note text,
+  approval_ref text,
+  requested_at timestamptz not null default now(),
+  reviewed_at timestamptz,
+  completed_at timestamptz,
+  evidence_ref text,
+  constraint private_document_retention_review_state_chk check (
+    (request_status='PENDING_REVIEW' and reviewed_at is null and completed_at is null)
+    or (request_status in ('APPROVED','REJECTED') and reviewed_at is not null and completed_at is null)
+    or (request_status='COMPLETED' and reviewed_at is not null and completed_at is not null)
+  )
+);
+create unique index if not exists candidate_private_document_one_pending_deletion_uq
+  on public.candidate_private_document_retention_requests(document_id)
+  where request_status in ('PENDING_REVIEW','APPROVED');
+alter table public.candidate_private_document_retention_requests enable row level security;
+revoke all on public.candidate_private_document_retention_requests from public, anon, authenticated;
+grant all on public.candidate_private_document_retention_requests to service_role;
+
 create table if not exists public.candidate_communication_preferences (
   candidate_ref text primary key,
   transactional_email_enabled boolean not null default true,
@@ -240,6 +275,110 @@ $document_trigger$;
 
 revoke all on function public.enqueue_document_review_notification() from public, anon, authenticated;
 grant execute on function public.enqueue_document_review_notification() to service_role;
+
+create or replace function public.request_candidate_private_document_deletion(
+  p_supabase_user_id uuid, p_candidate_id uuid, p_document_id uuid, p_reason text
+) returns jsonb language plpgsql security definer set search_path = ''
+as $function$
+declare v_doc public.candidate_private_documents%rowtype; v_request public.candidate_private_document_retention_requests%rowtype;
+begin
+  if p_supabase_user_id is null or p_candidate_id is null or p_document_id is null
+     or p_reason is null or length(trim(p_reason)) not between 3 and 1200 then
+    raise exception 'INVALID_DOCUMENT_DELETION_REQUEST' using errcode='22023';
+  end if;
+  if not exists (select 1 from public.candidate_auth_identity_links l
+    join public.candidates c on c.id=l.candidate_id and c.is_active is true
+    where l.supabase_user_id=p_supabase_user_id and l.candidate_id=p_candidate_id
+      and l.link_status='VERIFIED' and l.verified_at is not null
+      and l.verified_at<=statement_timestamp() and l.verified_by is not null) then
+    raise insufficient_privilege using message='VERIFIED_CANDIDATE_IDENTITY_REQUIRED';
+  end if;
+  select * into v_doc from public.candidate_private_documents d
+    where d.id=p_document_id and d.candidate_id=p_candidate_id and d.deleted_at is null for update;
+  if not found then raise exception 'DOCUMENT_NOT_FOUND' using errcode='P0002'; end if;
+  if v_doc.status='UPLOAD_PENDING' then raise exception 'PENDING_UPLOAD_CANNOT_BE_DELETED' using errcode='55000'; end if;
+  select * into v_request from public.candidate_private_document_retention_requests r
+    where r.document_id=p_document_id and r.request_status in ('PENDING_REVIEW','APPROVED') limit 1;
+  if found then return jsonb_build_object('ok',true,'request_id',v_request.id,'request_ref',v_request.request_ref,
+    'request_status',v_request.request_status,'idempotent',true,'file_deleted',false); end if;
+  insert into public.candidate_private_document_retention_requests(
+    request_ref,document_id,candidate_id,requested_by_auth_user_id,reason,evidence_ref
+  ) values ('doc-delete-' || replace(gen_random_uuid()::text,'-',''),p_document_id,p_candidate_id,
+    p_supabase_user_id,left(trim(p_reason),1200),'doc-retention:' || p_document_id::text)
+  returning * into v_request;
+  return jsonb_build_object('ok',true,'request_id',v_request.id,'request_ref',v_request.request_ref,
+    'request_status',v_request.request_status,'idempotent',false,'file_deleted',false);
+end;
+$function$;
+
+create or replace function public.review_candidate_private_document_deletion(
+  p_request_id uuid, p_reviewer_auth_user_id uuid, p_decision text, p_reviewer_note text, p_approval_ref text default null
+) returns jsonb language plpgsql security definer set search_path = ''
+as $function$
+declare v_request public.candidate_private_document_retention_requests%rowtype; v_status text;
+begin
+  if p_request_id is null or p_reviewer_auth_user_id is null or p_decision not in ('APPROVE','REJECT')
+     or p_reviewer_note is null or length(trim(p_reviewer_note)) not between 3 and 1200
+     or (p_decision='APPROVE' and nullif(trim(coalesce(p_approval_ref,'')),'') is null) then
+    raise exception 'INVALID_DOCUMENT_DELETION_REVIEW' using errcode='22023';
+  end if;
+  if not exists (select 1 from public.platform_reviewers r where r.auth_user_id=p_reviewer_auth_user_id
+    and r.is_active is true and r.revoked_at is null and r.role_code='PLATFORM_ADMIN') then
+    raise insufficient_privilege using message='PLATFORM_ADMIN_REQUIRED_FOR_DOCUMENT_DELETION';
+  end if;
+  select * into v_request from public.candidate_private_document_retention_requests where id=p_request_id for update;
+  if not found then raise exception 'DOCUMENT_DELETION_REQUEST_NOT_FOUND' using errcode='P0002'; end if;
+  if v_request.request_status='APPROVED' and p_decision='APPROVE' then
+    return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status','APPROVED','document_id',v_request.document_id,'idempotent',true);
+  end if;
+  if v_request.request_status='REJECTED' and p_decision='REJECT' then
+    return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status','REJECTED','document_id',v_request.document_id,'idempotent',true);
+  end if;
+  if v_request.request_status<>'PENDING_REVIEW' then raise exception 'DOCUMENT_DELETION_REQUEST_ALREADY_FINALIZED' using errcode='55000'; end if;
+  v_status:=case when p_decision='APPROVE' then 'APPROVED' else 'REJECTED' end;
+  update public.candidate_private_document_retention_requests set request_status=v_status,
+    reviewed_by_auth_user_id=p_reviewer_auth_user_id,reviewer_note=left(trim(p_reviewer_note),1200),
+    approval_ref=case when p_decision='APPROVE' then p_approval_ref else null end,reviewed_at=statement_timestamp()
+    where id=v_request.id;
+  return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status',v_status,
+    'document_id',v_request.document_id,'candidate_id',v_request.candidate_id,'idempotent',false);
+end;
+$function$;
+
+create or replace function public.complete_candidate_private_document_deletion(
+  p_request_id uuid, p_reviewer_auth_user_id uuid, p_evidence_ref text
+) returns jsonb language plpgsql security definer set search_path = ''
+as $function$
+declare v_request public.candidate_private_document_retention_requests%rowtype;
+begin
+  if p_request_id is null or p_reviewer_auth_user_id is null or p_evidence_ref is null then
+    raise exception 'INVALID_DOCUMENT_DELETION_COMPLETION' using errcode='22023';
+  end if;
+  if not exists (select 1 from public.platform_reviewers r where r.auth_user_id=p_reviewer_auth_user_id
+    and r.is_active is true and r.revoked_at is null and r.role_code='PLATFORM_ADMIN') then
+    raise insufficient_privilege using message='PLATFORM_ADMIN_REQUIRED_FOR_DOCUMENT_DELETION';
+  end if;
+  select * into v_request from public.candidate_private_document_retention_requests where id=p_request_id for update;
+  if not found then raise exception 'DOCUMENT_DELETION_REQUEST_NOT_FOUND' using errcode='P0002'; end if;
+  if v_request.request_status='COMPLETED' then
+    return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status','COMPLETED','file_deleted',true,'idempotent',true);
+  end if;
+  if v_request.request_status<>'APPROVED' then raise exception 'APPROVED_DELETION_REQUEST_REQUIRED' using errcode='55000'; end if;
+  update public.candidate_private_documents set deleted_at=coalesce(deleted_at,statement_timestamp()),
+    retention_expires_at=null,updated_at=statement_timestamp() where id=v_request.document_id and candidate_id=v_request.candidate_id;
+  if not found then raise exception 'DOCUMENT_NOT_FOUND' using errcode='P0002'; end if;
+  update public.candidate_private_document_retention_requests set request_status='COMPLETED',
+    completed_at=statement_timestamp(),evidence_ref=p_evidence_ref where id=v_request.id;
+  return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status','COMPLETED','file_deleted',true,'idempotent',false);
+end;
+$function$;
+
+revoke all on function public.request_candidate_private_document_deletion(uuid,uuid,uuid,text) from public, anon, authenticated;
+grant execute on function public.request_candidate_private_document_deletion(uuid,uuid,uuid,text) to service_role;
+revoke all on function public.review_candidate_private_document_deletion(uuid,uuid,text,text,text) from public, anon, authenticated;
+grant execute on function public.review_candidate_private_document_deletion(uuid,uuid,text,text,text) to service_role;
+revoke all on function public.complete_candidate_private_document_deletion(uuid,uuid,text) from public, anon, authenticated;
+grant execute on function public.complete_candidate_private_document_deletion(uuid,uuid,text) to service_role;
 
 create or replace function public.get_candidate_communication_preferences()
 returns jsonb language plpgsql security definer set search_path = ''
