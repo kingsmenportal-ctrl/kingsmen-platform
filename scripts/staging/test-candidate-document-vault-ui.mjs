@@ -141,7 +141,7 @@ try {
   page.setDefaultTimeout(10_000);
   page.setDefaultNavigationTimeout(15_000);
 
-  await page.route("**/functions/v1/candidate-private-documents", async route => {
+  await context.route("**/functions/v1/candidate-private-documents", async route => {
     const request = route.request();
     const method = request.method();
     if (method === "OPTIONS") {
@@ -165,7 +165,7 @@ try {
     await route.fulfill({ status: 200, headers: corsHeaders, json: servicePayload(action) });
   });
 
-  await page.route("https://ci-storage.test/**", async route => {
+  await context.route("https://ci-storage.test/**", async route => {
     const request = route.request();
     if (request.method() === "OPTIONS") {
       await route.fulfill({ status: 204, headers: corsHeaders });
