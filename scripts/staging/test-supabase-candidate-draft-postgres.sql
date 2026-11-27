@@ -21,6 +21,14 @@ INSERT INTO public.candidate_accounts (candidate_id,auth_user_id,email) VALUES
   ('33333333-3333-4333-8333-333333333333','cccccccc-0000-4000-8000-000000000003','c@example.test'),
   ('44444444-4444-4444-8444-444444444444','dddddddd-0000-4000-8000-000000000004','d@example.test');
 
+INSERT INTO public.candidate_auth_identity_links
+  (supabase_user_id,candidate_id,link_status,verified_at,verified_by)
+VALUES
+  ('aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111','VERIFIED',now()-interval '2 minutes','eeeeeeee-eeee-4eee-8eee-eeeeeeeeee01'),
+  ('bbbbbbbb-0000-4000-8000-000000000002','22222222-2222-4222-8222-222222222222','VERIFIED',now()-interval '2 minutes','eeeeeeee-eeee-4eee-8eee-eeeeeeeeee02'),
+  ('cccccccc-0000-4000-8000-000000000003','33333333-3333-4333-8333-333333333333','VERIFIED',now()-interval '2 minutes','eeeeeeee-eeee-4eee-8eee-eeeeeeeeee03'),
+  ('dddddddd-0000-4000-8000-000000000004','44444444-4444-4444-8444-444444444444','VERIFIED',now()-interval '2 minutes','eeeeeeee-eeee-4eee-8eee-eeeeeeeeee04');
+
 INSERT INTO public.candidate_master_profiles (candidate_id) VALUES
   ('11111111-1111-4111-8111-111111111111'),
   ('22222222-2222-4222-8222-222222222222'),
@@ -173,10 +181,18 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM public.candidate_applications
     WHERE id='ffffffff-ffff-4fff-8fff-fffffffffff1'
-      AND status='DRAFT' AND readiness_status='NOT_CHECKED'
+      AND status='READY_TO_SUBMIT' AND readiness_status='NOT_CHECKED'
       AND readiness_snapshot->>'readiness_recheck_required'='true'
   ) THEN
-    RAISE EXCEPTION 'saving a draft did not invalidate previous readiness';
+    RAISE EXCEPTION 'saving a draft must invalidate readiness without rewriting workflow status';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM public.candidate_application_events
+    WHERE application_id='ffffffff-ffff-4fff-8fff-fffffffffff1'
+      AND event_type='APPLICATION_DRAFT_SAVED'
+      AND from_status='READY_TO_SUBMIT' AND to_status='READY_TO_SUBMIT'
+  ) THEN
+    RAISE EXCEPTION 'draft audit event must preserve the application lifecycle status';
   END IF;
 
   v_result := public.get_candidate_application_draft('ffffffff-ffff-4fff-8fff-fffffffffff1');
