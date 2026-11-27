@@ -126,3 +126,24 @@ The prior failure was caused by running the communications bootstrap after the f
 - [ ] Verified backup and isolated restore of the real Kingsmen database; staging migration provenance remains unresolved.
 - [ ] Run CI against the new record commit and reconcile all release gates before considering merge/deployment.
 
+## External runtime and backup gate verification — 2026-11-27
+
+Read-only inspection of the connected Supabase staging project `kingsmen-portal-staging` (`euhubhhnumtibbyufghm`) confirmed:
+
+- `candidate-private-documents` is ACTIVE, version 17, with JWT verification enabled.
+- `payfast-sandbox` is ACTIVE, version 10. Its source reports that a GET health response exposes only whether required configuration is missing; this session could not invoke the Edge Function URL through an available runtime tool.
+- The private document bucket `kingsmen-candidate-documents` exists, is private, is limited to 10 MiB, and allows only PDF/JPEG/PNG.
+- The connected staging schema contains the document, finance, PayFast ITN, communication-preference and notification-outbox tables. Relevant upload/finalize/read-audit and sandbox payment RPCs exist.
+- The private document bucket currently contains zero objects, so there is no existing staging document to use for a reviewer/download/expiry journey without creating an authenticated test identity and test record.
+- Supabase migration ledger has 130 rows. This is a count only; it does not resolve the previously identified source migration provenance mismatches.
+- Neon rehearsal project `bitter-mouse-01847035` reports zero snapshots. Its branches are rehearsal fixtures, not a verified backup of the Kingsmen source database.
+
+## Runtime execution blockers — must not be represented as passes
+
+1. **Authenticated document journey:** requires a dedicated staging test candidate, confirmed candidate-auth identity link, and a reviewer identity authorized by the staging policy. No credentials or approved test identity are available in this session. Anonymous requests and source checks cannot prove upload/review/download/expiry end to end.
+2. **PayFast sandbox round-trip:** requires active sandbox merchant credentials and an eligible verified staging candidate/plan. Secret values are intentionally not read or exposed. The checkout and ITN handler are deployed, but no provider-confirmed transaction or authenticated provider ITN was executed here.
+3. **Email provider delivery/bounce/unsubscribe:** the SQL outbox is tested, but no provider-specific credentials, webhook signing secret, controlled recipient, or provider delivery/bounce/unsubscribe event was available. No email was sent.
+4. **Backup/restore:** no verified source backup archive or source identity/checksum/creation timestamp was found in the connected Neon rehearsal project. Creating a branch from staging or replaying migrations would not constitute a backup-based restore and would not resolve provenance. No restore was attempted.
+
+The requested live checks remain blocked by these missing inputs. No secrets were printed, no external payment was initiated, no email was sent, and no production database was modified. Do not mark Phase 5 or launch readiness complete until these runtime proofs are captured on the correct isolated staging/restore targets.
+
