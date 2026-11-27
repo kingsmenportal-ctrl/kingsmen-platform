@@ -269,7 +269,8 @@ begin
   loop
     if jsonb_typeof(v_answer) is distinct from 'object'
        or v_answer - array['question_key','answer']::text[] <> '{}'::jsonb
-       or coalesce(v_answer->>'question_key', '') !~ '^[A-Za-z0-9._:-]{1,80}$'
+       or length(coalesce(v_answer->>'question_key', '')) not between 1 and 80
+       or translate(coalesce(v_answer->>'question_key', ''), 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._:-', '') <> ''
        or jsonb_typeof(v_answer->'answer') is distinct from 'string'
        or length(v_answer->>'answer') > 2000 then
       return jsonb_build_object('ok', false, 'code', 'APPLICATION_ADDITIONAL_ANSWER_INVALID');
