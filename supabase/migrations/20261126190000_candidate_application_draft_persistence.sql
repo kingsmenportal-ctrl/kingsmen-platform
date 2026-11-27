@@ -379,9 +379,9 @@ begin
       updated_at = v_now
   where id = p_application_id and candidate_id = v_candidate_id;
 
-  select coalesce(jsonb_agg(key order by key), '[]'::jsonb)
+  select coalesce(jsonb_agg(answer_key order by answer_key), '[]'::jsonb)
     into v_answer_keys
-  from jsonb_object_keys(p_answer_data) as key;
+  from jsonb_object_keys(p_answer_data) as fields(answer_key);
 
   insert into public.candidate_application_events (
     event_ref, application_id, candidate_id, actor_auth_user_id,
