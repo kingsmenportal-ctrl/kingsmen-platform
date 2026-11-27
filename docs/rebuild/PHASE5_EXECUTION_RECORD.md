@@ -147,3 +147,18 @@ Read-only inspection of the connected Supabase staging project `kingsmen-portal-
 
 The requested live checks remain blocked by these missing inputs. No secrets were printed, no external payment was initiated, no email was sent, and no production database was modified. Do not mark Phase 5 or launch readiness complete until these runtime proofs are captured on the correct isolated staging/restore targets.
 
+
+
+## Automated provisioning attempt and hard gates — 2026-11-27
+
+The connected tooling was inspected for safe automation of staging Auth users, provider secrets, and a source backup. The currently available Supabase connector supports read-only SQL, function inspection/deployment, and branch operations, but exposes no Supabase Auth-admin user provisioning, secret-manager write, database-backup export, or arbitrary Edge Function invocation operation. The connected Neon tooling can create snapshots/branches, but a snapshot of the rehearsal project or staging project would not be a source backup of the real Kingsmen database. No substitute artifact or identity was fabricated.
+
+### Execution boundaries
+- **Backup:** require a source-owned archive or authorized source storage locator, immutable source database/project identity, creation timestamp, and SHA-256. Restore into a new isolated target with application migrations disabled; record schema inventory and checksums before/after. Never use the rehearsal branch as the source.
+- **Candidate/reviewer:** create through the staging Supabase Auth admin path with unique non-production test addresses; confirm identities through the real auth flow, and grant reviewer capability through the existing staging authorization policy—not by writing role claims directly or bypassing RLS. No admin-user creation endpoint is available through the connected tool set in this session.
+- **PayFast:** add merchant ID, merchant key, passphrase, and sandbox mode only in the staging function secret store; never commit them. Use a staging candidate with an eligible plan and a provider-generated sandbox ITN; validate signature/amount/reference and replay/idempotency behavior. No secret-store write or function invocation capability is exposed by the connected tools here.
+- **Email:** configure a provider account/API key and webhook signing secret only in the staging secret store; use an explicitly controlled recipient. Verify provider acceptance, delivered/bounce event signature, unsubscribe/opt-out persistence, suppression of later sends, idempotent webhook replay, and that test/mock delivery never becomes SENT without provider evidence. No provider credentials or controlled recipient were available, and no email was sent.
+- **Documents:** create a real staging Auth session for the candidate and reviewer, then test upload -> finalize -> reviewer decision -> candidate download -> signed URL expiry/denial, with cross-user denial, oversized/invalid MIME rejection, and audit event assertions. Source/SQL checks are not a substitute for this runtime proof.
+
+### Current release decision
+These gates remain **BLOCKED**, not passed. No production resources were modified, no live payment was initiated, no message was sent, no credentials were exposed, and no backup restore was attempted. The next useful external action is to place the authorized source backup in a connected storage location and configure the required staging secrets/identities through their native admin consoles; after those prerequisites exist, run the runtime tests and attach raw redacted evidence to this record.
