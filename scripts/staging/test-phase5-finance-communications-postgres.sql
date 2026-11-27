@@ -165,7 +165,7 @@ BEGIN
   INSERT INTO public.candidate_private_documents(id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,document_type,original_filename,mime_type,size_bytes,status)
   VALUES ('99999999-9999-4999-8999-999999999998','11111111-1111-4111-8111-111111111111','aaaaaaaa-0000-4000-8000-000000000001','candidate-private-documents','11111111-1111-4111-8111-111111111111/retention-test.pdf','OTHER','retention-test.pdf','application/pdf',1200,'VERIFIED');
   v_refund := public.request_candidate_private_document_deletion('aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111','99999999-9999-4999-8999-999999999998','Candidate privacy request for this document');
-  IF v_refund->>'request_status' IS DISTINCT FROM 'PENDING_REVIEW' OR v_refund->>'fileDeleted' IS DISTINCT FROM 'false' THEN
+  IF v_refund->>'request_status' IS DISTINCT FROM 'PENDING_REVIEW' OR v_refund->>'file_deleted' IS DISTINCT FROM 'false' THEN
     RAISE EXCEPTION 'candidate deletion request must not immediately remove a file: %',v_refund;
   END IF;
   v_refund_ref := v_refund->>'request_id';
