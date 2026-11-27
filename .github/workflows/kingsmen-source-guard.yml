@@ -67,6 +67,9 @@ jobs:
       - name: Safe web-to-backend boundary validator
         run: npm run web:validate:backend-boundary
 
+      - name: PayFast signature hardening regression tests
+        run: npm run finance:test:payfast-signature
+
       - name: PayFast sandbox source proof
         run: npm run payments:prove:sandbox
 
