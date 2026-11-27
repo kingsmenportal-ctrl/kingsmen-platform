@@ -32,7 +32,7 @@ begin
 
   v_updated_definition := regexp_replace(
     v_definition,
-    '::text\]\)\)\)
+    '::text\]\)\)\)$',
     '::text, ''APPLICATION_DRAFT_SAVED''::text])))'
   );
 
