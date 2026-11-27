@@ -1,23 +1,13 @@
-export async function POST(request: Request) {
-  const body = await request.json();
+import { n06WorkbenchAdapterRequired, verifyN06CandidateSession } from "@/lib/n06-candidate-session-auth";
 
-  if (!body?.candidateId || !body?.routeId) {
-    return Response.json(
-      { ok: false, productionReady: false, error: "Missing candidateId or routeId" },
-      { status: 400 }
-    );
-  }
+export const dynamic = "force-dynamic";
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N06 candidate-safe readiness API shell",
-    candidateId: body.candidateId,
-    routeId: body.routeId,
-    candidateCanVerifySource: false,
-    candidateCanMarkPaid: false,
-    candidateCanMarkSubmitted: false,
-    candidateCanVerifyOutcome: false,
-    serviceRoleVisibleToBrowser: false
-  });
+export async function POST(request: Request): Promise<Response> {
+  const session = await verifyN06CandidateSession(request);
+  if (!session.ok) return session.response;
+
+  // Authentication is necessary but not sufficient: candidate-to-auth linkage
+  // and the verified route read model must exist before this endpoint can answer.
+  // Do not echo caller-supplied IDs or report fabricated readiness/optimization.
+  return n06WorkbenchAdapterRequired();
 }
