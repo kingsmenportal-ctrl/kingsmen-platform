@@ -11,7 +11,7 @@ assert.ok(route.indexOf("ACTIVE_FINANCE_REVIEWER_REQUIRED") < route.indexOf('rea
 assert.match(route, /SUPABASE_SERVICE_ROLE_KEY/);
 assert.match(route, /Cache-Control/);
 assert.match(route, /refundMutationEnabled: false/);
-assert.match(route, /refund\/order models and their audited RPC are reconciled/);
+assert.ok(route.includes("refund rows and the legacy candidate refund-review RPC use different order/request tables"), "refund schema mismatch must fail closed");
 assert.match(page, /ACTIVE_FINANCE_REVIEWER_REQUIRED/);
 assert.match(page, /livePaymentsEnabled/);
 assert.match(page, /Refund requests/);
