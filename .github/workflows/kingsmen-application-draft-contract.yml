@@ -10,6 +10,10 @@ on:
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
+      - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+      - scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
+      - scripts/staging/test-phase5-finance-privileges.sql
+      - scripts/staging/test-phase5-finance-privileges-contract.mjs
       - scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
       - scripts/staging/test-supabase-candidate-draft-postgres.sql
       - apps/web/src/app/api/candidate/application-handoff/route.ts
@@ -81,6 +85,10 @@ on:
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
+      - supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+      - scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
+      - scripts/staging/test-phase5-finance-privileges.sql
+      - scripts/staging/test-phase5-finance-privileges-contract.mjs
       - scripts/staging/fixtures/supabase-candidate-draft-postgres-bootstrap.sql
       - scripts/staging/test-supabase-candidate-draft-postgres.sql
       - apps/web/src/app/api/candidate/application-handoff/route.ts
@@ -223,6 +231,14 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_supabase_candidate_draft -v ON_ERROR_STOP=1 < supabase/migrations/20261126190000_candidate_application_draft_persistence.sql
       - name: Test exact Supabase candidate-draft migration and official portal handoff
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_supabase_candidate_draft -v ON_ERROR_STOP=1 < scripts/staging/test-supabase-candidate-draft-postgres.sql
+      - name: Test Phase 5 finance table least-privilege migration in isolated PostgreSQL
+        run: |
+          set -euo pipefail
+          docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_phase5_finance"
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < supabase/migrations/20261127130000_phase5_finance_least_privilege.sql
+          docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_phase5_finance -v ON_ERROR_STOP=1 < scripts/staging/test-phase5-finance-privileges.sql
+          node scripts/staging/test-phase5-finance-privileges-contract.mjs
       - name: Create isolated candidate status-contract database
         run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_status_contract"
       - name: Bootstrap candidate status-contract database
