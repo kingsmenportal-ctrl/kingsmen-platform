@@ -3,9 +3,21 @@ declare
   table_name text;
   privilege text;
   names text[] := array[
-    'finance_plan_catalog','finance_orders','finance_invoices','payfast_payment_intents',
-    'finance_payments','payfast_itn_receipts','payfast_signature_audit',
-    'finance_refund_requests','finance_ledger_entries','finance_audit_events'
+    'finance_plan_catalog',
+    'finance_orders',
+    'finance_invoices',
+    'payfast_payment_intents',
+    'finance_payments',
+    'payfast_itn_receipts',
+    'payfast_signature_audit',
+    'finance_refund_requests',
+    'finance_ledger_entries',
+    'finance_audit_events',
+    'candidate_communication_preferences',
+    'candidate_communications',
+    'candidate_communication_attempts',
+    'candidate_messages',
+    'candidate_mobile_notification_preferences'
   ];
   privileges text[] := array['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER'];
 begin
@@ -36,4 +48,4 @@ begin
   end loop;
 end
 $test$;
-select 'PASS: Phase 5 finance tables deny all direct anon/authenticated table privileges while preserving service_role workflow access.' as result;
+select 'PASS: Phase 5 finance and communications tables deny direct anon/authenticated privileges while preserving service_role workflow access.' as result;

@@ -1,5 +1,5 @@
 -- Phase 5 least-privilege hardening.
--- Finance and payment truth is accessed only through reviewed server-side paths.
+-- Finance, payment and candidate communication truth is accessed only through reviewed server-side paths.
 -- RLS does not protect TRUNCATE, REFERENCES, or TRIGGER privileges, so direct table
 -- grants to anon/authenticated must be removed as well.
 begin;
@@ -20,7 +20,12 @@ begin
     ('payfast_signature_audit'),
     ('finance_refund_requests'),
     ('finance_ledger_entries'),
-    ('finance_audit_events')
+    ('finance_audit_events'),
+    ('candidate_communication_preferences'),
+    ('candidate_communications'),
+    ('candidate_communication_attempts'),
+    ('candidate_messages'),
+    ('candidate_mobile_notification_preferences')
   ) as t(table_name)
   where to_regclass('public.' || quote_ident(t.table_name)) is null;
 
@@ -40,7 +45,12 @@ revoke all privileges on table
   public.payfast_signature_audit,
   public.finance_refund_requests,
   public.finance_ledger_entries,
-  public.finance_audit_events
+  public.finance_audit_events,
+  public.candidate_communication_preferences,
+  public.candidate_communications,
+  public.candidate_communication_attempts,
+  public.candidate_messages,
+  public.candidate_mobile_notification_preferences
 from anon, authenticated;
 
 comment on table public.finance_orders is

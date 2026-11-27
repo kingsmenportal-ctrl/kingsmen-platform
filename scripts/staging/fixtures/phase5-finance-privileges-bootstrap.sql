@@ -46,3 +46,27 @@ create policy payfast_signature_audit_service_only on public.payfast_signature_a
 create policy finance_refund_requests_service_only on public.finance_refund_requests for all to service_role using (true) with check (true);
 create policy finance_ledger_entries_service_only on public.finance_ledger_entries for all to service_role using (true) with check (true);
 create policy finance_audit_events_service_only on public.finance_audit_events for all to service_role using (true) with check (true);
+
+create table public.candidate_communication_preferences(id uuid primary key default gen_random_uuid());
+create table public.candidate_communications(id uuid primary key default gen_random_uuid());
+create table public.candidate_communication_attempts(id uuid primary key default gen_random_uuid());
+create table public.candidate_messages(id uuid primary key default gen_random_uuid());
+create table public.candidate_mobile_notification_preferences(id uuid primary key default gen_random_uuid());
+
+grant all privileges on table
+  public.candidate_communication_preferences, public.candidate_communications,
+  public.candidate_communication_attempts, public.candidate_messages,
+  public.candidate_mobile_notification_preferences
+to anon, authenticated, service_role;
+
+alter table public.candidate_communication_preferences enable row level security;
+alter table public.candidate_communications enable row level security;
+alter table public.candidate_communication_attempts enable row level security;
+alter table public.candidate_messages enable row level security;
+alter table public.candidate_mobile_notification_preferences enable row level security;
+
+create policy candidate_communication_preferences_service_only on public.candidate_communication_preferences for all to service_role using (true) with check (true);
+create policy candidate_communications_service_only on public.candidate_communications for all to service_role using (true) with check (true);
+create policy candidate_communication_attempts_service_only on public.candidate_communication_attempts for all to service_role using (true) with check (true);
+create policy candidate_messages_service_only on public.candidate_messages for all to service_role using (true) with check (true);
+create policy candidate_mobile_notification_preferences_service_only on public.candidate_mobile_notification_preferences for all to service_role using (true) with check (true);
