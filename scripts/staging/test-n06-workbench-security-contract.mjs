@@ -12,7 +12,7 @@ const read = (path) => {
 const authPath = "apps/web/src/lib/n06-candidate-session-auth.ts";
 const auth = read(authPath);
 for (const [label, pattern] of [
-  ["Bearer token is required", /Bearer\\s\+\\S+/],
+  ["Bearer token is required", /Bearer\s+\S+/],
   ["session validated against Supabase Auth", /\/auth\/v1\/user/],
   ["redirects are rejected", /redirect:\s*"error"/],
   ["cache is disabled", /cache:\s*"no-store"/],
