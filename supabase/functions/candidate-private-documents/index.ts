@@ -501,7 +501,7 @@ Deno.serve(async (req: Request) => {
 
   // Preserve the deployed v14 reviewer actions when the upgraded function is published.
   // Reviewers are authorized by platform_reviewers, not candidate identity links.
-  if (["list_review_queue", "create_reviewer_download_url", "review_document", "review_deletion_request"].includes(action)) {
+  if (["list_review_queue", "create_reviewer_download_url", "review_document", "list_deletion_requests", "review_deletion_request"].includes(action)) {
     const authorization = req.headers.get("authorization") ?? "";
     const token = /^Bearer\s+(\S+)$/i.exec(authorization)?.[1];
     if (!token) return fail(req, 401, "AUTHENTICATION_REQUIRED");
@@ -515,6 +515,20 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const origin = req.headers.get("origin");
     const reply = (status: number, payload: Record<string, unknown>, _origin: string | null) => response(req, payload, status);
+
+if (action === "list_deletion_requests") {
+    const adminRole = await admin.from("platform_reviewers").select("role_code")
+      .eq("auth_user_id", authData.user.id).eq("is_active", true).is("revoked_at", null)
+      .eq("role_code", "PLATFORM_ADMIN").maybeSingle();
+    if (adminRole.error) return reply(503, { error: "Could not verify document-retention permissions." }, origin);
+    if (!adminRole.data) return reply(403, { code: "PLATFORM_ADMIN_REQUIRED", error: "Only a platform administrator may view deletion requests." }, origin);
+    const { data, error } = await admin.from("candidate_private_document_retention_requests")
+      .select("id,request_ref,document_id,candidate_id,reason,request_status,requested_at,reviewer_note")
+      .in("request_status", ["PENDING_REVIEW", "APPROVED"])
+      .order("requested_at", { ascending: true }).limit(100);
+    if (error) return reply(503, { error: "Could not load document-retention requests." }, origin);
+    return reply(200, { ok: true, requests: data ?? [], limit: 100 }, origin);
+  }
 
 if (action === "review_deletion_request") {
     const adminRole = await admin.from("platform_reviewers").select("role_code")
