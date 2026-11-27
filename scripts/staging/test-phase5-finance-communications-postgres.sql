@@ -42,6 +42,18 @@ BEGIN
      OR v_checkout#>'{intent,signedPayload}' ? 'signature' THEN
     RAISE EXCEPTION 'checkout intent violated sandbox or secret-storage boundary: %',v_checkout;
   END IF;
+  v_bad := false;
+  BEGIN
+    PERFORM public.create_payfast_sandbox_checkout_bundle(
+      'aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111',
+      'FOUNDATIONAL_ACCORD_R169_99','idem-secret-phase5-001','ord_secret_001','inv_secret_001',
+      'intent_secret_001','evidence_secret_001','https://portal.example/return','https://portal.example/cancel','https://project.example/itn',
+      '{"merchant_id":"10000100","merchant_key":"NEVER-PERSIST","m_payment_id":"ord_secret_001","amount":"169.99","item_name":"Foundational Accord"}'::jsonb
+    );
+  EXCEPTION WHEN SQLSTATE '22023' THEN v_bad := true;
+  END;
+  IF NOT v_bad THEN RAISE EXCEPTION 'checkout accepted merchant secret in persisted payload'; END IF;
+
   v_again := public.create_payfast_sandbox_checkout_bundle(
     'aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111',
     'FOUNDATIONAL_ACCORD_R169_99','idem-phase5-0001','ord_other','inv_other',
@@ -60,6 +72,14 @@ BEGIN
     'itn_phase5_0001','ord_phase5_0001','123456789','COMPLETE','169.99',
     true,true,true,true,'itn-idem-phase5-0001','evidence_itn_0001'
   );
+  v_bad := false;
+  BEGIN
+    PERFORM public.payfast_settle_sandbox_payment('ord_phase5_0001','987654321',16000,400,15600,
+      'pay_wrong_amount','evidence_wrong_amount','itn_phase5_0001','11111111-1111-4111-8111-111111111111');
+  EXCEPTION WHEN SQLSTATE '22023' THEN v_bad := true;
+  END;
+  IF NOT v_bad THEN RAISE EXCEPTION 'settlement accepted a mismatched amount'; END IF;
+
   v_settle := public.payfast_settle_sandbox_payment(
     'ord_phase5_0001','123456789',16999,499,16500,'pay_phase5_0001',
     'evidence_payment_0001','itn_phase5_0001','11111111-1111-4111-8111-111111111111'
@@ -164,6 +184,12 @@ BEGIN
   -- Candidate deletion is a request; storage deletion requires a platform-admin decision.
   INSERT INTO public.candidate_private_documents(id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,document_type,original_filename,mime_type,size_bytes,status)
   VALUES ('99999999-9999-4999-8999-999999999998','11111111-1111-4111-8111-111111111111','aaaaaaaa-0000-4000-8000-000000000001','candidate-private-documents','11111111-1111-4111-8111-111111111111/retention-test.pdf','OTHER','retention-test.pdf','application/pdf',1200,'VERIFIED');
+  v_bad := false;
+  BEGIN
+    PERFORM public.request_candidate_private_document_deletion('bbbbbbbb-0000-4000-8000-000000000002','22222222-2222-4222-8222-222222222222','99999999-9999-4999-8999-999999999998','Cross-candidate deletion attempt');
+  EXCEPTION WHEN SQLSTATE 'P0002' THEN v_bad := true;
+  END;
+  IF NOT v_bad THEN RAISE EXCEPTION 'cross-candidate document deletion request was not rejected'; END IF;
   v_refund := public.request_candidate_private_document_deletion('aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111','99999999-9999-4999-8999-999999999998','Candidate privacy request for this document');
   IF v_refund->>'request_status' IS DISTINCT FROM 'PENDING_REVIEW' OR v_refund->>'file_deleted' IS DISTINCT FROM 'false' THEN
     RAISE EXCEPTION 'candidate deletion request must not immediately remove a file: %',v_refund;
@@ -187,7 +213,9 @@ BEGIN
   IF has_table_privilege('authenticated','public.notification_outbox','SELECT')
      OR has_table_privilege('anon','public.finance_payments','SELECT')
      OR has_table_privilege('authenticated','public.finance_orders','SELECT')
-     OR has_function_privilege('anon','public.payfast_settle_sandbox_payment(text,text,integer,integer,integer,text,text,text,text)','EXECUTE') THEN
+     OR has_function_privilege('anon','public.payfast_settle_sandbox_payment(text,text,integer,integer,integer,text,text,text,text)','EXECUTE')
+     OR has_table_privilege('authenticated','public.candidate_private_documents','SELECT')
+     OR has_table_privilege('authenticated','public.candidate_private_document_events','SELECT') THEN
     RAISE EXCEPTION 'client roles have excessive finance or outbox privileges';
   END IF;
 END;
