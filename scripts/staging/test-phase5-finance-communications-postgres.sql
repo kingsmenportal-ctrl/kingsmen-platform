@@ -248,7 +248,11 @@ BEGIN
      OR has_table_privilege('authenticated','public.finance_orders','SELECT')
      OR has_function_privilege('anon','public.payfast_settle_sandbox_payment(text,text,integer,integer,integer,text,text,text,text)','EXECUTE')
      OR has_table_privilege('authenticated','public.candidate_private_documents','SELECT')
-     OR has_table_privilege('authenticated','public.candidate_private_document_events','SELECT') THEN
+     OR has_table_privilege('authenticated','public.candidate_private_document_events','SELECT')
+     OR has_function_privilege('authenticated','public.record_notification_provider_event(text,text,text,jsonb)','EXECUTE')
+     OR has_function_privilege('anon','public.record_notification_provider_event(text,text,text,jsonb)','EXECUTE')
+     OR has_function_privilege('authenticated','public.claim_notification_outbox(integer)','EXECUTE')
+     OR has_function_privilege('authenticated','public.record_notification_delivery_attempt(text,text,text,text,text,jsonb,text)','EXECUTE') THEN
     RAISE EXCEPTION 'client roles have excessive finance or outbox privileges';
   END IF;
 END;
