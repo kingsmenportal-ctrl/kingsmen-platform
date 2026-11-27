@@ -25,7 +25,7 @@ Deno.serve(async (request: Request) => {
     return json(401, { ok: false, code: "SERVICE_AUTH_REQUIRED" });
   }
   const declaredLength = request.headers.get("content-length");
-  if (declaredLength !== null && (!/^\\d+$/.test(declaredLength) || Number(declaredLength) > 1024)) {
+  if (declaredLength !== null && (!/^\d+$/.test(declaredLength) || Number(declaredLength) > 1024)) {
     return json(413, { ok: false, code: "REQUEST_TOO_LARGE" });
   }
   const rawBody = await request.text();
