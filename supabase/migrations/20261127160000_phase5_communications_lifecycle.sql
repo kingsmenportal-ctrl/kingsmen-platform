@@ -136,6 +136,19 @@ drop policy if exists communication_quiet_hours_all on public.communication_quie
 drop policy if exists communication_rate_limits_all on public.communication_rate_limits;
 drop policy if exists message_evidence_ledger_all on public.message_evidence_ledger;
 
+do $communication_policy_reset$
+declare p record;
+begin
+  for p in select schemaname,tablename,policyname from pg_policies
+    where schemaname='public' and tablename in (
+      'communication_templates','communication_threads','notification_outbox','notification_delivery_attempts',
+      'inbound_messages','candidate_portal_messages','urgent_whatsapp_escalations','communication_quiet_hours',
+      'communication_rate_limits','message_evidence_ledger'
+    )
+  loop execute format('drop policy %I on %I.%I',p.policyname,p.schemaname,p.tablename); end loop;
+end;
+$communication_policy_reset$;
+
 do $policies$
 declare t text;
 begin
@@ -194,6 +207,18 @@ drop policy if exists finance_ledger_entries_all on public.finance_ledger_entrie
 drop policy if exists payment_evidence_ledger_all on public.payment_evidence_ledger;
 
 drop policy if exists finance_plan_catalog_active_read on public.finance_plan_catalog;
+do $finance_policy_reset$
+declare p record;
+begin
+  for p in select schemaname,tablename,policyname from pg_policies
+    where schemaname='public' and tablename in (
+      'finance_plan_catalog','finance_orders','finance_invoices','payfast_payment_intents','finance_payments',
+      'payfast_itn_receipts','payfast_signature_audit','finance_refund_requests','finance_ledger_entries','payment_evidence_ledger'
+    )
+  loop execute format('drop policy %I on %I.%I',p.policyname,p.schemaname,p.tablename); end loop;
+end;
+$finance_policy_reset$;
+
 create policy finance_plan_catalog_active_read
   on public.finance_plan_catalog for select to anon, authenticated using (active is true);
 
@@ -347,6 +372,9 @@ begin
   end if;
   select * into v_request from public.candidate_private_document_retention_requests where id=p_request_id for update;
   if not found then raise exception 'DOCUMENT_DELETION_REQUEST_NOT_FOUND' using errcode='P0002'; end if;
+  if v_request.request_status='COMPLETED' and p_decision='APPROVE' then
+    return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status','COMPLETED','document_id',v_request.document_id,'idempotent',true);
+  end if;
   if v_request.request_status='APPROVED' and p_decision='APPROVE' then
     return jsonb_build_object('ok',true,'request_id',v_request.id,'request_status','APPROVED','document_id',v_request.document_id,'idempotent',true);
   end if;
