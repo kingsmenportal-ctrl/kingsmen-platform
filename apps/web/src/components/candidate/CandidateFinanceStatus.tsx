@@ -37,7 +37,7 @@ export default function CandidateFinanceStatus() {
       cache: "no-store"
     });
     const payload = await response.json().catch(() => ({})) as FinanceSummary & RpcError & Record<string, unknown>;
-    if (!response.ok) throw new Error(payload.message || payload.code || "Finance service is unavailable.");
+    if (!response.ok) throw new Error("Finance service rejected the request or is temporarily unavailable.");
     return payload;
   }, []);
 
