@@ -181,6 +181,13 @@ BEGIN
     RAISE EXCEPTION 'provider bounce did not update delivery state and suppress further transactional email';
   END IF;
 
+  INSERT INTO public.candidate_application_events(application_id,candidate_id,event_type,from_status,to_status,evidence_ref)
+  VALUES ('88888888-8888-4888-8888-888888888888','11111111-1111-4111-8111-111111111111','APPLICATION_STATUS_CHANGED','DRAFT','SUBMITTED','application-event-fixture-001');
+  IF NOT EXISTS (SELECT 1 FROM public.candidate_portal_messages WHERE candidate_ref='11111111-1111-4111-8111-111111111111' AND message_type='APPLICATION_STATUS')
+     OR NOT EXISTS (SELECT 1 FROM public.notification_outbox WHERE candidate_ref='11111111-1111-4111-8111-111111111111' AND purpose='APPLICATION_STATUS_UPDATE') THEN
+    RAISE EXCEPTION 'application status transition did not enqueue portal/email notifications';
+  END IF;
+
   -- Candidate deletion is a request; storage deletion requires a platform-admin decision.
   INSERT INTO public.candidate_private_documents(id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,document_type,original_filename,mime_type,size_bytes,status)
   VALUES ('99999999-9999-4999-8999-999999999998','11111111-1111-4111-8111-111111111111','aaaaaaaa-0000-4000-8000-000000000001','candidate-private-documents','11111111-1111-4111-8111-111111111111/retention-test.pdf','OTHER','retention-test.pdf','application/pdf',1200,'VERIFIED');

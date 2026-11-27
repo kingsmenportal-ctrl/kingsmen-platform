@@ -52,6 +52,16 @@ CREATE TABLE public.candidate_private_documents (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+CREATE TABLE public.candidate_application_events (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id uuid NOT NULL,
+  candidate_id uuid NOT NULL REFERENCES public.candidates(id),
+  event_type text NOT NULL,
+  from_status text,
+  to_status text,
+  evidence_ref text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE public.candidate_private_document_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   document_id uuid NOT NULL,

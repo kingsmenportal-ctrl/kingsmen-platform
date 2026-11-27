@@ -30,6 +30,8 @@ assert.match(commMigration, /communication_preference_events/);
 assert.match(commMigration, /candidate_private_document_retention_requests/);
 assert.match(commMigration, /candidate_private_documents_service_role_all/);
 assert.match(commMigration, /candidate_private_document_events_service_role_all/);
+assert.match(commMigration, /candidate_application_status_notify/);
+assert.match(commMigration, /APPLICATION_STATUS_UPDATE/);
 assert.match(documents, /request_candidate_private_document_deletion/);
 assert.match(documents, /review_candidate_private_document_deletion/);
 assert.match(documents, /complete_candidate_private_document_deletion/);
