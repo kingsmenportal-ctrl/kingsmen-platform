@@ -20,8 +20,14 @@ export function createPayFastSignature(fields: PayFastFields, passphrase?: strin
 }
 
 export function verifyPayFastSignature(fields: PayFastFields, receivedSignature: string, passphrase?: string): boolean {
-  const calculated = createPayFastSignature(fields, passphrase);
-  return calculated.toLowerCase() === receivedSignature.toLowerCase();
+  // PayFast currently specifies an MD5 hex signature. Reject malformed input before
+  // decoding, then compare fixed-length buffers in constant time to avoid a
+  // character-by-character timing leak in the authentication check.
+  if (!/^[a-f0-9]{32}$/i.test(receivedSignature)) return false;
+
+  const calculated = Buffer.from(createPayFastSignature(fields, passphrase), "hex");
+  const received = Buffer.from(receivedSignature, "hex");
+  return calculated.length === received.length && crypto.timingSafeEqual(calculated, received);
 }
 
 export function redactPayFastSecrets(fields: PayFastFields): PayFastFields {
