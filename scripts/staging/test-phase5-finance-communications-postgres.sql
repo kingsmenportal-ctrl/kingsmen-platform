@@ -6,7 +6,7 @@ INSERT INTO public.candidates(id,public_ref,is_active) VALUES
  ('22222222-2222-4222-8222-222222222222','CAND-B',true);
 INSERT INTO public.candidate_accounts(candidate_id,auth_user_id,email,email_verified) VALUES
  ('11111111-1111-4111-8111-111111111111','aaaaaaaa-0000-4000-8000-000000000001','a@example.test',true),
- ('22222222-2222-4222-8222-000000000002','bbbbbbbb-0000-4000-8000-000000000002','b@example.test',true);
+ ('22222222-2222-4222-8222-222222222222','bbbbbbbb-0000-4000-8000-000000000002','b@example.test',true);
 INSERT INTO public.candidate_auth_identity_links(supabase_user_id,candidate_id,link_status,verified_at,verified_by) VALUES
  ('aaaaaaaa-0000-4000-8000-000000000001','11111111-1111-4111-8111-111111111111','VERIFIED',now()-interval '1 minute','eeeeeeee-eeee-4eee-8eee-eeeeeeeeee01'),
  ('bbbbbbbb-0000-4000-8000-000000000002','22222222-2222-4222-8222-222222222222','VERIFIED',now()-interval '1 minute','eeeeeeee-eeee-4eee-8eee-eeeeeeeeee02');
