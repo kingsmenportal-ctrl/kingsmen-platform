@@ -216,7 +216,9 @@ export default function CandidateApplicationDraftPage() {
       const body = await response.json() as ApiResponse;
       if (!response.ok || body.ready !== true || body.ok !== true) {
         if (body.code === "APPLICATION_DRAFT_VERSION_CONFLICT") {
-          setError("This draft was changed in another session. Reload the latest saved version before applying your changes.");
+          setError("This draft was changed in another session. Reload the latest saved version before applying your changes. Your current edits will remain on screen until you confirm the reload.");
+        } else if (body.code === "APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT") {
+          setError("This save key was already used for different content, so these newer edits were not saved. Choose “Reload saved draft” to reconcile the latest saved version, then reapply your changes before saving again. This did not submit your application to a provider.");
         } else {
           throw new Error(message(body));
         }
