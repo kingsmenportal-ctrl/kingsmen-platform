@@ -100,3 +100,29 @@ Required repair: make the finance and communications disposable fixtures composa
 - [ ] Communications migration and SQL integration test — blocked by incomplete/overlapping fixture schema; exact error above.
 - [ ] Full document-review and payment-notification end-to-end journeys — not yet runtime-verified.
 - [ ] Verified backup and isolated restore of the real Kingsmen database — still unavailable; the Neon rehearsal branch is not a substitute.
+
+## Communications rerun — 2026-11-27
+
+The prior failure was caused by running the communications bootstrap after the finance bootstrap on one branch. Both fixtures define overlapping baseline tables and are standalone fixtures, not sequential migrations. The corrected test procedure uses a fresh, separate disposable branch for communications rather than suppressing schema checks or changing the migration preflight.
+
+- Disposable Neon branch: `phase5-comms-clean-2026-11-27` (`br-super-sunset-bhvbjgbk`)
+- Parent: `br-young-surf-bhthqivn` in rehearsal project `bitter-mouse-01847035`; this is still not a verified restore of the source Kingsmen database.
+- Communications bootstrap fixture: PASS — 8 SQL statements executed.
+- Communications event/outbox migration: PASS — 20 SQL statements executed; the preflight remained enabled.
+- Communications SQL integration test: PASS — all 3 SQL statements executed; test returned: `PASS: consented events enqueue idempotently; worker claims are atomic, mock outcomes are not delivery, and retry exhaustion is recorded.`
+- The SQL test exercised both the document-review event and the transition to server-verified `COMPLETE` payment, preference/opt-out gating, idempotent payment updates, non-disclosure of reviewer notes/evidence, service-role-only worker RPC grants, queue claims, simulated outcomes, retry and terminal failure. No live email was sent; mock outcomes were not marked `SENT`.
+- The document-review Edge Function source was inspected: caller bearer authentication, verified identity-link requirement, active candidate check, private bucket validation, owner-scoped document queries, short-lived signed read links and audit-before-return are present in the inspected code. These are source findings, not an authenticated runtime E2E pass.
+- The PayFast ITN validator source was inspected: it checks merchant reference, signature, amount, duplicate receipt, source/IP verification and `COMPLETE` status before accepting. No real PayFast sandbox round-trip was performed.
+
+## Updated acceptance state
+
+- [x] Finance fixture, least-privilege migration and SQL test passed on a disposable Neon branch.
+- [x] Communications fixture, migration preflight and SQL integration/state-machine tests passed on a separate clean disposable Neon branch.
+- [x] Document-review event and verified-payment notification enqueue paths exercised in SQL, including consent, idempotency and mock-only delivery semantics.
+- [x] Source inspection performed for private-document access boundary and PayFast ITN validation logic.
+- [ ] Authenticated document upload/review/download and signed-link expiry end-to-end runtime test.
+- [ ] PayFast provider sandbox transaction and actual provider-authenticated ITN round-trip.
+- [ ] Actual email-provider delivery, bounce and unsubscribe round-trip.
+- [ ] Verified backup and isolated restore of the real Kingsmen database; staging migration provenance remains unresolved.
+- [ ] Run CI against the new record commit and reconcile all release gates before considering merge/deployment.
+
