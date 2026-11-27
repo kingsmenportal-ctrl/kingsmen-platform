@@ -918,7 +918,7 @@ begin
   -- Never downgrade a hard negative delivery event because a delayed/duplicate positive event arrived later.
   select provider_delivery_status into v_status from public.notification_outbox
     where notification_ref=v_notification_ref for update;
-  if v_status not in ('BOUNCED','COMPLAINED') or v_effective_event in ('BOUNCED','COMPLAINED') then
+  if coalesce(v_status,'UNKNOWN') not in ('BOUNCED','COMPLAINED') or v_effective_event in ('BOUNCED','COMPLAINED') then
     update public.notification_delivery_attempts set status=v_effective_event,
       response_body=coalesce(response_body,'{}'::jsonb) || jsonb_build_object('providerEvent',v_effective_event)
     where notification_ref=v_notification_ref and provider_message_id=p_provider_message_id;
