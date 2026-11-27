@@ -12,10 +12,10 @@ function json(status: number, body: Record<string, unknown>) {
 
 export async function GET(request: Request) {
   const authorization = request.headers.get("authorization") ?? "";
-  const match = /^Bearer\\s+(\\S+)$/i.exec(authorization);
+  const match = /^Bearer\s+(\S+)$/i.exec(authorization);
   if (!match) return json(401, { ok: false, code: "AUTHENTICATION_REQUIRED" });
 
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\\/$/, "");
+  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!baseUrl || !anonKey || !serviceKey) return json(503, { ok: false, code: "FINANCE_RUNTIME_NOT_CONFIGURED" });
