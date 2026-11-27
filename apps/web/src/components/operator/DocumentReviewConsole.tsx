@@ -26,6 +26,7 @@ export default function DocumentReviewConsole() {
   const [note, setNote] = useState("");
   const [evidenceReference, setEvidenceReference] = useState("");
   const [message, setMessage] = useState("");
+  const [downloadLink, setDownloadLink] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   async function api(path: string, method: "GET" | "POST", body?: Record<string, unknown>) {
@@ -63,14 +64,15 @@ export default function DocumentReviewConsole() {
 
   async function openReviewerDownload(documentId: string) {
     setError("");
+    setDownloadLink(null);
     try {
       const payload = await api("/api/founder/documents/review/download-url", "POST", {
         document_id: documentId
       });
       const url = typeof payload.signed_download_url === "string" ? payload.signed_download_url : "";
       if (!url || new URL(url).protocol !== "https:") throw new Error("The review service did not return a valid temporary HTTPS link.");
-      window.open(url, "_blank", "noopener,noreferrer");
-      setMessage("A temporary reviewer download link was issued and audited.");
+      setDownloadLink(url);
+      setMessage("A temporary reviewer download link was issued and audited. Open it promptly; it expires after 60 seconds.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "The document could not be opened.");
     }
@@ -91,6 +93,7 @@ export default function DocumentReviewConsole() {
       setNote("");
       setEvidenceReference("");
       await loadQueue();
+      setMessage("Review decision recorded and queue refreshed from the authoritative service.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "The review decision could not be recorded.");
     } finally {
@@ -112,6 +115,7 @@ export default function DocumentReviewConsole() {
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">A candidate upload is not proof of authenticity. Provider receipts remain candidate-reported until independently reviewed. Temporary download links expire quickly and are not public URLs.</div>
         {error ? <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">{error}</p> : null}
         {message ? <p role="status" className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">{message}</p> : null}
+        {downloadLink ? <p className="mt-3"><a href={downloadLink} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50">Open temporary document</a></p> : null}
         <section aria-label="Pending private documents" className="mt-6 space-y-4">
           {!documents.length && !loading ? <div className="rounded-2xl border border-slate-200 bg-white p-8 text-sm text-slate-600">Queue not loaded or no documents are waiting. Select Refresh queue to check reviewer authorization and current queue state.</div> : null}
           {documents.map((doc) => (
