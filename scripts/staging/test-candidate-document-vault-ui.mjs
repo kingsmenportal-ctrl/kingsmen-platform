@@ -246,6 +246,11 @@ try {
   assert.equal(providerReceiptRequest.body.applicationId, parentApplicationId);
   assert.equal(providerReceiptRequest.body.documentTypeCode, "APPLICATION_PROOF");
   assert.equal(providerReceiptRequest.body.evidencePurpose, "PROVIDER_SUBMISSION_RECEIPT");
+  // The visible filename can render before the asynchronous server finalisation completes.
+  // Wait for the authoritative mocked server record, not the preflight filename.
+  for (let attempt = 0; attempt < 50 && serverDocument?.application_id !== parentApplicationId; attempt += 1) {
+    await delay(100);
+  }
   assert.equal(serverDocument.application_id, parentApplicationId);
   assert.equal(serverDocument.evidence_purpose, "PROVIDER_SUBMISSION_RECEIPT");
   assert.equal(serverDocument.status, "UPLOADED_CANDIDATE_REPORTED",
