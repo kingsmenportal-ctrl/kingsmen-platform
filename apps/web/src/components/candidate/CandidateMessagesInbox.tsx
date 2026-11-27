@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { getCandidateSessionState } from "@/lib/candidate-session";
 
 type PortalMessage = { portal_message_ref: string; title: string; body: string; message_type: string; created_at: string; read_at: string | null };
@@ -65,7 +65,7 @@ export default function CandidateMessagesInbox() {
     return () => { active = false; };
   }, []);
 
-  async function savePreferences(event: React.FormEvent<HTMLFormElement>) {
+  async function savePreferences(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSavingPreferences(true);
     setPreferenceNotice("");
