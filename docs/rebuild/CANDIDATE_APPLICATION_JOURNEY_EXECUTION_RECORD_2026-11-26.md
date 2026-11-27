@@ -1,101 +1,89 @@
 # Kingsmen Candidate Application Journey — Execution Record
-Date: 2026-11-26
+Last updated: 2026-11-27
 Repository: `kingsmenportal-ctrl/kingsmen-platform`
 Branch: `feat/candidate-application-journey-batch-2026-11-26`
 PR: #358 — https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/358
-Latest implementation commit: `fd35e648909921a2eb0bd2e296c40dd8d32f96d2`
-Latest CI observed: Jarvis Live Runtime and staging RLS API boundary passed; Kingsmen CI run 803 and application draft contract run 195 were in progress at last query. These results do not prove runtime persistence or a restore.
+Latest implementation commit at record time: `e42193466d9c986b4249c6d8c29ae71df450d740`
 
-## Required operating contract for Kingsmen work
-- Continue implementation rather than substituting a report for work.
+## Operating contract
+- Keep implementing; a report is not a substitute for code, tests, fixes and deployment.
 - Report frontend, backend/API, database, security, tests, deployment and PR separately.
-- Record repository paths, commits and test evidence; never infer runtime success from source checks.
-- Finish and verify the end-to-end journey before declaring it complete.
-- Carry this record forward in subsequent Kingsmen work.
+- Record exact commits and test evidence; never infer runtime success from source checks or CI fixture tests.
+- Keep production unchanged until backup, restore, schema provenance, security and change-control gates pass.
+- Continue independent implementation while the Oracle execution credentials/runner are deferred.
 
-## Why the previous batch was incomplete
-The earlier batch stopped at API/source-level validation and documentation while the persistence RPCs were missing. That did not meet the requested acceptance criteria. The persistence layer is now implemented as a repository migration, but it has not been executed against a database. The verified backup/restore gate and runtime test evidence are still outstanding.
-
-## Implementation status
+## Current implementation
 
 ### Frontend
-- Existing candidate workbench and application draft page are present in the branch.
-- The page supports loading, editing, saving, reloading and version-conflict messaging through the draft API.
-- Full authenticated journey through start, save, reload/resume, readiness validation, submit/status progression and browser E2E has not been demonstrated.
-- Status: INCOMPLETE / NOT E2E-VERIFIED.
+- Candidate workbench and application tracker are present. The application draft page supports load, edit, save, reload/resume, version checks, and leave-page unsaved-change warnings.
+- On 2026-11-27, `apps/web/src/app/candidate/applications/[applicationId]/page.tsx` was improved to give a clear recovery instruction for `APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT`. It explains that the conflicting edit was not saved, directs the candidate to reload/reconcile and reapply changes, and explicitly states that no provider submission occurred.
+- A regression assertion was added in `scripts/staging/test-candidate-application-draft-contract.mjs`.
+- Status: implementation present; the newly added conflict-recovery regression is awaiting CI confirmation. Full authenticated candidate journey remains incomplete.
 
 ### Backend/API
-- `apps/web/src/lib/candidate-application-draft-contract.ts`: bounded JSON checks, identity-field contract, application answer validation, date/email validation, idempotency and lifecycle helpers.
-- `apps/web/src/app/api/candidate/application-draft/route.ts`: authenticated API boundary, caller JWT forwarding, request-size/content validation, no-store response policy, timeout and error mapping; forwards calls to the two persistence RPCs.
-- Status: source implementation present; runtime integration not yet verified.
+- `apps/web/src/app/api/candidate/application-draft/route.ts` authenticates via caller bearer token, forwards the candidate JWT with the Supabase anon/publishable key, validates bounded input, disables caching, times out upstream requests and maps version/idempotency conflicts to HTTP 409.
+- `apps/web/src/lib/candidate-application-draft-contract.ts` implements bounded JSON, field/date/email checks, answer limits, idempotency-key validation and lifecycle helpers.
+- Status: source implementation present; runtime integration against a real restored database is not verified.
 
-### Database / persistence
-- Live Supabase staging project inspected read-only: `euhubhhnumtibbyufghm`, organization `iiyscijqwapbqdxshzbq`, Postgres 17.11.
-- The actual schema confirms `candidate_applications(candidate_id, opportunity_id, status, readiness_status, readiness_snapshot, ...)`, `candidate_opportunities`, `candidate_accounts`, and `candidate_master_profiles`.
-- The authenticated identity mapping is `kingsmen_security.current_authenticated_candidate_id()`, resolving through `candidate_accounts.auth_user_id = auth.uid()`.
-- New migration: `supabase/migrations/20261126190000_candidate_application_draft_persistence.sql`.
-  - Creates candidate-owned answer persistence with bounded JSON, version and idempotency fields.
-  - Uses a composite application/candidate ownership foreign key.
-  - Enables and forces RLS, revokes direct table privileges from PUBLIC/anon/authenticated, and exposes only authenticated get/save RPCs.
-  - Checks authenticated candidate identity and application ownership inside security-definer functions.
-  - Implements row locking, optimistic version conflicts, idempotent retries, editable-status gating and readiness invalidation.
-  - Corrected an idempotency defect on 2026-11-26: reusing a key with a different answer payload now returns `APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT`; only an identical payload may be accepted as a retry. Added the source-contract assertion. This fix is committed, but CI is still pending.
-  - Saving a draft does not submit to an external provider.
-- Migration NOT applied to staging. No staging DDL, grants, RLS or Auth changes were made.
-- No verified PostgreSQL backup archive with source identity, creation time, SHA-256 checksum and retention evidence has been established.
-- Neon disposable project `bitter-mouse-01847035` has zero snapshots and is not a restored copy of staging.
-- Status: migration implemented in repository; database execution is blocked pending verified backup/isolated restore and provenance review.
+### Database and persistence
+- Source staging project: Supabase project ref `euhubhhnumtibbyufghm`, organisation `iiyscijqwapbqdxshzbq`. Previous inspection was read-only.
+- Candidate identity resolution uses `kingsmen_security.current_authenticated_candidate_id()`, mapping authenticated users through candidate accounts.
+- Migration: `supabase/migrations/20261126190000_candidate_application_draft_persistence.sql`.
+- The migration defines candidate-owned draft persistence, a composite application/candidate ownership constraint, bounded JSON, forced RLS, no direct table privileges for public/anon/authenticated, authenticated ownership-checking get/save RPCs, optimistic version conflicts, idempotency handling, editable-state gating and readiness invalidation.
+- Migration has NOT been applied to staging or production. No staging DDL, grants, RLS or Auth changes were made.
+- Verified source backup, timestamp, checksum and retention evidence are still unavailable. The Neon rehearsal project `bitter-mouse-01847035` has zero snapshots and is not a restored copy.
+- Status: committed to code; real-database execution remains gated on verified isolated restore and provenance review.
 
 ### Security
-- Source boundaries: caller JWT forwarded; no service-role key in web API; RPCs check auth.uid(), verified candidate identity, application ownership and editable lifecycle state; direct authenticated table access revoked.
-- Runtime cross-candidate isolation, RLS behavior, idempotency, version conflicts and privilege behavior have not been tested.
-- Status: source design present; runtime security NOT PASSED.
+- Source design checks authenticated identity and candidate/application ownership, forwards the caller JWT, avoids a service-role key in the web API, and revokes direct access to the draft table.
+- The prior disposable PostgreSQL CI fixture tested draft save, idempotency, consent and cross-candidate isolation.
+- Effective grants/RLS and authenticated candidate isolation have NOT been verified against a restored copy of the real database.
+- Status: CI-fixture evidence available; live restored-database security acceptance pending.
 
 ### Tests and build evidence
-- Previous commit `8598036eff44d09bce5672f4297258dd2e57e2ce`: Kingsmen CI run 793, Jarvis Live Runtime run 2866, and staging RLS API-boundary run 48 completed successfully. These runs preceded the persistence migration.
-- Added `scripts/staging/test-candidate-application-draft-persistence-migration.mjs`, wired into `npm test`; it checks the source-level migration security/behavior contract only.
-- CI on head `f8c921fd1f9e88348607c7c3b90032c7c5918634` passed: Kingsmen CI run 799, Jarvis Live Runtime run 2872, staging RLS API boundary run 54, and application draft contract run 191. Run 191's job completed successfully, including steps applying the draft-persistence migration to a disposable PostgreSQL fixture, testing save/idempotency/consent/candidate isolation, building the Next.js app, API auth/input boundaries, and Chromium browser smoke tests for draft save/resume, profile save/reload/consent, application workbench navigation and document flows. This is repeatable CI fixture evidence, not a restore of production/staging data and not a live Supabase execution.
-- PostgreSQL migration execution, draft persistence/security fixture tests and browser smoke tests are now available and passed in CI run 191. Live Supabase runtime integration and a full journey against a restored staging copy remain unverified.
+- Commit `09c15b7f29754afc954839133a03353372eb4353` had the following successful workflows:
+  - Jarvis Live Runtime: run 2878.
+  - Kingsmen CI: run 805.
+  - Kingsmen staging RLS API boundary: run 60.
+  - Kingsmen application draft contract: run 197.
+- Application draft contract run 197 completed the disposable PostgreSQL bootstrap and migration, draft save/idempotency/consent/candidate isolation tests, Next.js build, API auth/input boundary tests, and Chromium browser smoke tests for tracker/draft resume, document flows, candidate draft save/resume, profile save/reload/consent, workbench navigation and source-review flows.
+- These checks passed on commit `09c15b7...`; they do not prove restore from the real source database, live Supabase runtime, or deployed production acceptance.
+- The subsequent frontend regression fix and assertion are committed through `e42193466d9c986b4249c6d8c29ae71df450d740`. No workflow run for that latest head had been returned at the time of this record update, so its new assertion is not yet marked passed.
+- Status: previous head CI green; latest change awaits CI evidence.
 
-### Backup and restore
-- No actual source database backup archive has been verified. Gmail search for PostgreSQL dump/backup/manifest attachments returned no matching archive; the connected Neon project still reports zero snapshots.
-- The user selected Option B: use an authorized existing server or CI environment, with isolated disposable restore only and no production modifications.
-- Repository inspection confirms backup/restore scripts exist (`scripts/backup/New-KingsmenTruthVaultBackup.ps1`, `scripts/backup/Test-KingsmenTruthVaultRestore.ps1`), but no dedicated backup workflow is present in `.github/workflows`, no backup archive is attached to the latest draft-contract CI run, and the connected tools do not expose a server shell or GitHub Actions workflow-dispatch/secret configuration capability.
-- Therefore authorization is recorded, but the execution environment/credentials are not currently exposed through the connected tools. Do not infer that selecting Option B grants actual host access. To run it, the authorized server/CI runner must already have `KINGSMEN_DATABASE_URL`, `KINGSMEN_RESTORE_DRILL_DATABASE_URL`, `pg_dump`, `pg_restore`, and `psql` available as protected secrets/tools; never print or commit these values.
-- No isolated restore of staging has been completed.
-- Empty Neon project/snapshot absence is explicitly not restore evidence.
-- Status: NOT COMPLETED.
+### Backup and isolated restore
+- The user selected Option E: attempt all available routes in order while continuing implementation in parallel; only isolated disposable restore is authorised, with no production modification and no secrets in chat.
+- Gmail/storage searches found no usable PostgreSQL backup archive. The unrelated Manus account export is not a database backup.
+- The Neon rehearsal project has no snapshots. The Supabase disposable target is empty and is not a restore.
+- Repository backup scripts exist: `scripts/backup/New-KingsmenTruthVaultBackup.ps1` and `scripts/backup/Test-KingsmenTruthVaultRestore.ps1`.
+- Connected tools do not currently expose an Oracle/server shell or a GitHub Actions workflow-dispatch/secrets-configuration route. Oracle Cloud Free Tier can serve as the runner once instance access is set up; credentials and server access are deferred by the user for later.
+- Required protected environment: `KINGSMEN_DATABASE_URL`, `KINGSMEN_RESTORE_DRILL_DATABASE_URL`, and installed `pg_dump`, `pg_restore`, `psql`. Do not place secret values in chat, source control, or build logs.
+- Status: NOT COMPLETED; no source backup has been restored.
 
-### Deployment
-- No deployment of this candidate-journey batch has been performed or verified.
-- The correct Kingsmen frontend deployment target has not been conclusively identified from the connected hosting results.
-- Status: NOT DEPLOYED / LIVE SMOKE NOT RUN.
-
-### Pull request
+### Deployment and pull request
+- No deployment of this candidate journey batch has been performed or verified. The correct live frontend target and deployed commit are not yet established.
 - PR #358 is open and unmerged: https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/358
-- Latest observed PR head: `654ecd20f03a44058e26ddfd8c353a17f5e8cfe3`.
-- PR description updated to distinguish committed migration from unverified runtime acceptance.
-- Status: OPEN; not approved for merge/deployment.
+- Latest observed PR head: `e42193466d9c986b4249c6d8c29ae71df450d740`.
+- Status: not approved for merge/deployment; runtime acceptance gates remain open.
 
-## Acceptance gate
-- [ ] Verified source backup identity, timestamp, checksum and retention
-- [ ] Isolated backup restore without blind application-migration replay
-- [ ] Migration provenance reconciled against the restored schema
-- [x] Persistence migration and ownership-checked RPCs committed to the repository
-- [x] SQL migration executes successfully against the isolated PostgreSQL CI fixture (run 191)\n- [ ] SQL migration executes successfully on an isolated restored copy of the real staging database
-- [x] CI fixture tests for draft save/idempotency/candidate isolation pass\n- [ ] Authenticated save/reload, idempotent retry and optimistic conflict tests pass against a restored staging copy
-- [ ] Cross-candidate isolation and effective grants/RLS tests pass
-- [x] CI browser smoke tests for draft save/resume, profile save/reload/consent, application workbench navigation and document flows pass\n- [ ] Full authenticated candidate browser journey passes E2E against integrated runtime
-- [ ] Correct target deployment and live smoke test pass
-- [ ] PR review, merge and change-control decisions recorded
+## Acceptance gates
+- [ ] Obtain and verify real source backup identity, timestamp, SHA-256 checksum and retention evidence.
+- [ ] Restore backup to isolated disposable infrastructure without blind replay of unresolved application migrations.
+- [ ] Reconcile migration provenance and schema on the restored copy.
+- [x] Candidate draft persistence/RPC migration committed to repository.
+- [x] Previous-head CI PostgreSQL fixture tests and browser smoke tests passed (run 197).
+- [ ] Latest UI conflict-recovery regression and assertion pass CI.
+- [ ] Apply migration only to the verified isolated restored copy and run authenticated persistence/RLS/ownership tests.
+- [ ] Complete full authenticated browser/API journey against the integrated restored runtime.
+- [ ] Verify correct deployment target, deploy after gates pass, and run live smoke tests.
+- [ ] Record review/change-control and final acceptance results.
 
 ## Next execution order
-1. Obtain an execution path to the authorized existing server/CI runner (not secret values in chat), with protected source and disposable-target connections and PostgreSQL client tools. Create or locate the real backup, verify its SHA-256 manifest, restore to the isolated target, and run counts-only checks. No connected server shell or workflow dispatch is currently available.
-2. Restore it to isolated infrastructure without blindly replaying unresolved application migrations.
-3. Reconcile schema/migration provenance and execute the new migration on the isolated restore.
-4. Run authenticated database security/persistence tests and correct failures.
-5. Complete browser/API E2E for the full candidate journey.
-6. Deploy only after gates pass and verify the live journey.
-7. Record run IDs, restore evidence, deployment URL/ID and final acceptance outcome.
+1. Continue candidate journey improvements and checks independently of Oracle access.
+2. When Oracle VM/runner access is supplied, create the real protected backup, verify its manifest and restore to isolated infrastructure.
+3. Reconcile migration history/schema before executing the new migration on that restored copy.
+4. Run authenticated draft persistence, idempotency, optimistic conflict, cross-candidate and effective-privilege tests; fix any failures.
+5. Complete the full candidate browser/API journey, then deploy only after approval gates pass.
+6. Record the exact workflow IDs, restore evidence, deployed commit and live smoke result.
 
-This is an evidence register. It does not declare the candidate application journey complete.
+This is the active evidence register. It does not declare the candidate journey complete.
