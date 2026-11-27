@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 const migration = await readFile("supabase/migrations/20261127130000_phase5_finance_least_privilege.sql", "utf8");
 const fixture = await readFile("scripts/staging/fixtures/phase5-finance-privileges-bootstrap.sql", "utf8");
 const test = await readFile("scripts/staging/test-phase5-finance-privileges.sql", "utf8");
+const payfast = await readFile("supabase/functions/payfast-sandbox/index.ts", "utf8");
 for (const table of ["finance_plan_catalog","finance_orders","finance_invoices","payfast_payment_intents","finance_payments","payfast_itn_receipts","payfast_signature_audit","finance_refund_requests","finance_ledger_entries","finance_audit_events","candidate_communication_preferences","candidate_communications","candidate_communication_attempts","candidate_messages","candidate_mobile_notification_preferences"]) {
   assert.ok(migration.includes("public." + table), "migration missing " + table);
   assert.ok(fixture.includes("public." + table), "fixture missing " + table);
@@ -11,4 +12,8 @@ for (const table of ["finance_plan_catalog","finance_orders","finance_invoices",
 assert.match(migration, /revoke all privileges on table[\s\S]*from anon, authenticated/i);
 assert.match(test, /TRUNCATE/);
 assert.match(test, /has_table_privilege\('service_role'/);
+assert.ok(payfast.includes(String.raw`/^\d+$/`), "PayFast ITN must accept numeric Content-Length values");
+assert.match(payfast, /duplicate_form_field/);
+assert.match(payfast, /priorAccepted/);
+assert.match(payfast, /payment_status === "COMPLETE"/);
 console.log("PASS: Phase 5 finance and communication least-privilege migration covers protected tables and tests non-RLS privileges.");
