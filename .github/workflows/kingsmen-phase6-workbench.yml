@@ -9,6 +9,7 @@ on:
       - "packages/db/src/n06*"
       - "apps/web/src/app/candidate/workbench/**"
       - "apps/web/src/app/api/candidate/workbench/**"
+      - "apps/web/src/lib/n06-candidate-session-auth.ts"
       - "apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx"
       - "scripts/proof/prove-n06-route-*.mjs"
       - "scripts/validators/validate-n06-route-*.mjs"
@@ -30,6 +31,7 @@ on:
       - "packages/db/src/n06*"
       - "apps/web/src/app/candidate/workbench/**"
       - "apps/web/src/app/api/candidate/workbench/**"
+      - "apps/web/src/lib/n06-candidate-session-auth.ts"
       - "apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx"
       - "scripts/proof/prove-n06-route-*.mjs"
       - "scripts/validators/validate-n06-route-*.mjs"
@@ -57,6 +59,8 @@ jobs:
         run: npm ci
       - name: Run ordered N06 proof and validator chain
         run: npm run n06:check
+      - name: Run N06 authorization and fail-closed regression contract
+        run: node scripts/staging/test-n06-workbench-security-contract.mjs
       - name: Verify generated closeout matrix
         run: |
           node --input-type=module -e '
