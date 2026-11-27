@@ -19,6 +19,11 @@ Deno.serve(async (request: Request) => {
   const url = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !serviceKey) return json(503, { ok: false, code: "WORKER_NOT_CONFIGURED" });
+  // Supabase Edge Functions verify JWT by default; the internal runner must present
+  // the service JWT plus the separate worker token. Neither credential is returned.
+  if ((request.headers.get("authorization") ?? "") !== "Bearer " + serviceKey) {
+    return json(401, { ok: false, code: "SERVICE_AUTH_REQUIRED" });
+  }
   const body = await request.json().catch(() => null) as { limit?: unknown; mockOutcome?: unknown } | null;
   if (!body || typeof body !== "object") return json(400, { ok: false, code: "INVALID_JSON" });
   const limit = typeof body.limit === "number" && Number.isInteger(body.limit) ? Math.min(Math.max(body.limit, 1), 20) : 10;
