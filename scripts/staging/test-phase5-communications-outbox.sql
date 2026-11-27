@@ -44,4 +44,56 @@ begin
   end if;
 end
 $test$;
-select 'PASS: document-review and verified-payment events enqueue consented, idempotent email without claiming delivery.' as result;
+
+-- The worker state machine distinguishes queueing, simulated provider acceptance,
+-- retryable failure and terminal failure. No row is marked SENT by the mock adapter.
+do $delivery_test$
+declare
+  v_row record;
+  v_doc_ref text;
+  v_payment_ref text;
+  v_result record;
+  v_count integer;
+begin
+  for v_row in select * from public.claim_kingsmen_notification_outbox(10) loop
+    if v_row.idempotency_key='payment-verified:pay_a' then
+      select * into v_result from public.record_kingsmen_notification_attempt(
+        v_row.notification_ref,'MOCK','SIMULATED','MOCK_ONLY',null,60);
+      v_payment_ref := v_row.notification_ref;
+      if v_result.status <> 'SIMULATED' then raise exception 'mock payment notice was not marked simulated'; end if;
+    else
+      v_doc_ref := v_row.notification_ref;
+      select * into v_result from public.record_kingsmen_notification_attempt(
+        v_row.notification_ref,'MOCK','FAILED','MOCK_PROVIDER_FAILURE',null,30);
+      if v_result.status <> 'QUEUED' then raise exception 'first failure must be requeued'; end if;
+    end if;
+  end loop;
+  if v_doc_ref is null or v_payment_ref is null then raise exception 'expected both outbox records to be claimed'; end if;
+  if (select status from public.notification_outbox where notification_ref=v_payment_ref) <> 'SIMULATED' then
+    raise exception 'mock success was confused with real delivery';
+  end if;
+  if (select sent_at from public.notification_outbox where notification_ref=v_payment_ref) is not null then
+    raise exception 'simulated provider set sent_at';
+  end if;
+  update public.notification_outbox set scheduled_for=now()-interval '1 second' where notification_ref=v_doc_ref;
+  select * into v_row from public.claim_kingsmen_notification_outbox(10) where notification_ref=v_doc_ref;
+  if v_row.notification_ref is null then raise exception 'retryable notification was not reclaimable'; end if;
+  select * into v_result from public.record_kingsmen_notification_attempt(
+    v_doc_ref,'MOCK','FAILED','MOCK_PROVIDER_FAILURE',null,30);
+  if v_result.status <> 'QUEUED' then raise exception 'second failure must be requeued'; end if;
+  update public.notification_outbox set scheduled_for=now()-interval '1 second' where notification_ref=v_doc_ref;
+  select * into v_row from public.claim_kingsmen_notification_outbox(10) where notification_ref=v_doc_ref;
+  if v_row.notification_ref is null then raise exception 'third attempt was not claimable'; end if;
+  select * into v_result from public.record_kingsmen_notification_attempt(
+    v_doc_ref,'MOCK','FAILED','MOCK_PROVIDER_FAILURE',null,30);
+  if v_result.status <> 'FAILED' then raise exception 'third failure must reach terminal FAILED state'; end if;
+  if (select count(*) from public.notification_delivery_attempts where notification_ref=v_doc_ref) <> 3 then
+    raise exception 'expected exactly three recorded delivery attempts';
+  end if;
+  if exists(select 1 from public.notification_outbox where status='SENT') then
+    raise exception 'mock provider falsely reported real delivery';
+  end if;
+end
+$delivery_test$;
+
+select 'PASS: consented events enqueue idempotently; worker claims are atomic, mock outcomes are not delivery, and retry exhaustion is recorded.' as result;
