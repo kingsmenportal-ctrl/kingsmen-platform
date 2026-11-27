@@ -114,7 +114,8 @@ Deno.serve(async (request: Request) => {
   }
   return reply(200, {
     ok: true, claimed: rows.length, sent, simulated, failed,
-    deliveryConfirmed: sent,
+    providerAccepted: sent,
+    deliveryConfirmed: 0,
     liveSendingEnabled: mode === "resend" && liveEnabled && Boolean(approvalRef && resendKey && from)
   });
 });
