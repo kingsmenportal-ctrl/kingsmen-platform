@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -10,7 +9,7 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const sourcePath = join(root, 'apps/api/src/finance/payfast-signature.ts');
 const source = readFileSync(sourcePath, 'utf8');
 const compiled = ts.transpileModule(source, {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true }
 }).outputText;
 const module = { exports: {} };
 const require = createRequire(import.meta.url);
