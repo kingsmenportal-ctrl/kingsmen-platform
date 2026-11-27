@@ -250,8 +250,6 @@ export default function CandidateApplicationDraftPage() {
       setSaveIdempotencyKey("");
       setApplication(old => old ? {
         ...old,
-        status: "DRAFT",
-        kingsmen_status: "Draft",
         readiness_status: "NOT_CHECKED",
         updated_at: body.updated_at ?? new Date().toISOString()
       } : old);
