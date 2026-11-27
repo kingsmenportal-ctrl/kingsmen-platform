@@ -1,0 +1,87 @@
+name: Kingsmen Phase 6 Route Workbench Contract
+
+on:
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "packages/backend/src/n06/**"
+      - "packages/contracts/src/n06-*.ts"
+      - "packages/db/src/n06*"
+      - "apps/web/src/app/candidate/workbench/**"
+      - "apps/web/src/app/api/candidate/workbench/**"
+      - "apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx"
+      - "scripts/proof/prove-n06-route-*.mjs"
+      - "scripts/validators/validate-n06-route-*.mjs"
+      - "scripts/staging/test-n06-*.mjs"
+      - "manifests/n06/**"
+      - "docs/n06/**"
+      - "reports/n06/**"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - ".github/workflows/kingsmen-phase6-workbench.yml"
+  push:
+    branches:
+      - "feat/phase6-route-application-workbench-2026-11-27"
+    paths:
+      - "packages/backend/src/n06/**"
+      - "packages/contracts/src/n06-*.ts"
+      - "packages/db/src/n06*"
+      - "apps/web/src/app/candidate/workbench/**"
+      - "apps/web/src/app/api/candidate/workbench/**"
+      - "apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx"
+      - "scripts/proof/prove-n06-route-*.mjs"
+      - "scripts/validators/validate-n06-route-*.mjs"
+      - "scripts/staging/test-n06-*.mjs"
+      - "manifests/n06/**"
+      - "docs/n06/**"
+      - "reports/n06/**"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - ".github/workflows/kingsmen-phase6-workbench.yml"
+
+jobs:
+  n06-proof-and-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install pinned repository dependencies
+        run: npm ci
+      - name: Run ordered N06 proof and validator chain
+        run: npm run n06:check
+      - name: Verify generated closeout matrix
+        run: |
+          node --input-type=module -e '
+          import fs from "node:fs";
+          const matrix = JSON.parse(fs.readFileSync("reports/n06/n06-closeout-evidence-matrix-latest.json", "utf8"));
+          if (matrix.allPassed !== true || matrix.productionReady !== false || matrix.handoverTo !== "N07-AIRTABLE-SYNC") {
+            console.error(JSON.stringify(matrix, null, 2));
+            process.exit(1);
+          }
+          if (!Array.isArray(matrix.rows) || matrix.rows.length !== 5 || matrix.rows.some(row => row.passed !== true || row.productionReady !== false)) process.exit(1);
+          console.log("N06 closeout matrix passed; production remains gated.");
+          '
+  workbench-web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install pinned web dependencies
+        run: npm ci --prefix apps/web
+      - name: Build the candidate workbench
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-project.supabase.test
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-only-not-a-real-anon-key
+        run: npm --prefix apps/web run build
