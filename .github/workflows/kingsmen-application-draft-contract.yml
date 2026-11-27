@@ -43,6 +43,9 @@ on:
       - apps/web/src/app/api/candidate/documents/read-url/route.ts
       - apps/web/src/app/api/candidate/documents/status/route.ts
       - apps/web/src/app/api/founder/documents/review/route.ts
+      - apps/web/src/app/api/founder/finance/route.ts
+      - apps/web/src/app/operator/finance/page.tsx
+      - scripts/staging/test-phase5-finance-operator-boundary.mjs
       - apps/web/src/app/api/founder/documents/review/download-url/route.ts
       - apps/web/src/app/operator/documents/page.tsx
       - apps/web/src/components/operator/DocumentReviewConsole.tsx
@@ -126,6 +129,9 @@ on:
       - apps/web/src/app/api/candidate/documents/read-url/route.ts
       - apps/web/src/app/api/candidate/documents/status/route.ts
       - apps/web/src/app/api/founder/documents/review/route.ts
+      - apps/web/src/app/api/founder/finance/route.ts
+      - apps/web/src/app/operator/finance/page.tsx
+      - scripts/staging/test-phase5-finance-operator-boundary.mjs
       - apps/web/src/app/api/founder/documents/review/download-url/route.ts
       - apps/web/src/app/operator/documents/page.tsx
       - apps/web/src/components/operator/DocumentReviewConsole.tsx
