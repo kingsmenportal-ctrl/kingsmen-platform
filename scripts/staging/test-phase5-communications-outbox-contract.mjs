@@ -15,5 +15,6 @@ assert.match(worker,/COMMUNICATIONS_PROVIDER_MODE.*mock/);
 assert.match(worker,/KINGSMEN_LIVE_MESSAGING_ENABLED.*true/);
 assert.match(worker,/x-kingsmen-worker-token/);
 assert.match(worker,/SERVICE_AUTH_REQUIRED/);
+assert.match(worker,/REQUEST_TOO_LARGE/);
 assert.match(worker,/liveSendExecuted: false/);
 console.log("PASS: document and verified-payment events enqueue idempotent, consent-gated notifications without claiming delivery.");

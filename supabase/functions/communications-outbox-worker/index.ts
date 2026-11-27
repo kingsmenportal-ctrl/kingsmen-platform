@@ -24,8 +24,16 @@ Deno.serve(async (request: Request) => {
   if ((request.headers.get("authorization") ?? "") !== "Bearer " + serviceKey) {
     return json(401, { ok: false, code: "SERVICE_AUTH_REQUIRED" });
   }
-  const body = await request.json().catch(() => null) as { limit?: unknown; mockOutcome?: unknown } | null;
-  if (!body || typeof body !== "object") return json(400, { ok: false, code: "INVALID_JSON" });
+  const declaredLength = request.headers.get("content-length");
+  if (declaredLength !== null && (!/^\\d+$/.test(declaredLength) || Number(declaredLength) > 1024)) {
+    return json(413, { ok: false, code: "REQUEST_TOO_LARGE" });
+  }
+  const rawBody = await request.text();
+  if (new TextEncoder().encode(rawBody).byteLength > 1024) return json(413, { ok: false, code: "REQUEST_TOO_LARGE" });
+  let body: { limit?: unknown; mockOutcome?: unknown } | null;
+  try { body = JSON.parse(rawBody) as { limit?: unknown; mockOutcome?: unknown }; }
+  catch { body = null; }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return json(400, { ok: false, code: "INVALID_JSON" });
   const limit = typeof body.limit === "number" && Number.isInteger(body.limit) ? Math.min(Math.max(body.limit, 1), 20) : 10;
   const mockOutcome = body.mockOutcome === "fail" ? "fail" : "simulate";
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });

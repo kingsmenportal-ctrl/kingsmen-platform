@@ -42,6 +42,18 @@ begin
   if (select count(*) from public.notification_delivery_attempts) <> 0 then
     raise exception 'event enqueue falsely created a delivery attempt';
   end if;
+
+  if (has_function_privilege('anon','public.claim_kingsmen_notification_outbox(integer)','EXECUTE')
+     or has_function_privilege('authenticated','public.claim_kingsmen_notification_outbox(integer)','EXECUTE')
+     or has_function_privilege('anon','public.record_kingsmen_notification_attempt(text,text,text,text,text,integer)','EXECUTE')
+     or has_function_privilege('authenticated','public.record_kingsmen_notification_attempt(text,text,text,text,text,integer)','EXECUTE')) then
+    raise exception 'client roles can execute internal notification worker RPCs';
+  end if;
+  if not has_function_privilege('service_role','public.claim_kingsmen_notification_outbox(integer)','EXECUTE')
+     or not has_function_privilege('service_role','public.record_kingsmen_notification_attempt(text,text,text,text,text,integer)','EXECUTE') then
+    raise exception 'service_role cannot execute notification worker RPCs';
+  end if;
+
 end
 $test$;
 
