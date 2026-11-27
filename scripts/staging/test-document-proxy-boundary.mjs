@@ -14,7 +14,7 @@ const routes = [
   "apps/web/src/components/operator/DocumentReviewConsole.tsx"
 ];
 const source = await Promise.all(routes.map((route) => readFile(path.join(root, route), "utf8")));
-assert.ok(helper.includes("Bearer\\\\s+"), "upstream proxy must require a bearer token");
+assert.ok(helper.includes("Bearer" + String.fromCharCode(92) + "s+"), "upstream proxy must require a bearer token");
 assert.ok(helper.includes("NEXT_PUBLIC_SUPABASE_ANON_KEY"), "proxy must use the public anon key only");
 assert.ok(helper.includes("/functions/v1/candidate-private-documents"), "proxy must call the existing private document runtime");
 assert.ok(helper.includes('cache: "no-store"'), "private responses must not be cached");
