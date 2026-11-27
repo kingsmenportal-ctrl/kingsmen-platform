@@ -256,6 +256,69 @@ insert into public.communication_templates(
    'A document status has changed in your Kingsmen vault. Sign in to review the status and next action.','DOCUMENT_REVIEW_UPDATE',array['DOCUMENT_REVIEW_UPDATE'],false,true,1)
 on conflict (template_key) do nothing;
 
+insert into public.communication_templates(
+  template_key,template_name,channel,subject_template,body_template,purpose,allowed_when,requires_human_review,is_active,version
+) values (
+  'application_status_update_v1','Application status update','EMAIL_PRIMARY','Your Kingsmen application status changed',
+  'Your Kingsmen application status changed. Sign in to review the application tracker and the next required action.',
+  'APPLICATION_STATUS_UPDATE',array['APPLICATION_STATUS_UPDATE'],false,true,1
+) on conflict (template_key) do nothing;
+
+create or replace function public.enqueue_application_status_notification()
+returns trigger language plpgsql security definer set search_path = ''
+as $function$
+declare v_email text; v_title text; v_body text; v_key text; v_created text;
+begin
+  if new.application_id is null or new.candidate_id is null or new.to_status is null
+     or new.to_status not in ('SUBMITTED','IN_REVIEW','NEEDS_INFORMATION','ACCEPTED','REJECTED','WITHDRAWN')
+     or new.from_status is not distinct from new.to_status then
+    return new;
+  end if;
+  v_title := case new.to_status
+    when 'SUBMITTED' then 'Application submitted'
+    when 'IN_REVIEW' then 'Application under review'
+    when 'NEEDS_INFORMATION' then 'Action required on your application'
+    when 'ACCEPTED' then 'Application decision updated'
+    when 'REJECTED' then 'Application decision updated'
+    when 'WITHDRAWN' then 'Application withdrawn'
+    else 'Application status updated' end;
+  v_body := 'Your Kingsmen application status changed to ' || replace(new.to_status,'_',' ') ||
+    '. Sign in to review the application tracker and the next required action.';
+  v_created := to_char(new.created_at at time zone 'UTC','YYYYMMDDHH24MISSMS');
+  v_key := 'application-status:' || new.application_id::text || ':' || new.to_status || ':' || v_created;
+  select ca.email into v_email from public.candidate_accounts ca
+    where ca.candidate_id=new.candidate_id and ca.email_verified is true limit 1;
+  insert into public.candidate_portal_messages(
+    portal_message_ref,candidate_ref,title,body,message_type,visible_to_candidate,evidence_ref
+  ) values ('portal-' || v_key,new.candidate_id::text,v_title,v_body,'APPLICATION_STATUS',true,
+    coalesce(new.evidence_ref,'application-event:' || new.application_id::text))
+    on conflict (portal_message_ref) do nothing;
+  if v_email is not null then
+    insert into public.notification_outbox(
+      notification_ref,candidate_ref,application_ref,template_key,channel,recipient,subject,body,purpose,urgency,status,
+      idempotency_key,scheduled_for,evidence_ref
+    ) values ('notif-' || v_key,new.candidate_id::text,new.application_id::text,'application_status_update_v1',
+      'EMAIL_PRIMARY',v_email,v_title,v_body,'APPLICATION_STATUS_UPDATE','NORMAL','QUEUED',v_key,
+      statement_timestamp(),coalesce(new.evidence_ref,'application-event:' || new.application_id::text))
+      on conflict (idempotency_key) do nothing;
+  end if;
+  return new;
+end;
+$function$;
+
+do $application_trigger$
+begin
+  if to_regclass('public.candidate_application_events') is null then
+    raise exception 'PHASE5_REQUIRES_candidate_application_events_SCHEMA_RECONCILIATION';
+  end if;
+  drop trigger if exists candidate_application_status_notify on public.candidate_application_events;
+  create trigger candidate_application_status_notify after insert on public.candidate_application_events
+    for each row execute function public.enqueue_application_status_notification();
+end;
+$application_trigger$;
+revoke all on function public.enqueue_application_status_notification() from public, anon, authenticated;
+grant execute on function public.enqueue_application_status_notification() to service_role;
+
 create or replace function public.enqueue_document_review_notification()
 returns trigger
 language plpgsql security definer
