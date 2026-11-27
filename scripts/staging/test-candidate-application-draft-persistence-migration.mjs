@@ -13,7 +13,7 @@ for (const token of [
   "private.current_verified_candidate_id()",
   "candidate_auth_identity_links",
   "link_status = 'VERIFIED'",
-  "pg_input_is_valid(l.verified_by, 'uuid')",
+  "length(btrim(l.verified_by)) between 1 and 200",
   "auth.uid()",
   "for update",
   "APPLICATION_DRAFT_VERSION_CONFLICT",
