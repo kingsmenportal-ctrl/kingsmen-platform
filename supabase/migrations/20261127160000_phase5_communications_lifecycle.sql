@@ -144,6 +144,79 @@ grant all on table public.finance_orders, public.finance_invoices, public.payfas
   public.finance_refund_requests, public.finance_ledger_entries, public.payment_evidence_ledger
 to service_role;
 
+insert into public.communication_templates(
+  template_key,template_name,channel,subject_template,body_template,purpose,allowed_when,requires_human_review,is_active,version
+) values
+  ('payment_verified_v1','Payment verified','EMAIL_PRIMARY','Kingsmen payment verified',
+   'Your Kingsmen payment has been verified. Sign in to review your plan status and next steps.','PAYMENT_VERIFIED',array['PAYMENT_VERIFIED'],false,true,1),
+  ('document_review_status_v1','Document review status','EMAIL_PRIMARY','Your Kingsmen document status changed',
+   'A document status has changed in your Kingsmen vault. Sign in to review the status and next action.','DOCUMENT_REVIEW_UPDATE',array['DOCUMENT_REVIEW_UPDATE'],false,true,1)
+on conflict (template_key) do nothing;
+
+create or replace function public.enqueue_document_review_notification()
+returns trigger
+language plpgsql security definer
+set search_path = ''
+as $function$
+declare
+  v_email text;
+  v_title text;
+  v_body text;
+  v_key text;
+  v_created text;
+begin
+  if new.from_status is not distinct from new.to_status
+     or new.to_status not in ('UNDER_REVIEW','VERIFIED','CORRECTION_REQUIRED','REJECTED') then
+    return new;
+  end if;
+  v_title := case new.to_status
+    when 'VERIFIED' then 'Document verified'
+    when 'CORRECTION_REQUIRED' then 'Document correction requested'
+    when 'REJECTED' then 'Document review rejected'
+    else 'Document under review' end;
+  v_body := case new.to_status
+    when 'VERIFIED' then 'A Kingsmen reviewer has verified a document in your vault. Sign in to view the updated status.'
+    when 'CORRECTION_REQUIRED' then 'A Kingsmen reviewer requested a correction. Sign in to read the next steps and upload corrected evidence.'
+    when 'REJECTED' then 'A Kingsmen reviewer rejected a document. Sign in to review the recorded reason and next steps.'
+    else 'A Kingsmen reviewer has started reviewing a document. Sign in to view its status.' end;
+  v_created := to_char(new.created_at at time zone 'UTC','YYYYMMDDHH24MISSMS');
+  v_key := 'document-review:' || new.document_id::text || ':' || new.to_status || ':' || v_created;
+  select ca.email into v_email from public.candidate_accounts ca
+    where ca.candidate_id=new.candidate_id and ca.email_verified is true limit 1;
+  insert into public.candidate_portal_messages(
+    portal_message_ref,candidate_ref,title,body,message_type,visible_to_candidate,evidence_ref
+  ) values (
+    'portal-' || v_key,new.candidate_id::text,v_title,v_body,'DOCUMENT_STATUS',true,'document-review:' || new.document_id::text
+  ) on conflict (portal_message_ref) do nothing;
+  if v_email is not null then
+    insert into public.notification_outbox(
+      notification_ref,candidate_ref,template_key,channel,recipient,subject,body,purpose,urgency,status,
+      idempotency_key,scheduled_for,evidence_ref
+    ) values (
+      'notif-' || v_key,new.candidate_id::text,'document_review_status_v1','EMAIL_PRIMARY',v_email,
+      v_title,v_body,'DOCUMENT_REVIEW_UPDATE','NORMAL','QUEUED',v_key,statement_timestamp(),
+      'document-review:' || new.document_id::text
+    ) on conflict (idempotency_key) do nothing;
+  end if;
+  return new;
+end;
+$function$;
+
+do $document_trigger$
+begin
+  if to_regclass('public.candidate_private_document_events') is null then
+    raise exception 'PHASE5_REQUIRES_candidate_private_document_events_SCHEMA_RECONCILIATION';
+  end if;
+  drop trigger if exists candidate_private_document_review_notify on public.candidate_private_document_events;
+  create trigger candidate_private_document_review_notify
+    after insert on public.candidate_private_document_events
+    for each row execute function public.enqueue_document_review_notification();
+end;
+$document_trigger$;
+
+revoke all on function public.enqueue_document_review_notification() from public, anon, authenticated;
+grant execute on function public.enqueue_document_review_notification() to service_role;
+
 create or replace function public.claim_notification_outbox(p_limit integer default 20)
 returns setof public.notification_outbox
 language plpgsql security definer
