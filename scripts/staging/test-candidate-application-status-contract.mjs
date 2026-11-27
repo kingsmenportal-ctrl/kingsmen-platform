@@ -91,6 +91,8 @@ assert.match(page, /body\.is_editable === true/);
 assert.match(page, /isCandidateEditableApplicationStatus\(application\.kingsmen_status\)/);
 assert.doesNotMatch(page, /status:\s*"DRAFT"/,
   "A draft save in the client must not rewrite the internal workflow state.");
+assert.doesNotMatch(page, /kingsmen_status:\s*"Draft"/,
+  "A draft save must preserve the server-confirmed candidate-facing lifecycle status.");
 const applicationSelect = service.match(
   /admin\.from\(["']candidate_applications["']\)\s*\.select\(["']([^"']+)["']\)/
 );
