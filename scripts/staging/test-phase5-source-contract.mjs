@@ -46,7 +46,7 @@ assert.match(financeUi, /verified === true/);
 assert.match(messagesUi, /update_candidate_communication_preferences/);
 assert.match(messagesUi, /transactional_email_enabled/);
 assert.match(documentUi, /request_deletion/);
-assert.match(documentUi, /platform administrator must review it/);
+assert.match(documentUi, /setNotice\(result\.message/);
 assert.match(webhook, /verifySvix/);
 assert.match(webhook, /email\.bounced/);
 assert.match(webhook, /email\.delivered/);
