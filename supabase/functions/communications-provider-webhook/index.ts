@@ -44,8 +44,35 @@ Deno.serve(async (request: Request) => {
   const signature = request.headers.get("svix-signature") ?? "";
   if (!secret || !id || !timestamp || !signature) return reply(401, { ok: false, code: "WEBHOOK_AUTH_REQUIRED" });
 
-  const rawBody = await request.text();
-  if (rawBody.length > 64 * 1024) return reply(413, { ok: false, code: "WEBHOOK_TOO_LARGE" });
+  // Bound the streamed byte count before buffering/decoding; character length is not a byte limit.
+  const maxBodyBytes = 64 * 1024;
+  const reader = request.body?.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  if (reader) {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBodyBytes) {
+        await reader.cancel();
+        return reply(413, { ok: false, code: "WEBHOOK_TOO_LARGE" });
+      }
+      chunks.push(value);
+    }
+  }
+  const bodyBytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bodyBytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  let rawBody: string;
+  try {
+    rawBody = new TextDecoder("utf-8", { fatal: true }).decode(bodyBytes);
+  } catch {
+    return reply(400, { ok: false, code: "INVALID_WEBHOOK_ENCODING" });
+  }
   let valid = false;
   try { valid = await verifySvix(rawBody, id, timestamp, signature, secret); } catch { valid = false; }
   if (!valid) return reply(401, { ok: false, code: "WEBHOOK_SIGNATURE_INVALID" });
