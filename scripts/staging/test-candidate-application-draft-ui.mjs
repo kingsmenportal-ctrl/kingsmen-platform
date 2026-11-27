@@ -41,7 +41,8 @@ function createState(id, status, kingsmenStatus, version, motivation) {
       additional_answers: []
     },
     version,
-    updatedAt: timestamp
+    updatedAt: timestamp,
+    handoff: null
   };
 }
 
@@ -51,6 +52,7 @@ const states = new Map([
 ]);
 const providerRequests = [];
 const savedRequests = [];
+const handoffRequests = [];
 
 const server = spawn(process.execPath, [
   path.resolve(webDirectory, "node_modules/next/dist/bin/next"),
@@ -104,6 +106,27 @@ try {
   await page.route("**/functions/v1/**", async route => {
     providerRequests.push(route.request().url());
     await route.abort();
+  });
+  await page.route("**/api/candidate/application-handoff", async route => {
+    const incoming = route.request().postDataJSON();
+    handoffRequests.push(incoming);
+    const state = states.get(incoming.application_id);
+    if (!state || incoming.application_id !== appA || state.version < 1) {
+      await route.fulfill({ status: 409, json: { ready: true, ok: false, code: "APPLICATION_DRAFT_REQUIRED" } });
+      return;
+    }
+    state.handoff = {
+      submission_ref: "KM-SUB-CI1234567890",
+      job_status: "MANUAL_REQUIRED",
+      delivery_mode: "EXTERNAL_PORTAL",
+      provider_name: "CI fixture provider",
+      official_url: "https://provider.example/apply",
+      provider_submission_sent: false,
+      next_steps: ["Complete the provider portal.", "Upload the provider receipt for authorised review."]
+    };
+    state.application.status = "MANUAL_ACTION_REQUIRED";
+    state.application.kingsmen_status = "Action required";
+    await route.fulfill({ status: 200, json: { ready: true, ok: true, ...state.handoff } });
   });
   await page.route("**/api/candidate/application-draft**", async route => {
     const request = route.request();
@@ -167,7 +190,8 @@ try {
         shared_profile_updated_at: timestamp,
         is_editable: ["Draft", "Action required"].includes(state.application.kingsmen_status)
           && ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(state.application.status),
-        provider_submission_sent: false
+        provider_submission_sent: false,
+        handoff: state.handoff
       }
     });
   });
@@ -213,18 +237,42 @@ try {
   });
   assert.equal(await page.getByText("Draft version 2", { exact: true }).count(), 1);
 
+  // The last candidate-side action is a manual, idempotent portal handoff.
+  // It is not an external provider submission.
+  await page.getByRole("button", { name: "Prepare official portal handoff" }).click();
+  await page.getByRole("heading", { name: "Complete the provider's official process" }).waitFor();
+  assert.equal(handoffRequests.length, 1);
+  assert.equal(handoffRequests[0].application_id, appA);
+  const portalLink = page.getByRole("link", { name: "Open official provider portal ↗" });
+  assert.equal(await portalLink.getAttribute("href"), "https://provider.example/apply");
+  const receiptLink = page.getByRole("link", { name: "Upload provider receipt to this application" });
+  const receiptHref = await receiptLink.getAttribute("href");
+  assert.ok(receiptHref?.includes("application_id=" + appA));
+  assert.ok(receiptHref?.includes("evidence_purpose=PROVIDER_SUBMISSION_RECEIPT"));
+  assert.equal(states.get(appA).application.status, "MANUAL_ACTION_REQUIRED");
+  assert.equal(states.get(appA).handoff.provider_submission_sent, false);
+
+  // Reload restores the persisted handoff and its application-linked receipt route.
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: "Complete the provider's official process" }).waitFor();
+  assert.equal(await page.getByRole("link", { name: "Open official provider portal ↗" }).getAttribute("href"),
+    "https://provider.example/apply");
+  assert.equal(await page.getByRole("button", { name: "Prepare official portal handoff" }).count(), 0);
+
   // A submission-state application is read-only in the candidate editor.
   await page.goto(baseUrl + "/candidate/applications/" + appB, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Application draft" }).waitFor();
   await page.getByText("This application is in a Kingsmen status that does not allow candidate editing. The answer form is read-only.").waitFor();
   await page.getByText("Submitted to Kingsmen", { exact: true }).waitFor();
   assert.equal(await page.getByRole("button", { name: "Save application draft" }).isDisabled(), true);
+  assert.equal(await page.getByRole("button", { name: "Prepare official portal handoff" }).count(), 0);
   assert.equal(savedRequests.length, 1, "locked application must not send a save request");
   assert.deepEqual(providerRequests, [], "draft UI must not make a provider-submission request");
 
   console.log("PASS: browser loads, saves, reloads and locks candidate application drafts");
   console.log("PASS: candidate-facing statuses remain separate from internal workflow/readiness states");
   console.log("PASS: save uses parent application id, expected version and idempotency key");
+  console.log("PASS: manual portal handoff is persisted, idempotent in state, and links provider receipt to its parent application");
   console.log("PASS: no provider-submission endpoint was called");
 } finally {
   if (browser) await browser.close().catch(() => {});
