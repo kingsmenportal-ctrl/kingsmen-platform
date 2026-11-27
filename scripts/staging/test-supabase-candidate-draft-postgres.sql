@@ -128,7 +128,7 @@ BEGIN
 
   v_result := public.save_candidate_application_draft(
     'ffffffff-ffff-4fff-8fff-fffffffffff1',
-    '{"motivation_statement":"First draft","availability_date":"","additional_answers":[{"question_key":"q1","answer":"Example"}]}'::jsonb,
+    '{"motivation_statement":"First draft","availability_date":"2026-12-01","additional_answers":[{"question_key":"q1","answer":"Example"}]}'::jsonb,
     0,'draft-key-A-001'
   );
   IF v_result->>'reused' IS DISTINCT FROM 'true'
@@ -157,7 +157,7 @@ BEGIN
 
   v_result := public.save_candidate_application_draft(
     'ffffffff-ffff-4fff-8fff-fffffffffff1',
-    '{"motivation_statement":"Version 2","qualifications_summary":"Updated"}'::jsonb,
+    '{"motivation_statement":"Version 2","qualifications_summary":"Updated","availability_date":""}'::jsonb,
     1,'draft-key-A-003'
   );
   IF v_result->>'ok' IS DISTINCT FROM 'true'
