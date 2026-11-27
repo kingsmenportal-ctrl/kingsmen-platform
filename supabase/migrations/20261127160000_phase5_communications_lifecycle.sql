@@ -50,6 +50,18 @@ alter table public.notification_provider_events enable row level security;
 revoke all on public.notification_provider_events from public, anon, authenticated;
 grant all on public.notification_provider_events to service_role;
 
+create table if not exists public.communication_preference_events (
+  event_ref text primary key,
+  candidate_ref text not null,
+  actor_auth_user_id uuid not null,
+  old_preferences jsonb not null check (jsonb_typeof(old_preferences)='object'),
+  new_preferences jsonb not null check (jsonb_typeof(new_preferences)='object'),
+  created_at timestamptz not null default now()
+);
+alter table public.communication_preference_events enable row level security;
+revoke all on public.communication_preference_events from public, anon, authenticated;
+grant all on public.communication_preference_events to service_role;
+
 create index if not exists notification_outbox_retry_idx
   on public.notification_outbox(status, next_attempt_at, created_at)
   where status in ('QUEUED','FAILED');
@@ -228,6 +240,78 @@ $document_trigger$;
 
 revoke all on function public.enqueue_document_review_notification() from public, anon, authenticated;
 grant execute on function public.enqueue_document_review_notification() to service_role;
+
+create or replace function public.get_candidate_communication_preferences()
+returns jsonb language plpgsql security definer set search_path = ''
+as $function$
+declare v_uid uuid:=auth.uid(); v_candidate uuid; v_count integer; v_preferences public.candidate_communication_preferences%rowtype;
+begin
+  if v_uid is null then raise insufficient_privilege using message='AUTHENTICATION_REQUIRED'; end if;
+  select count(*),(array_agg(l.candidate_id order by l.id))[1] into v_count,v_candidate
+  from public.candidate_auth_identity_links l join public.candidates c on c.id=l.candidate_id and c.is_active is true
+  where l.supabase_user_id=v_uid and l.link_status='VERIFIED' and l.verified_at is not null
+    and l.verified_at<=statement_timestamp() and l.verified_by is not null;
+  if v_count<>1 or v_candidate is null then raise insufficient_privilege using message='VERIFIED_CANDIDATE_IDENTITY_REQUIRED'; end if;
+  select * into v_preferences from public.candidate_communication_preferences where candidate_ref=v_candidate::text;
+  if not found then return jsonb_build_object('transactional_email_enabled',true,'marketing_email_enabled',false,
+    'sms_fallback_enabled',false,'whatsapp_urgent_enabled',false,'suppressed_at',null,'suppression_reason',null); end if;
+  return jsonb_build_object('transactional_email_enabled',v_preferences.transactional_email_enabled,
+    'marketing_email_enabled',v_preferences.marketing_email_enabled,'sms_fallback_enabled',v_preferences.sms_fallback_enabled,
+    'whatsapp_urgent_enabled',v_preferences.whatsapp_urgent_enabled,'suppressed_at',v_preferences.suppressed_at,
+    'suppression_reason',v_preferences.suppression_reason);
+end;
+$function$;
+
+create or replace function public.update_candidate_communication_preferences(
+  p_transactional_email_enabled boolean, p_marketing_email_enabled boolean,
+  p_sms_fallback_enabled boolean, p_whatsapp_urgent_enabled boolean
+) returns jsonb language plpgsql security definer set search_path = ''
+as $function$
+declare
+  v_uid uuid:=auth.uid(); v_candidate uuid; v_count integer;
+  v_old jsonb; v_new jsonb; v_saved public.candidate_communication_preferences%rowtype;
+  v_event_ref text:='comm-pref-' || replace(gen_random_uuid()::text,'-','');
+begin
+  if v_uid is null then raise insufficient_privilege using message='AUTHENTICATION_REQUIRED'; end if;
+  if p_transactional_email_enabled is null or p_marketing_email_enabled is null or
+     p_sms_fallback_enabled is null or p_whatsapp_urgent_enabled is null then
+    raise exception 'ALL_COMMUNICATION_PREFERENCES_REQUIRED' using errcode='22023';
+  end if;
+  select count(*),(array_agg(l.candidate_id order by l.id))[1] into v_count,v_candidate
+  from public.candidate_auth_identity_links l join public.candidates c on c.id=l.candidate_id and c.is_active is true
+  where l.supabase_user_id=v_uid and l.link_status='VERIFIED' and l.verified_at is not null
+    and l.verified_at<=statement_timestamp() and l.verified_by is not null;
+  if v_count<>1 or v_candidate is null then raise insufficient_privilege using message='VERIFIED_CANDIDATE_IDENTITY_REQUIRED'; end if;
+  select to_jsonb(p) into v_old from public.candidate_communication_preferences p where p.candidate_ref=v_candidate::text for update;
+  v_old:=coalesce(v_old,jsonb_build_object('transactional_email_enabled',true,'marketing_email_enabled',false,
+    'sms_fallback_enabled',false,'whatsapp_urgent_enabled',false,'suppressed_at',null,'suppression_reason',null));
+  if p_transactional_email_enabled is true and v_old->>'suppressed_at' is not null then
+    raise exception 'EMAIL_PROVIDER_SUPPRESSED' using errcode='55000';
+  end if;
+  insert into public.candidate_communication_preferences(
+    candidate_ref,transactional_email_enabled,marketing_email_enabled,sms_fallback_enabled,whatsapp_urgent_enabled,
+    consent_source,consent_updated_at,updated_at
+  ) values (v_candidate::text,p_transactional_email_enabled,p_marketing_email_enabled,p_sms_fallback_enabled,
+    p_whatsapp_urgent_enabled,'USER_PREFERENCE',statement_timestamp(),statement_timestamp())
+  on conflict(candidate_ref) do update set
+    transactional_email_enabled=excluded.transactional_email_enabled,marketing_email_enabled=excluded.marketing_email_enabled,
+    sms_fallback_enabled=excluded.sms_fallback_enabled,whatsapp_urgent_enabled=excluded.whatsapp_urgent_enabled,
+    consent_source='USER_PREFERENCE',consent_updated_at=statement_timestamp(),updated_at=statement_timestamp()
+  returning * into v_saved;
+  v_new:=jsonb_build_object('transactional_email_enabled',v_saved.transactional_email_enabled,
+    'marketing_email_enabled',v_saved.marketing_email_enabled,'sms_fallback_enabled',v_saved.sms_fallback_enabled,
+    'whatsapp_urgent_enabled',v_saved.whatsapp_urgent_enabled,'suppressed_at',v_saved.suppressed_at,
+    'suppression_reason',v_saved.suppression_reason);
+  insert into public.communication_preference_events(event_ref,candidate_ref,actor_auth_user_id,old_preferences,new_preferences)
+    values(v_event_ref,v_candidate::text,v_uid,v_old,v_new);
+  return jsonb_build_object('ok',true,'preferences',v_new,'event_ref',v_event_ref);
+end;
+$function$;
+
+revoke all on function public.get_candidate_communication_preferences() from public, anon;
+grant execute on function public.get_candidate_communication_preferences() to authenticated;
+revoke all on function public.update_candidate_communication_preferences(boolean,boolean,boolean,boolean) from public, anon;
+grant execute on function public.update_candidate_communication_preferences(boolean,boolean,boolean,boolean) to authenticated;
 
 create or replace function public.claim_notification_outbox(p_limit integer default 20)
 returns setof public.notification_outbox
