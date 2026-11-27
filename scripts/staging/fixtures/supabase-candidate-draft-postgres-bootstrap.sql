@@ -10,6 +10,8 @@ $roles$;
 
 CREATE SCHEMA auth;
 CREATE SCHEMA kingsmen_security;
+CREATE SCHEMA private;
+GRANT USAGE ON SCHEMA private TO authenticated, service_role;
 
 CREATE TABLE auth.users (id uuid PRIMARY KEY);
 CREATE OR REPLACE FUNCTION auth.uid()
@@ -37,6 +39,30 @@ CREATE TABLE public.candidate_accounts (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE TABLE public.candidate_auth_identity_links (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  supabase_user_id uuid NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+  candidate_id uuid NOT NULL UNIQUE REFERENCES public.candidates(id) ON DELETE CASCADE,
+  link_status text NOT NULL CHECK (link_status IN ('PENDING','VERIFIED','REVOKED')),
+  verified_at timestamptz,
+  verified_by text,
+  CHECK (link_status <> 'VERIFIED' OR (verified_at IS NOT NULL AND verified_by IS NOT NULL))
+);
+
+CREATE OR REPLACE FUNCTION private.current_verified_candidate_id()
+RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path TO ''
+AS $function$
+  SELECT l.candidate_id
+  FROM public.candidate_auth_identity_links l
+  WHERE l.supabase_user_id = auth.uid()
+    AND l.link_status = 'VERIFIED'
+    AND l.verified_at IS NOT NULL
+  LIMIT 1
+$function$;
+REVOKE ALL ON FUNCTION private.current_verified_candidate_id() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION private.current_verified_candidate_id() TO authenticated, service_role;
 
 CREATE OR REPLACE FUNCTION kingsmen_security.current_authenticated_candidate_id()
 RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER
