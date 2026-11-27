@@ -73,7 +73,7 @@ Deno.serve(async (request: Request) => {
       try {
         const response = await fetch("https://api.resend.com/emails", {
           method: "POST",
-          headers: { authorization: "Bearer " + resendKey, "content-type": "application/json" },
+          headers: { authorization: "Bearer " + resendKey, "content-type": "application/json", "Idempotency-Key": row.notification_ref },
           body: JSON.stringify({ from, to: [row.recipient], subject: row.subject, text: row.body }),
           signal: AbortSignal.timeout(10000)
         });
