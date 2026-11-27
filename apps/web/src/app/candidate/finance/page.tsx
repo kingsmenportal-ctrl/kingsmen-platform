@@ -1,3 +1,5 @@
+import CandidateFinanceStatus from "@/components/candidate/CandidateFinanceStatus";
+
 const plans = [
   { id: "foundational_accord", name: "Foundational Accord", price: "R169.99", applications: "5", capacity: "4", note: "Includes 8 accommodation routes." },
   { id: "collegiate_ordinance", name: "Collegiate Ordinance", price: "R299.99", applications: "10", capacity: "8", note: "Expanded service capacity." },
@@ -36,6 +38,7 @@ export default function CandidateFinancePage() {
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <CandidateFinanceStatus />
         <div className="mb-5"><h2 className="text-2xl font-extrabold tracking-tight">Canonical products</h2><p className="mt-2 text-sm leading-6 text-slate-600">Priority application allowance and concurrent managed-route capacity are separate entitlements. All six pathways remain available for discovery on every plan.</p></div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {plans.map((plan) => (
