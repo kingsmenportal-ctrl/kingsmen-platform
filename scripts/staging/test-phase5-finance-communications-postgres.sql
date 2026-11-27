@@ -181,6 +181,32 @@ BEGIN
     RAISE EXCEPTION 'provider bounce did not update delivery state and suppress further transactional email';
   END IF;
 
+  -- Same provider event is idempotent; reusing its ID with a different event is rejected.
+  v_summary := public.record_notification_provider_event(
+    'svix-event-001','resend_msg_001','BOUNCED',
+    '{"provider":"RESEND","event_type":"email.bounced"}'::jsonb
+  );
+  IF v_summary->>'duplicate' IS DISTINCT FROM 'true' THEN
+    RAISE EXCEPTION 'provider event replay was not identified as duplicate: %',v_summary;
+  END IF;
+  v_bad := false;
+  BEGIN
+    PERFORM public.record_notification_provider_event(
+      'svix-event-001','resend_msg_001','DELIVERED',
+      '{"provider":"RESEND","event_type":"email.delivered"}'::jsonb
+    );
+  EXCEPTION WHEN SQLSTATE '22023' THEN v_bad := true;
+  END;
+  IF NOT v_bad THEN RAISE EXCEPTION 'provider event ID reuse with altered type was accepted'; END IF;
+  PERFORM public.record_notification_provider_event(
+    'svix-event-002','resend_msg_001','DELIVERED',
+    '{"provider":"RESEND","event_type":"email.delivered"}'::jsonb
+  );
+  IF (SELECT provider_delivery_status FROM public.notification_outbox WHERE notification_ref='notif-bounce-001') <> 'BOUNCED'
+     OR (SELECT transactional_email_enabled FROM public.candidate_communication_preferences WHERE candidate_ref='candidate-bounce') IS NOT FALSE THEN
+    RAISE EXCEPTION 'later delivery event incorrectly downgraded a bounce or lifted suppression';
+  END IF;
+
   INSERT INTO public.candidate_application_events(application_id,candidate_id,event_type,from_status,to_status,evidence_ref)
   VALUES ('88888888-8888-4888-8888-888888888888','11111111-1111-4111-8111-111111111111','APPLICATION_STATUS_CHANGED','DRAFT','SUBMITTED','application-event-fixture-001');
   IF NOT EXISTS (SELECT 1 FROM public.candidate_portal_messages WHERE candidate_ref='11111111-1111-4111-8111-111111111111' AND message_type='APPLICATION_STATUS')
