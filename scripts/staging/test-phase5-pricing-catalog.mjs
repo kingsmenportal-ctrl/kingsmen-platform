@@ -18,8 +18,15 @@ for (const [code, name, cents] of plans) {
   assert.ok(types.includes('"' + code + '"'), "finance type missing " + code);
   assert.ok(catalog.includes('planCode: "' + code + '"'), "finance catalog missing " + code);
   assert.ok(catalog.includes("amountCents: " + cents), "finance catalog missing price cents for " + code);
-  assert.ok(packages.includes('planCode: "' + code + '"'), "package UI missing " + code);
-  if (cents > 0) assert.ok(packages.includes('price: "R' + (cents / 100).toFixed(2) + '"'), "package UI price mismatch for " + code);
+  if (code === "FREE_DESTINY_MAP_R0") {
+    assert.ok(packages.includes("Free Destiny Map"), "free map entry point must remain visible");
+  } else if (code === "CV_REVAMP_R49_99") {
+    assert.ok(packages.includes('planCode="CV_REVAMP_R49_99"'), "standalone CV Revamp checkout is missing");
+    assert.ok(packages.includes("CV Revamp — R49.99"), "CV Revamp displayed price mismatch");
+  } else {
+    assert.ok(packages.includes('planCode: "' + code + '"'), "package UI missing " + code);
+    assert.ok(packages.includes('price: "R' + (cents / 100).toFixed(2) + '"'), "package UI price mismatch for " + code);
+  }
 }
 assert.ok(catalog.includes("accommodationRouteCount: 8"), "Foundational Accord must include eight accommodation routes");
 assert.ok(!types.includes("ACCOMMODATION_SUPPORT_R179"), "obsolete plan code must not remain in the canonical type union");
