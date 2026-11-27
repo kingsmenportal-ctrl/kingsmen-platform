@@ -87,6 +87,11 @@ begin
   if not found or v_plan.amount_cents <= 0 or v_plan.currency is distinct from 'ZAR' then
     raise exception 'ACTIVE_ZAR_PLAN_REQUIRED' using errcode = '22023';
   end if;
+  if p_signed_payload->>'m_payment_id' is distinct from p_order_ref
+     or p_signed_payload->>'amount' is distinct from to_char(v_plan.amount_cents::numeric / 100, 'FM999999990.00')
+     or p_signed_payload->>'item_name' is distinct from left(v_plan.plan_name,100) then
+    raise exception 'PLAN_PRICE_OR_SIGNED_PAYLOAD_CHANGED' using errcode = '22023';
+  end if;
 
   v_safe_payload := p_signed_payload - 'merchant_key' - 'signature' - 'passphrase';
   insert into public.finance_orders (
@@ -202,7 +207,11 @@ begin
   if found then
     if v_existing.merchant_reference is distinct from p_merchant_reference
        or v_existing.order_ref is distinct from v_intent.order_ref
+       or v_existing.candidate_ref is distinct from p_candidate_ref
        or v_existing.amount_gross_cents <> p_amount_gross_cents
+       or v_existing.amount_fee_cents <> p_amount_fee_cents
+       or v_existing.amount_net_cents <> p_amount_net_cents
+       or v_existing.currency is distinct from 'ZAR'
        or v_existing.payment_status is distinct from 'COMPLETE'
        or v_existing.verified is not true then
       raise exception 'CONFLICTING_DUPLICATE_PAYFAST_PAYMENT' using errcode = '23505';
